@@ -3,7 +3,10 @@ import {
   NEXT_SLIDER_IMAGE,
   FETCH_SLIDER_IMAGES_START,
   FETCH_SLIDER_IMAGES_SUCCESS,
-  FETCH_SLIDER_IMAGES_FAILURE
+  FETCH_SLIDER_IMAGES_FAILURE,
+  LOGIN_INPUT_CHANGED,
+  PASSWORD_INPUT_CHANGED,
+  TOGGLE_PASSWORD_VISIBILITY
 } from './signin.constants';
 
 export const setIsPending = (isPending: boolean) => ({
@@ -41,4 +44,18 @@ export const fetchImagesFailure = (error: Error) => ({
 
 export const nextImage = () => ({
   type: NEXT_SLIDER_IMAGE,
+});
+
+export const changeLoginInput = (login: string) => ({
+  type: LOGIN_INPUT_CHANGED,
+  payload: login
+});
+
+export const changePasswordInput = (password: string) => ({
+  type: PASSWORD_INPUT_CHANGED,
+  payload: password
+});
+
+export const togglePasswordVisibility = () => ({
+  type: TOGGLE_PASSWORD_VISIBILITY,
 });

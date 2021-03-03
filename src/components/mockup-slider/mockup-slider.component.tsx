@@ -36,6 +36,7 @@ const MockupSlider = () => {
             const isVisible: boolean = index === currentImageId || isPrevious;
             return (
               <SliderImage
+                key={index}
                 imageUrl={imageUrl}
                 visible={isVisible}
                 previous={isPrevious}
