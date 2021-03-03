@@ -1,4 +1,4 @@
-import { Center, Flex, Box, Text } from '@chakra-ui/react';
+import { Center, Flex, Box, Text, useMediaQuery } from '@chakra-ui/react';
 import { useSelector } from 'react-redux';
 import { State } from '../../redux/store';
 import MockupSlider from '../../components/mockup-slider/mockup-slider.component';
@@ -8,16 +8,21 @@ import DownloadApp from '../../components/download-app/download-app.component';
 import LoadingScreen from '../../components/loading-screen/loading-screen.component';
 
 const SignIn = () => {
-  const isPending: boolean = useSelector((state: State) => state.signIn.isPending);
+  const isImagesPending: boolean = useSelector((state: State) => state.signIn.isImagesPending);
+  const [isLessThan825] = useMediaQuery("(max-width: 825px)");
   return (
     <>
       <Center
-        w="100vw"
+        w="100%"
         h="100vh"
         bgColor="#fafafa"
       >
         <Flex h="90%">
-          <MockupSlider />
+          {
+            isLessThan825
+              ? <></>
+              : <MockupSlider />
+          }
           <Box h="100%" mt="2rem">
             <SignInCard />
             <SignUpRefCard />
@@ -26,14 +31,14 @@ const SignIn = () => {
               textAlign="center"
               fontSize="sm"
               position="relative"
-              left="-2rem"
+              left={isLessThan825 ? "0" : "-2rem"}
             >Get the app.</Text>
             <DownloadApp />
           </Box>
         </Flex>
       </Center>
       {
-        isPending ? <LoadingScreen /> : <></>
+        isImagesPending ? <LoadingScreen /> : <></>
       }
     </>
   );

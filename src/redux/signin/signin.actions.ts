@@ -6,8 +6,12 @@ import {
   FETCH_SLIDER_IMAGES_FAILURE,
   LOGIN_INPUT_CHANGED,
   PASSWORD_INPUT_CHANGED,
-  TOGGLE_PASSWORD_VISIBILITY
+  TOGGLE_PASSWORD_VISIBILITY,
+  SIGN_IN_START,
+  SIGN_IN_SUCCESS,
+  SIGN_IN_FAILURE
 } from './signin.constants';
+import { IUser } from './signin.interfaces';
 
 export const setIsPending = (isPending: boolean) => ({
   type: SET_IS_PENDING,
@@ -58,4 +62,31 @@ export const changePasswordInput = (password: string) => ({
 
 export const togglePasswordVisibility = () => ({
   type: TOGGLE_PASSWORD_VISIBILITY,
+});
+
+export const signIn = (login: string, password: string) => async (dispatch: Function) => {
+  dispatch(signInStart());
+  try {
+    dispatch(signInSuccess({
+      id: '1',
+      username: 'lustervolt',
+      avatar: 'https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=1c2owR3dgXUAX_0kT91&oh=aac7576ef58864f678d25d50f9b3d691&oe=60685A28'
+    }));
+  } catch (error) {
+    dispatch(signInFailure(error));
+  }
+}
+
+export const signInStart = () => ({
+  type: SIGN_IN_START,
+});
+
+export const signInSuccess = (user: IUser) => ({
+  type: SIGN_IN_SUCCESS,
+  payload: user
+});
+
+export const signInFailure = (error: Error) => ({
+  type: SIGN_IN_FAILURE,
+  payload: error.message
 });

@@ -13,3 +13,9 @@ export const LOGIN_INPUT_CHANGED: string = 'LOGIN_INPUT_CHANGED';
 export const PASSWORD_INPUT_CHANGED: string = 'PASSWORD_INPUT_CHANGED';
 
 export const TOGGLE_PASSWORD_VISIBILITY: string = 'TOGGLE_PASSWORD_VISIBILITY';
+
+export const SIGN_IN_START: string = 'SIGN_IN_START';
+
+export const SIGN_IN_SUCCESS: string = 'SIGN_IN_SUCCESS';
+
+export const SIGN_IN_FAILURE: string = 'SIGN_IN_FAILURE';

@@ -1,11 +1,12 @@
-import { Flex, Image } from '@chakra-ui/react';
+import { Flex, Image, useMediaQuery } from '@chakra-ui/react';
 
 const DownloadApp = () => {
+  const [isLessThan825] = useMediaQuery("(max-width: 825px)");
   return (
     <Flex
       mt="1rem"
       position="relative"
-      left="-2rem"
+      left={isLessThan825 ? "0" : "-2rem"}
       align="center"
       justify="Center"
     >

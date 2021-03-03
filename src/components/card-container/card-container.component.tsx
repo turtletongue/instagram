@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Flex } from '@chakra-ui/react';
+import { Flex, useMediaQuery } from '@chakra-ui/react';
 
 interface CardContainerProps {
   children: React.ReactNode;
@@ -7,17 +7,18 @@ interface CardContainerProps {
 }
 
 const CardContainer = ({ children, ...otherProps }: CardContainerProps) => {
+  const [isLessThan825] = useMediaQuery("(max-width: 825px)");
   return (
     <Flex
       direction="column"
       align="center"
-      minW="22rem"
+      minW={isLessThan825 ? "19rem" : "22rem"}
       bgColor="white"
       borderWidth="1px"
       p="1rem"
       zIndex="1"
       position="relative"
-      left="-2rem"
+      left={isLessThan825 ? "0" : "-2rem"}
       {...otherProps}
   >{ children }</Flex>
   );

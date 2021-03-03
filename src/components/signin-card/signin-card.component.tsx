@@ -1,3 +1,5 @@
+import * as React from 'react';
+import { useEffect } from 'react';
 import {
   Flex,
   Box,
@@ -8,29 +10,48 @@ import {
   InputRightElement,
   Button,
   Divider,
-  Icon
+  Icon,
+  Spinner
 } from '@chakra-ui/react';
 import { AiFillFacebook } from 'react-icons/ai';
 import { useSelector, useDispatch } from 'react-redux';
 import CardContainer from '../card-container/card-container.component';
+import Logo from '../logo/logo.component';
 import { State } from '../../redux/store';
-import { changeLoginInput, changePasswordInput, togglePasswordVisibility } from '../../redux/signin/signin.actions';
+import { changeLoginInput, changePasswordInput, togglePasswordVisibility, signIn } from '../../redux/signin/signin.actions';
 import { MIN_PASSWORD_LENGTH } from '../../constants';
 
 const SignInCard = () => {
   const dispatch = useDispatch();
-  const login = useSelector((state: State) => state.signIn.login);
-  const password = useSelector((state: State) => state.signIn.password);
-  const isPasswordVisible = useSelector((state: State) => state.signIn.isPasswordVisible);
+  const login: string = useSelector((state: State) => state.signIn.login);
+  const password: string = useSelector((state: State) => state.signIn.password);
+  const isPasswordVisible: boolean = useSelector((state: State) => state.signIn.isPasswordVisible);
+  const isSignInPending: boolean = useSelector((state: State) => state.signIn.isSignInPending);
+  const isFormDataValid: boolean = (login && password.length) >= MIN_PASSWORD_LENGTH;
+
+  const submitHandler = (event: React.MouseEvent) => {
+    event.preventDefault();
+    if (!isFormDataValid) return;
+    dispatch(signIn('lustervolt', '12345'));
+  }
+
+  useEffect(() => {
+    const listener: EventListener = (event: any) => {
+      if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+        if (!isFormDataValid) return;
+        dispatch(signIn('lustervolt', '12345'));
+      }
+    }
+
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+  }, [dispatch, isFormDataValid]);
+
   return (
     <CardContainer>
-      <Text
-        userSelect="none"
-        fontSize="5xl"
-        textAlign="center"
-        fontFamily="Grand Hotel"
-        color="#262626"
-      >Instagram</Text>
+      <Logo fontSize="5xl" />
       <Box w="85%" mt="1.5rem">
         <FormControl id="login">
           <Input
@@ -96,16 +117,19 @@ const SignInCard = () => {
           </InputGroup>
         </FormControl>
         <Button
+          type="submit"
+          cursor={isFormDataValid ? "pointer" : "default"}
+          onClick={(event: React.MouseEvent) => submitHandler(event)}
           borderRadius="3px"
           mt="1rem"
           h="2rem"
           w="100%"
-          bgColor={login && password.length >= MIN_PASSWORD_LENGTH ? "#0095f6": "#b2dffc"}
+          bgColor={isFormDataValid ? "#0095f6": "#b2dffc"}
           color="white"
           fontSize="sm"
           sx={{
             '&:hover': {
-              bgColor: login && password.length >= MIN_PASSWORD_LENGTH ? "#0095f6": "#b2dffc"
+              bgColor: isFormDataValid ? "#0095f6": "#b2dffc"
             },
             '&:active': {
               bgColor: '#b2dffc'
@@ -114,7 +138,7 @@ const SignInCard = () => {
               boxShadow: 'none'
             }
           }}
-        >Log In</Button>
+        >{ !isSignInPending ? "Log In" : <Spinner size="xs" /> }</Button>
         <Flex mt="1rem" w="100%" align="center">
           <Divider borderColor="gray.400" />
           <Text fontSize="xs" fontWeight="semibold" color="gray.500" ml="1rem" mr="1rem">OR</Text>
