@@ -8,12 +8,15 @@ const Header = () => {
   const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <Flex
+      w="100%"
       p={isLessThan820 ? "1rem" : "0 12rem 0"}
       h="3.4rem"
       bgColor="white"
       borderBottomWidth="1px"
       borderColor="blackAlpha.300"
       align="center"
+      position="fixed"
+      top={0}
     >
       <Link to="/">
         <Logo

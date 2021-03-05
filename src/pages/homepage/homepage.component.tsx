@@ -1,5 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import Header from '../../components/header/header.component';
+import Feed from '../../components/feed/feed.component';
 
 const HomePage = () => {
   return (
@@ -9,6 +10,7 @@ const HomePage = () => {
       bgColor="#fafafa"
     >
       <Header />
+      <Feed />
     </Box>
   );
 }

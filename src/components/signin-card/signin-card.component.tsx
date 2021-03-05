@@ -32,14 +32,14 @@ const SignInCard = () => {
   const submitHandler = (event: React.MouseEvent) => {
     event.preventDefault();
     if (!isFormDataValid) return;
-    dispatch(signIn('lustervolt', '12345'));
+    dispatch(signIn(login, password));
   }
 
   useEffect(() => {
     const listener: EventListener = (event: any) => {
       if (event.code === 'Enter' || event.code === 'NumpadEnter') {
         if (!isFormDataValid) return;
-        dispatch(signIn('lustervolt', '12345'));
+        dispatch(signIn(login, password));
       }
     }
 
@@ -47,7 +47,7 @@ const SignInCard = () => {
     return () => {
       document.removeEventListener("keydown", listener);
     };
-  }, [dispatch, isFormDataValid]);
+  }, [dispatch, isFormDataValid, login, password]);
 
   return (
     <CardContainer>
