@@ -9,7 +9,7 @@ const SearchInput = () => {
   const dispatch = useDispatch();
   const isFocused: boolean = useSelector((state: State) => state.searchInput.isFocused);
   return (
-    <InputGroup maxW="12rem">
+    <InputGroup maxW="13rem">
       <InputLeftElement
         pointerEvents="none"
         h="1.7rem"

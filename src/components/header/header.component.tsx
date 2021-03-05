@@ -1,17 +1,14 @@
-import { Flex, Spacer } from '@chakra-ui/react';
+import { Flex, Spacer, useMediaQuery } from '@chakra-ui/react';
 import Logo from '../logo/logo.component';
 import SearchInput from '../search-input/search-input.component';
-import Avatar from '../avatar/avatar.component';
+import IconsGroup from '../icons-group/icons-group.component';
 import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { State } from '../../redux/store';
-import { IUser } from '../../redux/signin/signin.interfaces';
 
 const Header = () => {
-  const user: IUser | null = useSelector((state: State) => state.signIn.user);
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <Flex
-      p="0 12rem 0"
+      p={isLessThan820 ? "1rem" : "0 12rem 0"}
       h="3.4rem"
       bgColor="white"
       borderBottomWidth="1px"
@@ -29,10 +26,18 @@ const Header = () => {
           }}
         />
       </Link>
+      {
+        isLessThan820
+        ? <></>
+        : ( 
+          <>
+            <Spacer />
+            <SearchInput />
+          </>
+        )
+      }
       <Spacer />
-      <SearchInput />
-      <Spacer />
-      <Avatar src={user?.avatar ? user?.avatar : null} />
+      <IconsGroup />
     </Flex>
   );
 }

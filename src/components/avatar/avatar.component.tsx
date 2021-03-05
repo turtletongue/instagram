@@ -2,17 +2,21 @@ import { Image } from '@chakra-ui/react';
 
 interface AvatarProps {
   src: string | null;
+  [propName: string]: any;
 }
 
-const Avatar = ({ src }: AvatarProps) => {
+const Avatar = ({ src, ...otherProps }: AvatarProps) => {
   return (
     <Image
       src={src ? src : ""}
-      h="1.4rem"
-      w="1.4rem"
+      h="1.5rem"
+      w="1.5rem"
+      p="0.09rem"
       borderRadius="5rem"
-      borderWidth="1px"
       alt="User Avatar"
+      cursor="pointer"
+      boxSizing="unset"
+      {...otherProps}
     />
   );
 }
