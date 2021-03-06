@@ -12,8 +12,6 @@ const PostContent = ({ imageUrl }: PostContentProps) => {
       userSelect="none"
       draggable={false}
       w="100%"
-      m={0}
-      p={0}
     />
   );
 }

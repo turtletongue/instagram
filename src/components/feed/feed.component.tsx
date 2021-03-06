@@ -1,4 +1,4 @@
-import { Box} from '@chakra-ui/react';
+import { Box } from '@chakra-ui/react';
 import Post from '../post/post.component';
 
 const Feed = () => {
