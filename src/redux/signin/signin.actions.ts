@@ -68,8 +68,7 @@ export const signIn = (login: string, password: string) => async (dispatch: Func
   dispatch(signInStart());
   try {
     dispatch(signInSuccess({
-      id: '1',
-      username: 'lustervolt',
+      id: 'lustervolt',
       avatar: 'https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=1c2owR3dgXUAX_0kT91&oh=aac7576ef58864f678d25d50f9b3d691&oe=60685A28'
     }));
   } catch (error) {

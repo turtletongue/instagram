@@ -20,7 +20,7 @@ const PostContainer = ({ post }: PostContainerProps) => {
       <PostHeader author={post.author} />
       <PostContent imageUrl={post.imageUrl} />
       <PostFooter post={post} />
-      <CommentInput />
+      <CommentInput postId={post.id} />
     </Box>
   );
 }

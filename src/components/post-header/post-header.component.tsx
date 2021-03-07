@@ -20,10 +20,10 @@ const PostHeader = ({ author }: PostHeaderProps) => {
       borderBottomColor="#efefef"
     >
       <Flex align="center">
-        <Link to={`/${author.username}/`}>
+        <Link to={`/${author.id}/`}>
           <Avatar src={author.avatar} w="2rem" h="2rem" />
         </Link>
-        <Link to={`/${author.username}/`}>
+        <Link to={`/${author.id}/`}>
           <Text
             ml="0.8rem"
             fontSize="sm"
@@ -37,7 +37,7 @@ const PostHeader = ({ author }: PostHeaderProps) => {
                 opacity: 0.6
               }
             }}
-          >{author.username}</Text>
+          >{author.id}</Text>
         </Link>
       </Flex>
       <Spacer />

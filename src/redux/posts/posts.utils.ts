@@ -12,9 +12,20 @@ export const changeIsBookmarked = (posts: IPost[], postId: string, isBookmarked:
   });
 }
 
-export const addComment = (posts: IPost[], postId: string, userId: string, content: string) => {
-  const comment: IComment = { id: null, authorId: userId, postId, content, date: new Date() };
+export const changeCommentInput = (posts: IPost[], postId: string, content: string) => {
   return posts.map(post => {
-    return post.id === postId ? { ...post, comments: [...post.comments, comment ] } : post;
+    return post.id === postId ? { ...post, commentInput: content } : post;
+  });
+}
+
+export const clearCommentInput = (posts: IPost[], postId: string) => {
+  return posts.map(post => {
+    return post.id === postId ? { ...post, commentInput: '' } : post;
+  });
+}
+
+export const addComment = (posts: IPost[], comment: IComment) => {
+  return posts.map(post => {
+    return post.id === comment.postId ? { ...post, comments: [...post.comments, comment ] } : post;
   });
 }

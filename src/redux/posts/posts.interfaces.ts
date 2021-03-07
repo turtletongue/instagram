@@ -17,4 +17,5 @@ export interface IPost {
   isLiked: boolean;
   isBookmarked: boolean;
   date: Date;
+  commentInput: string;
 } 

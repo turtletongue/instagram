@@ -1,21 +1,19 @@
-import { ADD_COMMENT_FAILURE, ADD_COMMENT_START, ADD_COMMENT_SUCCESS, CHANGE_COMMENT_INPUT, FETCH_POSTS_FAILURE, FETCH_POSTS_START, FETCH_POSTS_SUCCESS, SET_IS_BOOKMARKED, SET_IS_LIKED } from "./posts.constants";
+import { ADD_COMMENT_FAILURE, ADD_COMMENT_START, ADD_COMMENT_SUCCESS, CHANGE_COMMENT_INPUT, CLEAR_COMMENT_INPUT, FETCH_POSTS_FAILURE, FETCH_POSTS_START, FETCH_POSTS_SUCCESS, SET_IS_BOOKMARKED, SET_IS_LIKED } from "./posts.constants";
 import { IPost } from "./posts.interfaces";
-import { addComment, changeIsBookmarked, changeIsLiked } from "./posts.utils";
+import { addComment, changeCommentInput, changeIsBookmarked, changeIsLiked, clearCommentInput } from "./posts.utils";
 
 export interface PostsState {
   postsData: IPost[];
   isPostsPending: boolean;
   isAddCommentPending: boolean;
   error: string | null;
-  commentInput: string;
 } 
 
 const initialState: PostsState = {
   postsData: [],
   isPostsPending: true,
   isAddCommentPending: false,
-  error: null,
-  commentInput: ''
+  error: null
 };
 
 const postsReducer = (state: PostsState=initialState, action: any={}) => {
@@ -37,12 +35,16 @@ const postsReducer = (state: PostsState=initialState, action: any={}) => {
         state.postsData, action.payload.postId, action.payload.isBookmarked
       ) };
     case CHANGE_COMMENT_INPUT:
-      return { ...state, commentInput: action.payload };
+      return { ...state, postsData: changeCommentInput(
+        state.postsData, action.payload.postId, action.payload.content
+      ) };
+    case CLEAR_COMMENT_INPUT:
+      return { ...state, postsData: clearCommentInput(state.postsData, action.payload) };
     case ADD_COMMENT_START:
       return { ...state,  isAddCommentPending: true, error: null };
     case ADD_COMMENT_SUCCESS:
       return { ...state, isAddCommentPending: false, error: null, postsData: addComment(
-        state.postsData, action.payload.postId, action.payload.userId, action.payload.content
+        state.postsData, action.payload
       ) };
     case ADD_COMMENT_FAILURE:
       return { ...state, isAddCommentPending: false, error: action.payload };

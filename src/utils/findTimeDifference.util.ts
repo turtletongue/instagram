@@ -17,12 +17,12 @@ const findTimeDifference = (lastCommentDate: Date): string => {
     }
   } else if (hours) {
     if (hours > 1) {
-      return `${days} HOURS AGO`;
+      return `${hours} HOURS AGO`;
     } else {
-      return `${days} HOUR AGO`;
+      return `${hours} HOUR AGO`;
     }
   } else {
-    return '';
+    return 'JUST NOW';
   }
 }
 

@@ -1,4 +1,4 @@
-import { Box, Flex, Spacer, Icon, Text } from "@chakra-ui/react";
+import { Box, Flex, Spacer, Icon, Text, chakra } from "@chakra-ui/react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { FaRegComment } from 'react-icons/fa';
 import { IoPaperPlaneOutline } from 'react-icons/io5';
@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setIsLiked } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import { State } from "../../redux/store";
+import { motion } from 'framer-motion';
+
+const MotionBox = chakra(motion.div);
 
 interface PostActionsProps {
   post: IPost
@@ -18,6 +21,9 @@ const PostActions = ({ post }: PostActionsProps) => {
     (state: State) => state.posts.postsData.find((p: IPost) => {
       return post.id === p.id; 
     })?.isLiked);
+  const likeHandler = () => {
+    dispatch(setIsLiked(post.id, !isLiked));
+  }
   return (
     <Box mb="0.5rem">
       <Flex align="center">
@@ -25,14 +31,20 @@ const PostActions = ({ post }: PostActionsProps) => {
           align="center"
           w="7rem"
         >
-          <Icon
-            as={isLiked ? AiFillHeart : AiOutlineHeart}
-            color={isLiked ? "red.500" : ""}
+          <MotionBox
             w={7}
             h={7}
-            cursor="pointer"
-            onClick={() => dispatch(setIsLiked(post.id, !isLiked))}
-          />
+            whileTap={{ scale: 1.2 }}
+          >
+            <Icon
+              as={isLiked ? AiFillHeart : AiOutlineHeart}
+              color={isLiked ? "red.500" : ""}
+              w="100%"
+              h="100%"
+              cursor="pointer"
+              onClick={() => likeHandler()}
+            />
+          </MotionBox>
           <Spacer />
           <Icon
             as={FaRegComment}
