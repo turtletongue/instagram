@@ -16,8 +16,8 @@ const CommentInput = ({ postId }: CommentInputProps) => {
   )?.commentInput);
   const userId: string | undefined = useSelector((state: State) => state.signIn.user?.id);
   const addCommentHandler = () => {
-    if (userId) {
-      dispatch(addComment(postId, userId, commentInput ? commentInput : ''));
+    if (userId && commentInput) {
+      dispatch(addComment(postId, userId, commentInput));
       dispatch(clearCommentInput(postId));
     }
   }
@@ -38,6 +38,9 @@ const CommentInput = ({ postId }: CommentInputProps) => {
         onChange={
           (event) => dispatch(changeCommentInput(postId, event.target.value))
         }
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') addCommentHandler();
+        }}
         size="sm"
         borderRadius={0}
         borderWidth={0}

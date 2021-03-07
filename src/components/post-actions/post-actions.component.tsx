@@ -2,9 +2,9 @@ import { Box, Flex, Spacer, Icon, Text, chakra } from "@chakra-ui/react";
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { FaRegComment } from 'react-icons/fa';
 import { IoPaperPlaneOutline } from 'react-icons/io5';
-import { VscBookmark } from 'react-icons/vsc';
+import { RiBookmarkLine, RiBookmarkFill } from 'react-icons/ri';
 import { useDispatch, useSelector } from "react-redux";
-import { setIsLiked } from "../../redux/posts/posts.actions";
+import { setIsBookmarked, setIsLiked } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import { State } from "../../redux/store";
 import { motion } from 'framer-motion';
@@ -21,8 +21,15 @@ const PostActions = ({ post }: PostActionsProps) => {
     (state: State) => state.posts.postsData.find((p: IPost) => {
       return post.id === p.id; 
     })?.isLiked);
+  const isBookmarked: boolean | undefined = useSelector(
+    (state: State) => state.posts.postsData.find((p: IPost) => {
+      return post.id === p.id; 
+    })?.isBookmarked);
   const likeHandler = () => {
     dispatch(setIsLiked(post.id, !isLiked));
+  }
+  const toggleBookmarkHandler = () => {
+    dispatch(setIsBookmarked(post.id, !isBookmarked));
   }
   return (
     <Box mb="0.5rem">
@@ -62,13 +69,15 @@ const PostActions = ({ post }: PostActionsProps) => {
         </Flex>
         <Spacer />
         <Icon
-          as={VscBookmark}
+          onClick={toggleBookmarkHandler}
+          as={isBookmarked ? RiBookmarkFill : RiBookmarkLine}
           w={7}
           h={7}
           cursor="pointer"
         />
       </Flex>
       <Text
+        userSelect="none"
         mt="0.5rem"
         fontWeight="600"
         fontSize="sm"
