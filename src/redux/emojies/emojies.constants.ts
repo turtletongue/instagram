@@ -1,0 +1,5 @@
+export const FETCH_EMOJIES_START: string = 'FETCH_EMOJIES_START';
+
+export const FETCH_EMOJIES_SUCCESS: string = 'FETCH_EMOJIES_SUCCESS';
+
+export const FETCH_EMOJIES_FAILURE: string = 'FETCH_EMOJIES_FAILURE';

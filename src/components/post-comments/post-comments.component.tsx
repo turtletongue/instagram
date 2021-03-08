@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { IComment } from '../../redux/posts/posts.interfaces';
 import findTimeDifference from '../../utils/findTimeDifference.util';
+import EmojiText from '../emoji-text/emoji-text.component';
 
 interface PostCommentsProps {
   postDate: Date;
@@ -34,13 +35,13 @@ const PostComments = ({ postDate, comments }: PostCommentsProps) => {
                     }} 
                   >{comment.authorId}</Text>
                 </Link>
-                <Text
+                <EmojiText
                   ml="0.3rem"
                   display="inline"
                   fontSize="sm"
                 >
                   { comment.content }
-                </Text>
+                </EmojiText>
                 <Spacer />
                 <Icon
                   as={AiOutlineHeart}

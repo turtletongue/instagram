@@ -5,6 +5,7 @@ import signInReducer, { SignInState } from './signin/signin.reducer';
 import searchInputReducer, { SearchInputState } from './search-input/search-input.reducer';
 import menuReducer, { MenuState } from './menu/menu.reducer';
 import postsReducer, { PostsState } from './posts/posts.reducer';
+import emojiesReducer, { EmojiesState } from './emojies/emojies.reducer';
 
 const middlewares: any[] = [thunk];
 
@@ -17,13 +18,15 @@ export interface State {
   searchInput: SearchInputState;
   menu: MenuState;
   posts: PostsState;
+  emojies: EmojiesState;
 }
 
 const store: Store = createStore(combineReducers({
   signIn: signInReducer,
   searchInput: searchInputReducer,
   menu: menuReducer,
-  posts: postsReducer
+  posts: postsReducer,
+  emojies: emojiesReducer
 }), applyMiddleware(...middlewares));
 
 export default store;

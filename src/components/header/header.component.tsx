@@ -17,6 +17,7 @@ const Header = () => {
       align="center"
       position="fixed"
       top={0}
+      zIndex="2"
     >
       <Link to="/">
         <Logo
