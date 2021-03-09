@@ -17,3 +17,5 @@ export const ADD_COMMENT_SUCCESS: string = 'ADD_COMMENT_SUCCESS';
 export const ADD_COMMENT_FAILURE: string = 'ADD_COMMENT_FAILURE';
 
 export const CLEAR_COMMENT_INPUT: string = 'CLEAR_COMMENT_INPUT';
+
+export const TOGGLE_LIKE_COMMENT: string = 'TOGGLE_LIKE_COMMENT';

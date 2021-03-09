@@ -6,7 +6,8 @@ export interface IComment {
   postId: string;
   content: string;
   date: Date;
-};
+  isLiked: boolean;
+}
 
 export interface IPost {
   id: string;
@@ -18,4 +19,4 @@ export interface IPost {
   isBookmarked: boolean;
   date: Date;
   commentInput: string;
-} 
+}
