@@ -1,4 +1,4 @@
-import { Image } from '@chakra-ui/react';
+import { Image } from "@chakra-ui/react";
 
 interface AvatarProps {
   src: string | null;
@@ -16,9 +16,10 @@ const Avatar = ({ src, ...otherProps }: AvatarProps) => {
       alt="User Avatar"
       cursor="pointer"
       boxSizing="unset"
+      userSelect="none"
       {...otherProps}
     />
   );
-}
+};
 
 export default Avatar;

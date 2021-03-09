@@ -1,6 +1,7 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import CurrentUser from "../../components/current-user/current-user.component";
 import Feed from "../../components/feed/feed.component";
 import Header from "../../components/header/header.component";
 import LoadingScreen from "../../components/loading-screen/loading-screen.component";
@@ -22,9 +23,7 @@ const HomePage = () => {
           <Header />
           <Flex>
             <Feed />
-            <Text ml="2rem" mt="6rem" position="fixed" right="25%">
-              Lorem ipsum dolor sit amet.
-            </Text>
+            <CurrentUser />
           </Flex>
         </Box>
       ) : (

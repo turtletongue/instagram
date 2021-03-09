@@ -5,12 +5,13 @@ import PostComments from "../post-comments/post-comments.component";
 
 interface PostFooterProps {
   post: IPost;
+  inputRef: any;
 }
 
-const PostFooter = ({ post }: PostFooterProps) => {
+const PostFooter = ({ post, inputRef }: PostFooterProps) => {
   return (
     <Box bgColor="white" p="0.8rem" maxH="15rem" w="100%">
-      <PostActions post={post} />
+      <PostActions inputRef={inputRef} post={post} />
       <PostComments
         postId={post.id}
         postDate={post.date}

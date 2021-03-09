@@ -52,7 +52,10 @@ export const fetchPosts = () => async (dispatch: any) => {
     ];
     dispatch(
       fetchPostsSuccess(
-        data.map((post: any) => ({ ...post, commentInput: "" }))
+        data.map((post: any) => ({
+          ...post,
+          commentInput: "",
+        }))
       )
     );
   } catch (error) {

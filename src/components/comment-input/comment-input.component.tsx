@@ -17,9 +17,10 @@ import EmojiPopover from "../emoji-popover/emoji-popover.component";
 
 interface CommentInputProps {
   postId: string;
+  inputRef: any;
 }
 
-const CommentInput = ({ postId }: CommentInputProps) => {
+const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
   const dispatch = useDispatch();
   const commentInput: string | undefined = useSelector(
     (state: State) =>
@@ -47,6 +48,7 @@ const CommentInput = ({ postId }: CommentInputProps) => {
           <EmojiPopover postId={postId} />
         </InputLeftElement>
         <Input
+          ref={inputRef}
           value={commentInput ? commentInput : ""}
           onChange={(event) =>
             dispatch(changeCommentInput(postId, event.target.value))

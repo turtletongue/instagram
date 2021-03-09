@@ -41,11 +41,17 @@ const Comment = ({ postId, isLiked, comment }: CommentProps) => {
           {comment.authorId}
         </Text>
       </Link>
-      <EmojiText ml="0.3rem" display="inline" fontSize="sm">
+      <EmojiText ml="0.3rem" fontSize="sm" maxW="30rem" overflow="hidden">
         {comment.content}
       </EmojiText>
       <Spacer />
-      <MotionBox w={7} h={7} whileTap={{ scale: 1.2 }}>
+      <MotionBox
+        w={7}
+        h={7}
+        whileTap={{ scale: 1.2 }}
+        position="relative"
+        right="-0.5rem"
+      >
         <Icon
           as={isLiked ? AiFillHeart : AiOutlineHeart}
           color={isLiked ? "red.500" : ""}

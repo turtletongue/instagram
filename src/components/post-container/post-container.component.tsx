@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/react";
+import { useRef } from "react";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import CommentInput from "../comment-input/comment-input.component";
 import PostContent from "../post-content/post-content.component";
@@ -10,6 +11,7 @@ interface PostContainerProps {
 }
 
 const PostContainer = ({ post }: PostContainerProps) => {
+  const inputRef: any = useRef(null);
   return (
     <Box
       maxW="38rem"
@@ -18,10 +20,10 @@ const PostContainer = ({ post }: PostContainerProps) => {
       overflow="hidden"
       mb="2rem"
     >
-      <PostHeader author={post.author} />
+      <PostHeader author={post.author} postId={post.id} />
       <PostContent imageUrl={post.imageUrl} />
-      <PostFooter post={post} />
-      <CommentInput postId={post.id} />
+      <PostFooter inputRef={inputRef} post={post} />
+      <CommentInput inputRef={inputRef} postId={post.id} />
     </Box>
   );
 };

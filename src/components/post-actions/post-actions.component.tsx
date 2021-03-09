@@ -1,4 +1,4 @@
-import { Box, Flex, Icon, Spacer, Text } from "@chakra-ui/react";
+import { Box, Flex, Icon, Spacer, Text, useDisclosure } from "@chakra-ui/react";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
@@ -8,13 +8,16 @@ import { setIsBookmarked, setIsLiked } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import { State } from "../../redux/store";
 import MotionBox from "../motion-box/motion-box.component";
+import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 
 interface PostActionsProps {
   post: IPost;
+  inputRef: any;
 }
 
-const PostActions = ({ post }: PostActionsProps) => {
+const PostActions = ({ post, inputRef }: PostActionsProps) => {
   const dispatch = useDispatch();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const isLiked: boolean | undefined = useSelector(
     (state: State) =>
       state.posts.postsData.find((p: IPost) => {
@@ -33,8 +36,12 @@ const PostActions = ({ post }: PostActionsProps) => {
   const toggleBookmarkHandler = () => {
     dispatch(setIsBookmarked(post.id, !isBookmarked));
   };
+  const toggleInputFocusHandler = () => {
+    if (inputRef.current) inputRef.current.focus();
+  };
   return (
     <Box mb="0.5rem">
+      <PostActionsModal isOpen={isOpen} onClose={onClose} postId={post.id} />
       <Flex align="center">
         <Flex align="center" w="7rem">
           <MotionBox w={7} h={7} whileTap={{ scale: 1.2 }}>
@@ -44,13 +51,25 @@ const PostActions = ({ post }: PostActionsProps) => {
               w="100%"
               h="100%"
               cursor="pointer"
-              onClick={() => likeHandler()}
+              onClick={likeHandler}
             />
           </MotionBox>
           <Spacer />
-          <Icon as={FaRegComment} w={6} h={6} cursor="pointer" />
+          <Icon
+            as={FaRegComment}
+            w={6}
+            h={6}
+            cursor="pointer"
+            onClick={toggleInputFocusHandler}
+          />
           <Spacer />
-          <Icon as={IoPaperPlaneOutline} w={7} h={7} cursor="pointer" />
+          <Icon
+            as={IoPaperPlaneOutline}
+            w={7}
+            h={7}
+            cursor="pointer"
+            onClick={onOpen}
+          />
         </Flex>
         <Spacer />
         <Icon
