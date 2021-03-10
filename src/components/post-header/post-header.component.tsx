@@ -1,7 +1,7 @@
 import { Flex, Icon, Spacer, Text, useDisclosure } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { IUser } from "../../redux/signin/signin.interfaces";
+import { IUser } from "../../redux/users/users.interfaces";
 import Avatar from "../avatar/avatar.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 

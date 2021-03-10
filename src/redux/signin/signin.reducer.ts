@@ -1,17 +1,17 @@
+import { IUser } from "../users/users.interfaces";
 import {
-  NEXT_SLIDER_IMAGE,
-  FETCH_SLIDER_IMAGES_SUCCESS,
   FETCH_SLIDER_IMAGES_FAILURE,
   FETCH_SLIDER_IMAGES_START,
-  SET_IS_PENDING,
+  FETCH_SLIDER_IMAGES_SUCCESS,
   LOGIN_INPUT_CHANGED,
+  NEXT_SLIDER_IMAGE,
   PASSWORD_INPUT_CHANGED,
-  TOGGLE_PASSWORD_VISIBILITY,
+  SET_IS_PENDING,
+  SIGN_IN_FAILURE,
   SIGN_IN_START,
   SIGN_IN_SUCCESS,
-  SIGN_IN_FAILURE
-} from './signin.constants';
-import { IUser } from './signin.interfaces';
+  TOGGLE_PASSWORD_VISIBILITY,
+} from "./signin.constants";
 
 export interface SignInState {
   images: string[];
@@ -22,7 +22,7 @@ export interface SignInState {
   password: string;
   isPasswordVisible: boolean;
   isAuth: boolean;
-  user: IUser | null,
+  user: IUser | null;
   isSignInPending: boolean;
 }
 
@@ -31,18 +31,18 @@ const initialState: SignInState = {
   currentImageId: 0,
   error: null,
   isImagesPending: false,
-  login: '',
-  password: '',
+  login: "",
+  password: "",
   isPasswordVisible: false,
   isAuth: false,
   user: null,
   isSignInPending: false,
 };
 
-const signInReducer = (state: SignInState=initialState, action: any={}) => {
+const signInReducer = (state: SignInState = initialState, action: any = {}) => {
   switch (action.type) {
     case FETCH_SLIDER_IMAGES_START:
-      return { ...state, isImagesPending: true, error: null }
+      return { ...state, isImagesPending: true, error: null };
     case FETCH_SLIDER_IMAGES_SUCCESS:
       return { ...state, images: action.payload, error: null };
     case FETCH_SLIDER_IMAGES_FAILURE:
@@ -50,8 +50,10 @@ const signInReducer = (state: SignInState=initialState, action: any={}) => {
     case NEXT_SLIDER_IMAGE:
       return {
         ...state,
-        currentImageId: (state.currentImageId  >= state.images.length - 1) ?
-          0 : state.currentImageId + 1
+        currentImageId:
+          state.currentImageId >= state.images.length - 1
+            ? 0
+            : state.currentImageId + 1,
       };
     case SET_IS_PENDING:
       return { ...state, isImagesPending: action.payload };
@@ -64,12 +66,17 @@ const signInReducer = (state: SignInState=initialState, action: any={}) => {
     case SIGN_IN_START:
       return { ...state, isSignInPending: true };
     case SIGN_IN_SUCCESS:
-      return { ...state, isAuth: true, user: action.payload, isSignInPending: false };
+      return {
+        ...state,
+        isAuth: true,
+        user: action.payload,
+        isSignInPending: false,
+      };
     case SIGN_IN_FAILURE:
-      return { ...state, error: action.payload, isSignInPending: false }
+      return { ...state, error: action.payload, isSignInPending: false };
     default:
       return state;
   }
-}
+};
 
 export default signInReducer;

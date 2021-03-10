@@ -1,6 +1,5 @@
-import { CHANGE_POSITION } from "./menu.constants";
+import { TOGGLE_ACTIVITY } from "./menu.constants";
 
-export const changePosition = (newPosition: string) => ({
-  type: CHANGE_POSITION,
-  payload: newPosition
+export const toggleActivity = () => ({
+  type: TOGGLE_ACTIVITY,
 });

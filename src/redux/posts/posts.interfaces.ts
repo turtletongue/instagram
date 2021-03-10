@@ -1,4 +1,4 @@
-import { IUser } from "../signin/signin.interfaces";
+import { IUser } from "../users/users.interfaces";
 
 export interface IComment {
   id: string | null;

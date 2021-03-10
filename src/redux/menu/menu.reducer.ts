@@ -1,20 +1,20 @@
-import { CHANGE_POSITION, HOME } from "./menu.constants";
+import { TOGGLE_ACTIVITY } from "./menu.constants";
 
 export interface MenuState {
-  position: string;
+  isActivityOpen: boolean;
 }
 
 const initialState: MenuState = {
-  position: HOME
+  isActivityOpen: false,
 };
 
-const menuReducer = (state: MenuState=initialState, action: any={}) => {
+const menuReducer = (state: MenuState = initialState, action: any = {}) => {
   switch (action.type) {
-    case CHANGE_POSITION:
-      return { ...state, position: action.payload };
+    case TOGGLE_ACTIVITY:
+      return { ...state, isActivityOpen: !state.isActivityOpen };
     default:
       return state;
   }
-}
+};
 
 export default menuReducer;

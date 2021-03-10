@@ -6,47 +6,52 @@ import {
   AiOutlineHome,
 } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { changePosition } from "../../redux/menu/menu.actions";
-import { ACTIVITY, HOME, PROFILE } from "../../redux/menu/menu.constants";
-import { IUser } from "../../redux/signin/signin.interfaces";
+import { Link, useHistory } from "react-router-dom";
+import { toggleActivity } from "../../redux/menu/menu.actions";
 import { State } from "../../redux/store";
+import { IUser } from "../../redux/users/users.interfaces";
 import Avatar from "../avatar/avatar.component";
 
 const IconsGroup = () => {
+  const history = useHistory();
   const dispatch = useDispatch();
   const user: IUser | null = useSelector((state: State) => state.signIn.user);
-  const position: string = useSelector((state: State) => state.menu.position);
+  const isActivityOpen: boolean = useSelector(
+    (state: State) => state.menu.isActivityOpen
+  );
   return (
     <Flex align="center" minW="7rem">
       <Link to="/">
         <Icon
-          as={position === HOME ? AiFillHome : AiOutlineHome}
+          as={history.location.pathname === "/" ? AiFillHome : AiOutlineHome}
           h={6}
           w={6}
           cursor="pointer"
-          onClick={() => dispatch(changePosition(HOME))}
         />
       </Link>
       <Spacer />
       {user ? (
         <>
           <Icon
-            as={position === ACTIVITY ? AiFillHeart : AiOutlineHeart}
+            as={isActivityOpen ? AiFillHeart : AiOutlineHeart}
             h={6}
             w={6}
             cursor="pointer"
-            onClick={() => dispatch(changePosition(ACTIVITY))}
+            onClick={() => dispatch(toggleActivity())}
           />
           <Spacer />
           <Center w="1.7rem" h="1.7rem">
-            <Avatar
-              src={user?.avatar ? user?.avatar : null}
-              borderWidth={position === PROFILE ? "0.1rem" : 0}
-              borderColor="black"
-              borderStyle="solid"
-              onClick={() => dispatch(changePosition(PROFILE))}
-            />
+            <Link to={`/${user.id}/`}>
+              <Avatar
+                src={user?.avatar ? user?.avatar : null}
+                borderWidth={
+                  history.location.pathname === `/${user.id}/` ? "0.1rem" : 0
+                }
+                borderColor="black"
+                borderStyle="solid"
+                alt=""
+              />
+            </Link>
           </Center>
         </>
       ) : (
