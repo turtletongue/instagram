@@ -18,7 +18,7 @@ const PostContainer = ({ post }: PostContainerProps) => {
       borderWidth="1px"
       borderRadius="3px"
       overflow="hidden"
-      mb="2rem"
+      mt="2rem"
     >
       <PostHeader author={post.author} postId={post.id} />
       <PostContent imageUrl={post.imageUrl} />

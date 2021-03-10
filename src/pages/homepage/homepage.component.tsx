@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useMediaQuery } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CurrentUser from "../../components/current-user/current-user.component";
@@ -15,6 +15,7 @@ const HomePage = () => {
     dispatch(fetchPosts());
     dispatch(fetchEmojies());
   }, [dispatch]);
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   const isLoading = useSelector((state: State) => state.posts.isPostsPending);
   return (
     <>
@@ -23,7 +24,7 @@ const HomePage = () => {
           <Header />
           <Flex>
             <Feed />
-            <CurrentUser />
+            {isLessThan820 ? <></> : <CurrentUser />}
           </Flex>
         </Box>
       ) : (

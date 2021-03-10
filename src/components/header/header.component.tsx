@@ -1,8 +1,8 @@
-import { Flex, Spacer, useMediaQuery } from '@chakra-ui/react';
-import Logo from '../logo/logo.component';
-import SearchInput from '../search-input/search-input.component';
-import IconsGroup from '../icons-group/icons-group.component';
-import { Link } from 'react-router-dom';
+import { Flex, Spacer, useMediaQuery } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import IconsGroup from "../icons-group/icons-group.component";
+import Logo from "../logo/logo.component";
+import SearchInput from "../search-input/search-input.component";
 
 const Header = () => {
   const [isLessThan820] = useMediaQuery("(max-width: 820px)");
@@ -17,33 +17,31 @@ const Header = () => {
       align="center"
       position="fixed"
       top={0}
-      zIndex="2"
+      zIndex="3"
     >
       <Link to="/">
         <Logo
           fontSize="3xl"
           cursor="pointer"
           sx={{
-            '&:active': {
-              opacity: 0.6
-            }
+            "&:active": {
+              opacity: 0.6,
+            },
           }}
         />
       </Link>
-      {
-        isLessThan820
-        ? <></>
-        : ( 
-          <>
-            <Spacer />
-            <SearchInput />
-          </>
-        )
-      }
+      {isLessThan820 ? (
+        <></>
+      ) : (
+        <>
+          <Spacer />
+          <SearchInput />
+        </>
+      )}
       <Spacer />
       <IconsGroup />
     </Flex>
   );
-}
+};
 
 export default Header;
