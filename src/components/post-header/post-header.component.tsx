@@ -8,9 +8,10 @@ import PostActionsModal from "../post-actions-modal/post-actions-modal.component
 interface PostHeaderProps {
   author: IUser;
   postId: string;
+  [propName: string]: any;
 }
 
-const PostHeader = ({ author, postId }: PostHeaderProps) => {
+const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Flex
@@ -21,6 +22,7 @@ const PostHeader = ({ author, postId }: PostHeaderProps) => {
       p="1rem"
       borderBottomWidth={1}
       borderBottomColor="#efefef"
+      {...otherProps}
     >
       <PostActionsModal
         isOpen={isOpen}

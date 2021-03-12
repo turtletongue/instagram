@@ -28,7 +28,7 @@ const PostPage = () => {
           p="3rem 0 1rem 0"
         >
           {post ? (
-            <PostContainer post={post} />
+            <PostContainer post={post} full />
           ) : (
             <Text fontSize="3xl" color="gray.500" fontWeight="500">
               POST NOT FOUND

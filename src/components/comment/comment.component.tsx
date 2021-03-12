@@ -1,5 +1,6 @@
 import Icon from "@chakra-ui/icon";
-import { Flex, Spacer, Text } from "@chakra-ui/layout";
+import { Flex, Spacer } from "@chakra-ui/layout";
+import { chakra } from "@chakra-ui/system";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
@@ -9,26 +10,30 @@ import EmojiText from "../emoji-text/emoji-text.component";
 import MotionBox from "../motion-box/motion-box.component";
 
 interface CommentProps {
-  postId: string;
-  isLiked: boolean;
   comment: IComment;
+  full?: boolean;
+  [propName: string]: any;
 }
 
-const Comment = ({ postId, isLiked, comment }: CommentProps) => {
+const Comment = ({ comment, full, ...otherProps }: CommentProps) => {
   const dispatch = useDispatch();
+  const isLiked: boolean = comment.isLiked;
+  const postId: string = comment.postId;
   const commentLikeHandler = (comment: IComment) => {
     if (comment.id) {
       dispatch(toggleCommentLike(postId, comment.id));
     }
   };
   return (
-    <Flex align="center">
-      <Link to={`/${comment.authorId}/`}>
-        <Text
-          display="inline"
+    <Flex display="inline-flex" w={full ? "16rem" : "100%"}>
+      <EmojiText fontSize="sm" maxW="30rem" overflow="hidden" {...otherProps}>
+        <chakra.span
+          as={Link}
+          to={`/${comment.author.id}/`}
           fontSize="sm"
           fontWeight="500"
           color="#2a2a2a"
+          mr="0.3rem"
           sx={{
             "&:hover": {
               textDecoration: "underline",
@@ -38,10 +43,8 @@ const Comment = ({ postId, isLiked, comment }: CommentProps) => {
             },
           }}
         >
-          {comment.authorId}
-        </Text>
-      </Link>
-      <EmojiText ml="0.3rem" fontSize="sm" maxW="30rem" overflow="hidden">
+          {comment.author.id}
+        </chakra.span>
         {comment.content}
       </EmojiText>
       <Spacer />

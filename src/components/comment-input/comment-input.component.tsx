@@ -13,6 +13,7 @@ import {
 } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import { State } from "../../redux/store";
+import { IUser } from "../../redux/users/users.interfaces";
 import EmojiPopover from "../emoji-popover/emoji-popover.component";
 
 interface CommentInputProps {
@@ -26,12 +27,10 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
     (state: State) =>
       state.posts.postsData.find((p: IPost) => p.id === postId)?.commentInput
   );
-  const userId: string | undefined = useSelector(
-    (state: State) => state.signIn.user?.id
-  );
+  const user: IUser | null = useSelector((state: State) => state.signIn.user);
   const addCommentHandler = () => {
-    if (userId && commentInput) {
-      dispatch(addComment(postId, userId, commentInput));
+    if (user && commentInput) {
+      dispatch(addComment(postId, user, commentInput));
       dispatch(clearCommentInput(postId));
     }
   };

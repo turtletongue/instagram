@@ -1,39 +1,36 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { IComment } from "../../redux/posts/posts.interfaces";
 import findTimeDifference from "../../utils/findTimeDifference.util";
 import Comment from "../comment/comment.component";
+import Time from "../time/time.component";
 
 interface PostCommentsProps {
-  postId: string;
   postDate: Date;
   comments: IComment[];
 }
 
-const PostComments = ({ postId, postDate, comments }: PostCommentsProps) => {
+const PostComments = ({ postDate, comments }: PostCommentsProps) => {
   const timeAgo: string = findTimeDifference(postDate);
   return (
     <>
       <Box>
-        {comments.map((comment) => {
-          const isLiked: boolean = comment.isLiked;
-          return (
-            <Comment
-              key={comment.id}
-              postId={postId}
-              isLiked={isLiked}
-              comment={comment}
-            />
+        {comments.map((comment: IComment, index: number) => {
+          const slicedComment: IComment =
+            comment.content.length > 151
+              ? {
+                  ...comment,
+                  content: comment.content.slice(0, 151) + "...",
+                }
+              : comment;
+          return index < 2 || index === comments.length - 1 ? (
+            <Box w="100%" key={index}>
+              <Comment comment={slicedComment} />
+            </Box>
+          ) : (
+            <></>
           );
         })}
-        <Text
-          fontWeight="400"
-          color="#adadad"
-          fontSize="0.6rem"
-          mt="0.3rem"
-          userSelect="none"
-        >
-          {timeAgo}
-        </Text>
+        <Time timeAgo={timeAgo} />
       </Box>
     </>
   );

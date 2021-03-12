@@ -9,7 +9,7 @@ interface EmojiTextProps {
 
 const EmojiText = ({ children, ...otherProps }: EmojiTextProps) => {
   return (
-    <Text {...otherProps} sx={{ display: "flex", alignItems: "center" }}>
+    <Text {...otherProps} sx={{ img: { display: "inline" } }}>
       {emoji(children)}
     </Text>
   );

@@ -27,11 +27,11 @@ const App = () => {
           <Route exact path="/">
             <HomePage />
           </Route>
-          <Route path="/:userId">
-            <UserPage />
-          </Route>
           <Route path="/p/:postId">
             <PostPage />
+          </Route>
+          <Route path="/:userId">
+            <UserPage />
           </Route>
         </Switch>
       )}

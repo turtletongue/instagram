@@ -1,10 +1,11 @@
-import { Image } from '@chakra-ui/react';
+import { Image } from "@chakra-ui/react";
 
 interface PostContentProps {
   imageUrl: string;
+  [propName: string]: any;
 }
 
-const PostContent = ({ imageUrl }: PostContentProps) => {
+const PostContent = ({ imageUrl, ...otherProps }: PostContentProps) => {
   return (
     <Image
       src={imageUrl}
@@ -12,8 +13,9 @@ const PostContent = ({ imageUrl }: PostContentProps) => {
       userSelect="none"
       draggable={false}
       w="100%"
+      {...otherProps}
     />
   );
-}
+};
 
 export default PostContent;

@@ -12,11 +12,7 @@ const PostFooter = ({ post, inputRef }: PostFooterProps) => {
   return (
     <Box bgColor="white" p="0.8rem" maxH="15rem" w="100%">
       <PostActions inputRef={inputRef} post={post} />
-      <PostComments
-        postId={post.id}
-        postDate={post.date}
-        comments={post.comments}
-      />
+      <PostComments postDate={post.date} comments={post.comments} />
     </Box>
   );
 };

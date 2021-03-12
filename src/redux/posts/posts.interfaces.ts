@@ -2,7 +2,7 @@ import { IUser } from "../users/users.interfaces";
 
 export interface IComment {
   id: string | null;
-  authorId: string;
+  author: IUser;
   postId: string;
   content: string;
   date: Date;

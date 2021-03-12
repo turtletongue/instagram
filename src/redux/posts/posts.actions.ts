@@ -1,3 +1,4 @@
+import { IUser } from "../users/users.interfaces";
 import {
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_START,
@@ -34,7 +35,13 @@ export const fetchPosts = () => async (dispatch: any) => {
           {
             id: "1",
             postId: "32323",
-            authorId: "alternative.disney",
+            author: {
+              id: "k8lin.marie",
+              fullname: "Kfjefeef",
+              description: "",
+              avatar:
+                "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
+            },
             content: "Wrong lever!",
             date: new Date(2021, 2, 5),
             likers: [],
@@ -42,7 +49,13 @@ export const fetchPosts = () => async (dispatch: any) => {
           {
             id: "2",
             postId: "32323",
-            authorId: "k8lin.marie",
+            author: {
+              id: "k8lin.marie",
+              fullname: "Kfjefeef",
+              description: "",
+              avatar:
+                "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
+            },
             content: "@lindsayjmarie",
             date: new Date(2021, 2, 5),
             likers: [],
@@ -99,7 +112,7 @@ export const setIsBookmarked = (postId: string, isBookmarked: boolean) => ({
 
 export const addComment = (
   postId: string,
-  userId: string,
+  user: IUser,
   content: string
 ) => async (dispatch: any) => {
   dispatch(addCommentStart());
@@ -108,7 +121,7 @@ export const addComment = (
       id: Math.random().toString(),
       postId,
       content,
-      authorId: userId,
+      author: user,
       date: new Date(),
     };
     dispatch(addCommentSuccess({ ...data, isLiked: false }));
