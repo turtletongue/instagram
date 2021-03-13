@@ -19,4 +19,5 @@ export interface IPost {
   isBookmarked: boolean;
   date: Date;
   commentInput: string;
+  isDataVisible: boolean;
 }

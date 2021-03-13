@@ -10,6 +10,7 @@ import {
   SET_IS_BOOKMARKED,
   SET_IS_LIKED,
   TOGGLE_LIKE_COMMENT,
+  TOGGLE_POST_DATA_VISIBILITY,
 } from "./posts.constants";
 import { IPost } from "./posts.interfaces";
 import {
@@ -19,6 +20,7 @@ import {
   changeIsLiked,
   clearCommentInput,
   toggleCommentLike,
+  togglePostDataVisibility,
 } from "./posts.utils";
 
 export interface PostsState {
@@ -44,7 +46,7 @@ const postsReducer = (state: PostsState = initialState, action: any = {}) => {
         ...state,
         isPostsPending: false,
         error: null,
-        postsData: [...state.postsData, ...action.payload],
+        postsData: action.payload,
       };
     case FETCH_POSTS_FAILURE:
       return { ...state, isPostsPending: false, error: action.payload };
@@ -99,6 +101,11 @@ const postsReducer = (state: PostsState = initialState, action: any = {}) => {
           action.payload.postId,
           action.payload.commentId
         ),
+      };
+    case TOGGLE_POST_DATA_VISIBILITY:
+      return {
+        ...state,
+        postsData: togglePostDataVisibility(state.postsData, action.payload),
       };
     default:
       return state;

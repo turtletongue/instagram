@@ -67,3 +67,11 @@ export const toggleCommentLike = (
       : post;
   });
 };
+
+export const togglePostDataVisibility = (posts: IPost[], postId: string) => {
+  return posts.map((post: IPost) => {
+    return post.id === postId
+      ? { ...post, isDataVisible: !post.isDataVisible }
+      : post;
+  });
+};

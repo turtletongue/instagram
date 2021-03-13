@@ -1,4 +1,4 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { Box, Flex, useDisclosure } from "@chakra-ui/react";
 import { useRef } from "react";
 import { IPost } from "../../redux/posts/posts.interfaces";
 import findTimeDifference from "../../utils/findTimeDifference.util";
@@ -18,6 +18,11 @@ interface PostContainerProps {
 const PostContainer = ({ post, full }: PostContainerProps) => {
   const inputRef: any = useRef(null);
   const timeAgo: string = findTimeDifference(post.date);
+  const {
+    isOpen: isPostPageOpen,
+    onOpen: onPostPageOpen,
+    onClose: onPostPageClose,
+  } = useDisclosure();
   return (
     <Box
       maxW={full ? "60rem" : "38rem"}
@@ -35,7 +40,14 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
               <FullComments comments={post.comments} />
               <Box h="35%">
                 <Box p="0.8rem" bgColor="white" borderTopWidth="1px">
-                  <PostActions post={post} inputRef={inputRef} full />
+                  <PostActions
+                    post={post}
+                    inputRef={inputRef}
+                    isPostPageOpen={isPostPageOpen}
+                    onPostPageOpen={onPostPageOpen}
+                    onPostPageClose={onPostPageClose}
+                    full
+                  />
                   <Time timeAgo={timeAgo} />
                 </Box>
                 <CommentInput inputRef={inputRef} postId={post.id} />
@@ -47,7 +59,13 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
         <>
           <PostHeader author={post.author} postId={post.id} />
           <PostContent imageUrl={post.imageUrl} />
-          <PostFooter inputRef={inputRef} post={post} />
+          <PostFooter
+            inputRef={inputRef}
+            post={post}
+            isPostPageOpen={isPostPageOpen}
+            onPostPageOpen={onPostPageOpen}
+            onPostPageClose={onPostPageClose}
+          />
           <CommentInput inputRef={inputRef} postId={post.id} />
         </>
       )}

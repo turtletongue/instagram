@@ -3,32 +3,35 @@ import { Flex, Spacer } from "@chakra-ui/layout";
 import { BsGrid3X3 } from "react-icons/bs";
 import { RiBookmarkLine } from "react-icons/ri";
 import { useSelector } from "react-redux";
-import { POSTS, SAVED } from "../../redux/categories/categories.constants";
 import { State } from "../../redux/store";
+import {
+  POSTS_TAB,
+  SAVED_TAB,
+} from "../../redux/user-page/user-page.constants";
 import Category from "../category/category.component";
 
 const Categories = () => {
   const activeCategory: string = useSelector(
-    (state: State) => state.categories.activeCategory
+    (state: State) => state.userPage.tab
   );
   return (
     <Flex position="relative" top="-1px" maxW="58rem" justify="center">
       <Flex w="10rem">
-        <Category title={POSTS} isActive={activeCategory === POSTS}>
+        <Category category={POSTS_TAB} isActive={activeCategory === POSTS_TAB}>
           <Icon
             as={BsGrid3X3}
             w={3}
             h={3}
-            color={activeCategory === POSTS ? "" : "#939393"}
+            color={activeCategory === POSTS_TAB ? "" : "#939393"}
           />
         </Category>
         <Spacer />
-        <Category title={SAVED} isActive={activeCategory === SAVED}>
+        <Category category={SAVED_TAB} isActive={activeCategory === SAVED_TAB}>
           <Icon
             as={RiBookmarkLine}
             w={3}
             h={3}
-            color={activeCategory === SAVED ? "" : "#939393"}
+            color={activeCategory === SAVED_TAB ? "" : "#939393"}
           />
         </Category>
       </Flex>

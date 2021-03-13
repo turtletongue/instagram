@@ -11,17 +11,20 @@ import {
   SET_IS_BOOKMARKED,
   SET_IS_LIKED,
   TOGGLE_LIKE_COMMENT,
+  TOGGLE_POST_DATA_VISIBILITY,
 } from "./posts.constants";
 import { IComment, IPost } from "./posts.interfaces";
 
-export const fetchPosts = () => async (dispatch: any) => {
+export const fetchPosts = (userId: string | null = null) => async (
+  dispatch: any
+) => {
   dispatch(fetchPostsStart());
   try {
     const data = [
       {
         id: "32323",
         author: {
-          id: "alternative.disney",
+          id: "lustervolt",
           avatar:
             "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
         },
@@ -30,6 +33,7 @@ export const fetchPosts = () => async (dispatch: any) => {
         likes: 2454,
         isLiked: false,
         isBookmarked: false,
+        isDataVisible: false,
         date: new Date(),
         comments: [
           {
@@ -147,4 +151,9 @@ export const addCommentFailure = (error: Error) => ({
 export const toggleCommentLike = (postId: string, commentId: string) => ({
   type: TOGGLE_LIKE_COMMENT,
   payload: { postId, commentId },
+});
+
+export const togglePostDataVisibility = (postIndex: number | string) => ({
+  type: TOGGLE_POST_DATA_VISIBILITY,
+  payload: postIndex,
 });

@@ -1,15 +1,16 @@
 import { Flex, Text } from "@chakra-ui/layout";
 import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
-import { changeActiveCategory } from "../../redux/categories/categories.actions";
+import { showPosts, showSaved } from "../../redux/user-page/user-page.actions";
+import { POSTS_TAB } from "../../redux/user-page/user-page.constants";
 
 interface CategoryProps {
   children: ReactNode;
-  title: string;
+  category: string;
   isActive: boolean;
 }
 
-const Category = ({ children, title, isActive }: CategoryProps) => {
+const Category = ({ children, category, isActive }: CategoryProps) => {
   const dispatch = useDispatch();
   return (
     <Flex
@@ -20,7 +21,9 @@ const Category = ({ children, title, isActive }: CategoryProps) => {
       borderTopStyle="solid"
       borderTopColor="blackAlpha.800"
       pt="1rem"
-      onClick={() => dispatch(changeActiveCategory(title))}
+      onClick={() =>
+        dispatch(category === POSTS_TAB ? showPosts() : showSaved())
+      }
     >
       {children}
       <Text
@@ -30,7 +33,7 @@ const Category = ({ children, title, isActive }: CategoryProps) => {
         userSelect="none"
         color={isActive ? "" : "#939393"}
       >
-        {title.toUpperCase()}
+        {category}
       </Text>
     </Flex>
   );

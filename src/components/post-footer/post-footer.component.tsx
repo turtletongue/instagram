@@ -6,13 +6,32 @@ import PostComments from "../post-comments/post-comments.component";
 interface PostFooterProps {
   post: IPost;
   inputRef: any;
+  isPostPageOpen: boolean;
+  onPostPageOpen: () => void;
+  onPostPageClose: () => void;
 }
 
-const PostFooter = ({ post, inputRef }: PostFooterProps) => {
+const PostFooter = ({
+  post,
+  inputRef,
+  isPostPageOpen,
+  onPostPageClose,
+  onPostPageOpen,
+}: PostFooterProps) => {
   return (
     <Box bgColor="white" p="0.8rem" maxH="15rem" w="100%">
-      <PostActions inputRef={inputRef} post={post} />
-      <PostComments postDate={post.date} comments={post.comments} />
+      <PostActions
+        inputRef={inputRef}
+        post={post}
+        isPostPageOpen={isPostPageOpen}
+        onPostPageOpen={onPostPageOpen}
+        onPostPageClose={onPostPageClose}
+      />
+      <PostComments
+        postDate={post.date}
+        comments={post.comments}
+        onPostPageOpen={onPostPageOpen}
+      />
     </Box>
   );
 };

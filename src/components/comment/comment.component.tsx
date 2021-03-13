@@ -53,7 +53,7 @@ const Comment = ({ comment, full, ...otherProps }: CommentProps) => {
         h={7}
         whileTap={{ scale: 1.2 }}
         position="relative"
-        right="-0.5rem"
+        right={full ? "0" : "-0.5rem"}
       >
         <Icon
           as={isLiked ? AiFillHeart : AiOutlineHeart}

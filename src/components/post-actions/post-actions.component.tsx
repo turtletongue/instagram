@@ -14,20 +14,25 @@ import PostPageModal from "../post-page-modal/post-page-modal.component";
 interface PostActionsProps {
   post: IPost;
   inputRef: any;
+  isPostPageOpen: boolean;
+  onPostPageOpen: () => void;
+  onPostPageClose: () => void;
   full?: boolean;
 }
 
-const PostActions = ({ post, inputRef, full }: PostActionsProps) => {
+const PostActions = ({
+  post,
+  inputRef,
+  isPostPageOpen,
+  onPostPageOpen,
+  onPostPageClose,
+  full,
+}: PostActionsProps) => {
   const dispatch = useDispatch();
   const {
     isOpen: isActionsOpen,
     onOpen: onActionsOpen,
     onClose: onActionsClose,
-  } = useDisclosure();
-  const {
-    isOpen: isPostPageOpen,
-    onOpen: onPostPageOpen,
-    onClose: onPostPageClose,
   } = useDisclosure();
   const isLiked: boolean | undefined = useSelector(
     (state: State) =>
