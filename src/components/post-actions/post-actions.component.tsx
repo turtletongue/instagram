@@ -9,15 +9,26 @@ import { IPost } from "../../redux/posts/posts.interfaces";
 import { State } from "../../redux/store";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
+import PostPageModal from "../post-page-modal/post-page-modal.component";
 
 interface PostActionsProps {
   post: IPost;
   inputRef: any;
+  full?: boolean;
 }
 
-const PostActions = ({ post, inputRef }: PostActionsProps) => {
+const PostActions = ({ post, inputRef, full }: PostActionsProps) => {
   const dispatch = useDispatch();
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isActionsOpen,
+    onOpen: onActionsOpen,
+    onClose: onActionsClose,
+  } = useDisclosure();
+  const {
+    isOpen: isPostPageOpen,
+    onOpen: onPostPageOpen,
+    onClose: onPostPageClose,
+  } = useDisclosure();
   const isLiked: boolean | undefined = useSelector(
     (state: State) =>
       state.posts.postsData.find((p: IPost) => {
@@ -41,7 +52,16 @@ const PostActions = ({ post, inputRef }: PostActionsProps) => {
   };
   return (
     <Box mb="0.5rem">
-      <PostActionsModal isOpen={isOpen} onClose={onClose} postId={post.id} />
+      <PostActionsModal
+        isOpen={isActionsOpen}
+        onClose={onActionsClose}
+        postId={post.id}
+      />
+      <PostPageModal
+        isOpen={isPostPageOpen}
+        onClose={onPostPageClose}
+        post={post}
+      />
       <Flex align="center">
         <Flex align="center" w="7rem">
           <MotionBox w={7} h={7} whileTap={{ scale: 1.2 }}>
@@ -60,7 +80,7 @@ const PostActions = ({ post, inputRef }: PostActionsProps) => {
             w={6}
             h={6}
             cursor="pointer"
-            onClick={toggleInputFocusHandler}
+            onClick={full ? toggleInputFocusHandler : onPostPageOpen}
           />
           <Spacer />
           <Icon
@@ -68,7 +88,7 @@ const PostActions = ({ post, inputRef }: PostActionsProps) => {
             w={7}
             h={7}
             cursor="pointer"
-            onClick={onOpen}
+            onClick={onActionsOpen}
           />
         </Flex>
         <Spacer />

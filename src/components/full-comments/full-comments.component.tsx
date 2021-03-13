@@ -13,8 +13,7 @@ const FullComments = ({ comments }: FullCommentsProps) => {
   return (
     <Box
       p="0.5rem"
-      minH="60%"
-      maxH="25rem"
+      h="30rem"
       w="100%"
       bgColor="white"
       overflowY="scroll"

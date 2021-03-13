@@ -35,7 +35,7 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
               <FullComments comments={post.comments} />
               <Box h="35%">
                 <Box p="0.8rem" bgColor="white" borderTopWidth="1px">
-                  <PostActions post={post} inputRef={inputRef} />
+                  <PostActions post={post} inputRef={inputRef} full />
                   <Time timeAgo={timeAgo} />
                 </Box>
                 <CommentInput inputRef={inputRef} postId={post.id} />
