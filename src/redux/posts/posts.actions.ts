@@ -24,7 +24,7 @@ export const fetchPosts = (userId: string | null = null) => async (
       {
         id: "32323",
         author: {
-          id: "lustervolt",
+          id: "alternative.disney",
           avatar:
             "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
         },

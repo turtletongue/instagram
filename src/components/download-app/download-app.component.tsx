@@ -1,6 +1,10 @@
-import { Flex, Image, useMediaQuery } from '@chakra-ui/react';
+import { Flex, Image, useMediaQuery } from "@chakra-ui/react";
 
-const DownloadApp = () => {
+interface DownloadAppProps {
+  [propName: string]: any;
+}
+
+const DownloadApp = ({ ...otherProps }: DownloadAppProps) => {
   const [isLessThan825] = useMediaQuery("(max-width: 825px)");
   return (
     <Flex
@@ -9,6 +13,7 @@ const DownloadApp = () => {
       left={isLessThan825 ? "0" : "-2rem"}
       align="center"
       justify="Center"
+      {...otherProps}
     >
       <Image
         src="https://www.instagram.com/static/images/appstore-install-badges/badge_ios_english-en.png/180ae7a0bcf7.png"
@@ -16,9 +21,9 @@ const DownloadApp = () => {
         maxW="9rem"
         cursor="pointer"
         sx={{
-          '&:active': {
-            opacity: 0.6
-          }
+          "&:active": {
+            opacity: 0.6,
+          },
         }}
       />
       <Image
@@ -28,13 +33,13 @@ const DownloadApp = () => {
         maxW="9rem"
         cursor="pointer"
         sx={{
-          '&:active': {
-            opacity: 0.6
-          }
+          "&:active": {
+            opacity: 0.6,
+          },
         }}
       />
     </Flex>
   );
-}
+};
 
 export default DownloadApp;

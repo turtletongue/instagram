@@ -5,6 +5,7 @@ import { useParams } from "react-router";
 import Avatar from "../../components/avatar/avatar.component";
 import Categories from "../../components/categories/categories.component";
 import Header from "../../components/header/header.component";
+import NoPostsBanner from "../../components/no-posts-banner/no-posts-banner.component";
 import ProfileData from "../../components/profile-data/profile-data.component";
 import UserPosts from "../../components/user-posts/user-posts.component";
 import { fetchPosts } from "../../redux/posts/posts.actions";
@@ -26,10 +27,11 @@ const UserPage = () => {
     state.users.fetchedUsers.find((user: IUser) => user.id === userId)
   );
   const category: string = useSelector((state: State) => state.userPage.tab);
-  const posts: IPost[] = useSelector((state: State) =>
-    state.posts.postsData.filter((post: IPost) =>
-      category === POSTS_TAB ? post.author.id === userId : post.isBookmarked
-    )
+  const userPosts: IPost[] = useSelector((state: State) =>
+    state.posts.postsData.filter((post: IPost) => post.author.id === userId)
+  );
+  const savedPosts: IPost[] = useSelector((state: State) =>
+    state.posts.postsData.filter((post: IPost) => post.isBookmarked)
   );
   return (
     <>
@@ -50,7 +52,15 @@ const UserPage = () => {
             <Divider mt="4rem" maxW="58rem" borderColor="#c7c7c7" />
             <Categories />
             <Center maxW="60rem">
-              <UserPosts posts={posts} />
+              {category === POSTS_TAB ? (
+                userPosts.length ? (
+                  <UserPosts posts={userPosts} />
+                ) : (
+                  <NoPostsBanner />
+                )
+              ) : (
+                <UserPosts posts={savedPosts} />
+              )}
             </Center>
           </>
         ) : (

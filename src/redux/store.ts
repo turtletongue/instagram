@@ -1,6 +1,7 @@
 import { applyMiddleware, combineReducers, createStore, Store } from "redux";
 import logger from "redux-logger";
 import thunk from "redux-thunk";
+import activitiesReducer, { ActivityState } from "./activity/activity.reducer";
 import emojiesReducer, { EmojiesState } from "./emojies/emojies.reducer";
 import menuReducer, { MenuState } from "./menu/menu.reducer";
 import postsReducer, { PostsState } from "./posts/posts.reducer";
@@ -25,6 +26,7 @@ export interface State {
   emojies: EmojiesState;
   users: UsersState;
   userPage: UserPageState;
+  actiivities: ActivityState;
 }
 
 const store: Store = createStore(
@@ -36,6 +38,7 @@ const store: Store = createStore(
     emojies: emojiesReducer,
     users: usersReducer,
     userPage: userPageReducer,
+    activities: activitiesReducer,
   }),
   applyMiddleware(...middlewares)
 );

@@ -1,8 +1,10 @@
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { togglePostDataVisibility } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
+import MinPostData from "../min-post-data/min-post-data.component";
 import PostContent from "../post-content/post-content.component";
+import PostPageModal from "../post-page-modal/post-page-modal.component";
 
 interface UserPostsProps {
   posts: IPost[];
@@ -10,6 +12,11 @@ interface UserPostsProps {
 
 const UserPosts = ({ posts }: UserPostsProps) => {
   const dispatch = useDispatch();
+  const {
+    isOpen: isPostPageOpen,
+    onOpen: onPostPageOpen,
+    onClose: onPostPageClose,
+  } = useDisclosure();
   return (
     <SimpleGrid
       minChildWidth="16rem"
@@ -20,35 +27,28 @@ const UserPosts = ({ posts }: UserPostsProps) => {
     >
       {posts.map((post: IPost, index: number) => {
         return (
-          <Box
-            key={index}
-            maxW="18rem"
-            position="relative"
-            onMouseEnter={() => dispatch(togglePostDataVisibility(post.id))}
-            onMouseLeave={() => dispatch(togglePostDataVisibility(post.id))}
-          >
-            <PostContent
-              imageUrl={post.imageUrl}
-              cursor="pointer"
-              sx={{ "&:hover": { filter: "brightness(40%)" } }}
+          <>
+            <PostPageModal
+              post={post}
+              isOpen={isPostPageOpen}
+              onClose={onPostPageClose}
             />
-            {post.isDataVisible ? (
-              <Box
-                zIndex="2"
-                position="absolute"
-                w="5rem"
-                h="5rem"
-                m="auto"
-                top={0}
-                bottom={0}
-                left={0}
-                right={0}
-                bgColor="tomato"
+            <Box
+              key={index}
+              maxW="18rem"
+              position="relative"
+              onMouseEnter={() => dispatch(togglePostDataVisibility(post.id))}
+              onMouseLeave={() => dispatch(togglePostDataVisibility(post.id))}
+              onClick={onPostPageOpen}
+            >
+              <PostContent
+                imageUrl={post.imageUrl}
+                cursor="pointer"
+                filter={post.isDataVisible ? "brightness(40%)" : ""}
               />
-            ) : (
-              <></>
-            )}
-          </Box>
+              {post.isDataVisible ? <MinPostData post={post} /> : <></>}
+            </Box>
+          </>
         );
       })}
     </SimpleGrid>
