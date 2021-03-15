@@ -1,6 +1,6 @@
 import { Box, Center, Divider, Flex, Spacer, Text } from "@chakra-ui/layout";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router";
 import Avatar from "../../components/avatar/avatar.component";
 import Categories from "../../components/categories/categories.component";
@@ -10,7 +10,6 @@ import ProfileData from "../../components/profile-data/profile-data.component";
 import UserPosts from "../../components/user-posts/user-posts.component";
 import { fetchPosts } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
 import { POSTS_TAB } from "../../redux/user-page/user-page.constants";
 import { fetchUser } from "../../redux/users/users.actions";
 import { IUser } from "../../redux/users/users.interfaces";
@@ -23,16 +22,15 @@ const UserPage = () => {
     dispatch(fetchUser(userId));
     dispatch(fetchPosts(userId));
   }, [dispatch, userId]);
-  const user: IUser | undefined = useSelector((state: State) =>
-    state.users.fetchedUsers.find((user: IUser) => user.id === userId)
-  );
-  const category: string = useSelector((state: State) => state.userPage.tab);
-  const userPosts: IPost[] = useSelector((state: State) =>
-    state.posts.postsData.filter((post: IPost) => post.author.id === userId)
-  );
-  const savedPosts: IPost[] = useSelector((state: State) =>
-    state.posts.postsData.filter((post: IPost) => post.isBookmarked)
-  );
+  const user: IUser | undefined = {
+    id: "1",
+    avatar: "",
+    fullname: "",
+    description: "",
+  };
+  const category: string = "";
+  const userPosts: IPost[] = [];
+  const savedPosts: IPost[] = [];
   return (
     <>
       <Header />

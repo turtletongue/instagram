@@ -1,13 +1,29 @@
-import { InputGroup, Input, InputLeftElement, InputRightElement, Icon } from '@chakra-ui/react';
-import { BiSearch } from 'react-icons/bi';
-import { AiFillCloseCircle } from 'react-icons/ai';
-import { useSelector, useDispatch } from 'react-redux';
-import { State } from '../../redux/store';
-import { toggleFocusInput } from '../../redux/search-input/search-input.actions';
+import {
+  Icon,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
+} from "@chakra-ui/react";
+import { AiFillCloseCircle } from "react-icons/ai";
+import { BiSearch } from "react-icons/bi";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import {
+  blurSearchInput,
+  changeInputValue,
+  clearInput,
+  focusSearchInput,
+} from "../../redux/search-input/search-input.slice";
+import { RootState } from "../../redux/store";
 
 const SearchInput = () => {
-  const dispatch = useDispatch();
-  const isFocused: boolean = useSelector((state: State) => state.searchInput.isFocused);
+  const dispatch = useAppDispatch();
+  const isFocused: boolean = useAppSelector(
+    (state: RootState) => state.searchInput.isFocused
+  );
+  const inputValue: string = useAppSelector(
+    (state: RootState) => state.searchInput.inputValue
+  );
   return (
     <InputGroup maxW="13rem">
       <InputLeftElement
@@ -20,8 +36,10 @@ const SearchInput = () => {
         children={<Icon as={BiSearch} h={3} w={3} color="#a5a7aa" />}
       />
       <Input
-        onFocus={() => dispatch(toggleFocusInput())}
-        onBlur={() => dispatch(toggleFocusInput())}
+        value={inputValue}
+        onChange={(event) => dispatch(changeInputValue(event.target.value))}
+        onFocus={() => dispatch(focusSearchInput())}
+        onBlur={() => dispatch(blurSearchInput())}
         h="1.7rem"
         pl={isFocused ? "1.8rem" : "5rem"}
         bgColor="#fafafa"
@@ -29,36 +47,33 @@ const SearchInput = () => {
         borderColor="blackAlpha.300"
         borderRadius="2px"
         sx={{
-          '&:focus': {
+          "&:focus": {
             boxShadow: "none",
-            borderColor: "blackAlpha.400"
-          }
+            borderColor: "blackAlpha.400",
+          },
         }}
         placeholder="Search"
         fontSize="sm"
       />
-      {
-        isFocused ? (
-          <InputRightElement
-            h="1.7rem"
-            w="1.8rem"
-            d="flex"
-            justify="center"
-            align="center"
-            cursor="default"
-          >
-            <Icon
-              as={AiFillCloseCircle}
-              h={4}
-              w={4}
-              color="#c7c7c7"
-              opacity={0.8}
-            />
-        </InputRightElement>
-        ) : <></>
-      }
+      <InputRightElement
+        h="1.7rem"
+        w="1.8rem"
+        d="flex"
+        justify="center"
+        align="center"
+        cursor="default"
+        onMouseDown={isFocused ? () => dispatch(clearInput()) : () => {}}
+      >
+        <Icon
+          as={AiFillCloseCircle}
+          h={4}
+          w={4}
+          color="#c7c7c7"
+          opacity={isFocused ? 0.8 : 0}
+        />
+      </InputRightElement>
     </InputGroup>
   );
-}
+};
 
 export default SearchInput;

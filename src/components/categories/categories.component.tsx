@@ -2,8 +2,6 @@ import Icon from "@chakra-ui/icon";
 import { Flex, Spacer } from "@chakra-ui/layout";
 import { BsGrid3X3 } from "react-icons/bs";
 import { RiBookmarkLine } from "react-icons/ri";
-import { useSelector } from "react-redux";
-import { State } from "../../redux/store";
 import {
   POSTS_TAB,
   SAVED_TAB,
@@ -11,9 +9,7 @@ import {
 import Category from "../category/category.component";
 
 const Categories = () => {
-  const activeCategory: string = useSelector(
-    (state: State) => state.userPage.tab
-  );
+  const activeCategory: string = "POSTS";
   return (
     <Flex position="relative" top="-1px" maxW="58rem" justify="center">
       <Flex w="10rem">

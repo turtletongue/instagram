@@ -1,17 +1,15 @@
 import { Flex, Text } from "@chakra-ui/layout";
-import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import Header from "../../components/header/header.component";
 import LoadingScreen from "../../components/loading-screen/loading-screen.component";
 import PostContainer from "../../components/post-container/post-container.component";
 import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
 
 const PostPage = () => {
   const params: any = useParams();
   const postId = params.postId;
-  const isLoading = useSelector((state: State) => state.posts.isPostsPending);
-  const posts: IPost[] = useSelector((state: State) => state.posts.postsData);
+  const isLoading = false;
+  const posts: IPost[] = [];
   const post: IPost | undefined = posts.find(
     (post: IPost) => post.id === postId
   );

@@ -4,11 +4,9 @@ import { Flex, Spacer } from "@chakra-ui/layout";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/popover";
 import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { IEmoji } from "../../redux/emojies/emojies.interfaces";
 import { changeCommentInput } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
@@ -17,13 +15,8 @@ interface EmojiPopoverProps {
 
 const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
   const dispatch = useDispatch();
-  const emojies: IEmoji[] = useSelector(
-    (state: State) => state.emojies.emojiesData
-  );
-  const commentInput: string | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => p.id === postId)?.commentInput
-  );
+  const emojies: IEmoji[] = [];
+  const commentInput: string | undefined = "";
   const emojiPickHandler = (emoji: IEmoji) => {
     dispatch(
       changeCommentInput(

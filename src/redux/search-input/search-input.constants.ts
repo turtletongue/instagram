@@ -1,1 +1,0 @@
-export const TOGGLE_FOCUS_INPUT: string = 'TOGGLE_FOCUS_INPUT';

@@ -3,10 +3,9 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { RiBookmarkFill, RiBookmarkLine } from "react-icons/ri";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setIsBookmarked, setIsLiked } from "../../redux/posts/posts.actions";
 import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -34,18 +33,8 @@ const PostActions = ({
     onOpen: onActionsOpen,
     onClose: onActionsClose,
   } = useDisclosure();
-  const isLiked: boolean | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => {
-        return post.id === p.id;
-      })?.isLiked
-  );
-  const isBookmarked: boolean | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => {
-        return post.id === p.id;
-      })?.isBookmarked
-  );
+  const isLiked: boolean | undefined = false;
+  const isBookmarked: boolean | undefined = false;
   const likeHandler = () => {
     dispatch(setIsLiked(post.id, !isLiked));
   };

@@ -5,14 +5,12 @@ import {
   InputRightElement,
   Text,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   addComment,
   changeCommentInput,
   clearCommentInput,
 } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
 import { IUser } from "../../redux/users/users.interfaces";
 import EmojiPopover from "../emoji-popover/emoji-popover.component";
 
@@ -23,11 +21,8 @@ interface CommentInputProps {
 
 const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
   const dispatch = useDispatch();
-  const commentInput: string | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => p.id === postId)?.commentInput
-  );
-  const user: IUser | null = useSelector((state: State) => state.signIn.user);
+  const commentInput: string | undefined = "";
+  const user: IUser | null = null;
   const addCommentHandler = () => {
     if (user && commentInput) {
       dispatch(addComment(postId, user, commentInput));

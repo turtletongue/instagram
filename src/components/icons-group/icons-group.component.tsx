@@ -5,20 +5,19 @@ import {
   AiOutlineHeart,
   AiOutlineHome,
 } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import { toggleActivity } from "../../redux/menu/menu.actions";
-import { State } from "../../redux/store";
-import { IUser } from "../../redux/users/users.interfaces";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { IUser } from "../../redux/user/user.slice";
 import Avatar from "../avatar/avatar.component";
 
 const IconsGroup = () => {
   const history = useHistory();
-  const dispatch = useDispatch();
-  const user: IUser | null = useSelector((state: State) => state.signIn.user);
-  const isActivityOpen: boolean = useSelector(
-    (state: State) => state.menu.isActivityOpen
+  // const dispatch = useAppDispatch();
+  const user: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
   );
+  const isActivityOpen: boolean = false;
   return (
     <Flex align="center" minW="7rem">
       <Link to="/">
@@ -37,15 +36,17 @@ const IconsGroup = () => {
             h={6}
             w={6}
             cursor="pointer"
-            onClick={() => dispatch(toggleActivity())}
+            onClick={() => {}} //toggle activity
           />
           <Spacer />
           <Center w="1.7rem" h="1.7rem">
-            <Link to={`/${user.id}/`}>
+            <Link to={`/${user.userId}/`}>
               <Avatar
-                src={user?.avatar ? user?.avatar : null}
+                src={user.avatarUrl}
                 borderWidth={
-                  history.location.pathname === `/${user.id}/` ? "0.1rem" : 0
+                  history.location.pathname === `/${user.userId}/`
+                    ? "0.1rem"
+                    : 0
                 }
                 borderColor="black"
                 borderStyle="solid"
