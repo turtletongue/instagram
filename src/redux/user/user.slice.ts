@@ -48,6 +48,7 @@ const userSlice = createSlice({
   extraReducers: {
     [requestSignIn.pending as any]: (state: UserState) => {
       state.signInLoading = "loading";
+      state.errorMessage = null;
     },
     [requestSignIn.fulfilled as any]: (
       state: UserState,

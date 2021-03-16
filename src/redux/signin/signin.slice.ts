@@ -76,6 +76,7 @@ const signInSlice = createSlice({
   extraReducers: {
     [requestSliderImages.pending as any]: (state: SignInState) => {
       state.pageLoading = "loading";
+      state.errorMessage = null;
     },
     [requestSliderImages.fulfilled as any]: (
       state: SignInState,
@@ -88,6 +89,7 @@ const signInSlice = createSlice({
       action: PayloadAction<string>
     ) => {
       state.errorMessage = action.payload;
+      state.pageLoading = "idle";
     },
   },
 });

@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
 import PostActions from "../post-actions/post-actions.component";
 import PostComments from "../post-comments/post-comments.component";
 
@@ -28,7 +28,7 @@ const PostFooter = ({
         onPostPageClose={onPostPageClose}
       />
       <PostComments
-        postDate={post.date}
+        postDate={post.createdAt}
         comments={post.comments}
         onPostPageOpen={onPostPageOpen}
       />

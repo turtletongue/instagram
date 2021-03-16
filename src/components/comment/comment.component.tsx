@@ -4,8 +4,7 @@ import { chakra } from "@chakra-ui/system";
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { toggleCommentLike } from "../../redux/posts/posts.actions";
-import { IComment } from "../../redux/posts/posts.interfaces";
+import { IComment } from "../../redux/feed/feed.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 import MotionBox from "../motion-box/motion-box.component";
 
@@ -18,10 +17,10 @@ interface CommentProps {
 const Comment = ({ comment, full, ...otherProps }: CommentProps) => {
   const dispatch = useDispatch();
   const isLiked: boolean = comment.isLiked;
-  const postId: string = comment.postId;
+  const postId: number = comment.postId;
   const commentLikeHandler = (comment: IComment) => {
     if (comment.id) {
-      dispatch(toggleCommentLike(postId, comment.id));
+      // dispatch(toggleCommentLike(postId, comment.id));
     }
   };
   return (
@@ -29,7 +28,7 @@ const Comment = ({ comment, full, ...otherProps }: CommentProps) => {
       <EmojiText fontSize="sm" maxW="30rem" overflow="hidden" {...otherProps}>
         <chakra.span
           as={Link}
-          to={`/${comment.author.id}/`}
+          to={`/${comment.authorId}/`}
           fontSize="sm"
           fontWeight="500"
           color="#2a2a2a"
@@ -43,7 +42,7 @@ const Comment = ({ comment, full, ...otherProps }: CommentProps) => {
             },
           }}
         >
-          {comment.author.id}
+          {comment.authorId}
         </chakra.span>
         {comment.content}
       </EmojiText>

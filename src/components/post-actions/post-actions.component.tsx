@@ -4,8 +4,7 @@ import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { RiBookmarkFill, RiBookmarkLine } from "react-icons/ri";
 import { useDispatch } from "react-redux";
-import { setIsBookmarked, setIsLiked } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -36,10 +35,10 @@ const PostActions = ({
   const isLiked: boolean | undefined = false;
   const isBookmarked: boolean | undefined = false;
   const likeHandler = () => {
-    dispatch(setIsLiked(post.id, !isLiked));
+    // dispatch(setIsLiked(post.id, !isLiked));
   };
   const toggleBookmarkHandler = () => {
-    dispatch(setIsBookmarked(post.id, !isBookmarked));
+    // dispatch(setIsBookmarked(post.id, !isBookmarked));
   };
   const toggleInputFocusHandler = () => {
     if (inputRef.current) inputRef.current.focus();
@@ -101,7 +100,9 @@ const PostActions = ({
         fontSize="sm"
         color="#2a2a2a"
       >
-        {`${post.likes.toLocaleString("en")} like${post.likes > 1 ? "s" : ""}`}
+        {`${post.likesCount.toLocaleString("en")} like${
+          post.likesCount > 1 ? "s" : ""
+        }`}
       </Text>
     </Box>
   );

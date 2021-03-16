@@ -1,7 +1,10 @@
 import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
+import { Fragment } from "react";
 import { useDispatch } from "react-redux";
-import { togglePostDataVisibility } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
+import { togglePostDataVisibility } from "../../redux/feed/posts.actions";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
 import MinPostData from "../min-post-data/min-post-data.component";
 import PostContent from "../post-content/post-content.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -12,6 +15,9 @@ interface UserPostsProps {
 
 const UserPosts = ({ posts }: UserPostsProps) => {
   const dispatch = useDispatch();
+  const hoveredPostsIds: number[] = useAppSelector(
+    (state: RootState) => state.userPage.hoveredPostsIds
+  );
   const {
     isOpen: isPostPageOpen,
     onOpen: onPostPageOpen,
@@ -26,8 +32,9 @@ const UserPosts = ({ posts }: UserPostsProps) => {
       mt="1rem"
     >
       {posts.map((post: IPost, index: number) => {
+        const isHovered: boolean = hoveredPostsIds.includes(post.id);
         return (
-          <>
+          <Fragment key={index}>
             <PostPageModal
               post={post}
               isOpen={isPostPageOpen}
@@ -42,13 +49,13 @@ const UserPosts = ({ posts }: UserPostsProps) => {
               onClick={onPostPageOpen}
             >
               <PostContent
-                imageUrl={post.imageUrl}
+                imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
                 cursor="pointer"
-                filter={post.isDataVisible ? "brightness(40%)" : ""}
+                filter={isHovered ? "brightness(40%)" : ""}
               />
-              {post.isDataVisible ? <MinPostData post={post} /> : <></>}
+              {isHovered ? <MinPostData post={post} /> : <></>}
             </Box>
-          </>
+          </Fragment>
         );
       })}
     </SimpleGrid>

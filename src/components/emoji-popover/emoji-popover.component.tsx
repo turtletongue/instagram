@@ -6,11 +6,10 @@ import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
 import { useDispatch } from "react-redux";
 import { IEmoji } from "../../redux/emojies/emojies.interfaces";
-import { changeCommentInput } from "../../redux/posts/posts.actions";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
-  postId: string;
+  postId: number;
 }
 
 const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
@@ -18,12 +17,12 @@ const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
   const emojies: IEmoji[] = [];
   const commentInput: string | undefined = "";
   const emojiPickHandler = (emoji: IEmoji) => {
-    dispatch(
-      changeCommentInput(
-        postId,
-        (commentInput ? commentInput : "") + emoji.content
-      )
-    );
+    // dispatch(
+    //   changeCommentInput(
+    //     postId,
+    //     (commentInput ? commentInput : "") + emoji.content
+    //   )
+    // );
   };
   return (
     <Popover>

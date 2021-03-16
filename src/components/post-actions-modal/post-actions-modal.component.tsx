@@ -8,7 +8,7 @@ interface PostActionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   headerOptions?: boolean;
-  postId: string;
+  postId: number;
 }
 
 const PostActionsModal = ({

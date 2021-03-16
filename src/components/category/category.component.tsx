@@ -2,7 +2,7 @@ import { Flex, Text } from "@chakra-ui/layout";
 import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
 import { showPosts, showSaved } from "../../redux/user-page/user-page.actions";
-import { POSTS_TAB } from "../../redux/user-page/user-page.constants";
+import { POSTS } from "../../redux/user-page/user-page.slice";
 
 interface CategoryProps {
   children: ReactNode;
@@ -21,9 +21,7 @@ const Category = ({ children, category, isActive }: CategoryProps) => {
       borderTopStyle="solid"
       borderTopColor="blackAlpha.800"
       pt="1rem"
-      onClick={() =>
-        dispatch(category === POSTS_TAB ? showPosts() : showSaved())
-      }
+      onClick={() => dispatch(category === POSTS ? showPosts() : showSaved())}
     >
       {children}
       <Text

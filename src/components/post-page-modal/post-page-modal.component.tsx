@@ -1,5 +1,5 @@
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/modal";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
 import PostContainer from "../post-container/post-container.component";
 
 interface PostPageModalProps {

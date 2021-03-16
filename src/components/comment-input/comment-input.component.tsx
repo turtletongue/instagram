@@ -6,27 +6,26 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
-import {
-  addComment,
-  changeCommentInput,
-  clearCommentInput,
-} from "../../redux/posts/posts.actions";
-import { IUser } from "../../redux/users/users.interfaces";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { IUser } from "../../redux/user/user.slice";
 import EmojiPopover from "../emoji-popover/emoji-popover.component";
 
 interface CommentInputProps {
-  postId: string;
+  postId: number;
   inputRef: any;
 }
 
 const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
   const dispatch = useDispatch();
   const commentInput: string | undefined = "";
-  const user: IUser | null = null;
+  const user: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
   const addCommentHandler = () => {
     if (user && commentInput) {
-      dispatch(addComment(postId, user, commentInput));
-      dispatch(clearCommentInput(postId));
+      // dispatch(addComment(postId, user, commentInput));
+      // dispatch(clearCommentInput(postId));
     }
   };
   return (
@@ -44,9 +43,9 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
         <Input
           ref={inputRef}
           value={commentInput ? commentInput : ""}
-          onChange={(event) =>
-            dispatch(changeCommentInput(postId, event.target.value))
-          }
+          onChange={(event) => {
+            // dispatch(changeCommentInput(postId, event.target.value))
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") addCommentHandler();
           }}

@@ -2,7 +2,7 @@ import Icon from "@chakra-ui/icon";
 import { Flex, Spacer, Text } from "@chakra-ui/layout";
 import { AiFillHeart } from "react-icons/ai";
 import { FaComment } from "react-icons/fa";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
 
 interface MinPostDataProps {
   post: IPost;
@@ -27,7 +27,7 @@ const MinPostData = ({ post }: MinPostDataProps) => {
       <Flex align="center">
         <Icon as={AiFillHeart} w={4} h={4} color="white" />
         <Text fontWeight="500" color="white" ml="0.3rem">
-          {post.likes}
+          {post.likesCount}
         </Text>
       </Flex>
       <Spacer />
