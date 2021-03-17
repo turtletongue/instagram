@@ -57,7 +57,7 @@ const PostPage = () => {
         },
       })
     );
-  }, []);
+  }, [dispatch, postId]);
   const isLoading: boolean = useAppSelector(
     (state: RootState) => state.postPage.postLoading === "loading"
   );

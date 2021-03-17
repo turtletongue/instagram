@@ -1,8 +1,11 @@
 import { Flex, Text } from "@chakra-ui/layout";
 import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
-import { showPosts, showSaved } from "../../redux/user-page/user-page.actions";
-import { POSTS } from "../../redux/user-page/user-page.slice";
+import {
+  POSTS,
+  showPosts,
+  showSaved,
+} from "../../redux/user-page/user-page.slice";
 
 interface CategoryProps {
   children: ReactNode;

@@ -29,6 +29,7 @@ export interface IPost {
   isLiked: boolean;
   isBookmarked: boolean;
   comments: IComment[];
+  commentInput: string;
 }
 
 interface IPostsResponse {
@@ -36,11 +37,16 @@ interface IPostsResponse {
   postsSlice: number;
 }
 
+interface ICommentInput {
+  postId: number;
+  commentInput: string;
+}
+
 export const requestSliceOfPosts = createAsyncThunk(
   "feed/requestSliceOfPostsStatus",
   async (requestOptions: RequestOptions, thunkAPI) => {
     if (requestOptions.testData) {
-      return requestOptions.testData;
+      return { ...requestOptions.testData, commentInput: "" };
     }
     try {
       const res = await fetch("URL", {
@@ -48,6 +54,7 @@ export const requestSliceOfPosts = createAsyncThunk(
         body: requestOptions.query,
       });
       const data = await res.json();
+      data.commentInput = "";
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -74,7 +81,54 @@ const initialState: FeedState = postsAdapter.getInitialState({
 const feedSlice = createSlice({
   name: "feed",
   initialState,
-  reducers: {},
+  reducers: {
+    likePost: (state: FeedState, action: PayloadAction<number>) => {
+      postsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: {
+          isLiked: true,
+          likesCount: state.entities[action.payload].likesCount + 1,
+        },
+      });
+    },
+    unlikePost: (state: FeedState, action: PayloadAction<number>) => {
+      postsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: {
+          isLiked: false,
+          likesCount: state.entities[action.payload].likesCount - 1,
+        },
+      });
+    },
+    bookmarkPost: (state: FeedState, action: PayloadAction<number>) => {
+      postsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: { isBookmarked: true },
+      });
+    },
+    unbookmarkPost: (state: FeedState, action: PayloadAction<number>) => {
+      postsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: { isBookmarked: false },
+      });
+    },
+    setCommentInput: (
+      state: FeedState,
+      action: PayloadAction<ICommentInput>
+    ) => {
+      const { postId, commentInput } = action.payload;
+      postsAdapter.updateOne(state, { id: postId, changes: { commentInput } });
+    },
+    addComment: (state: FeedState, action: PayloadAction<IComment>) => {
+      const { postId } = action.payload;
+      postsAdapter.updateOne(state, {
+        id: postId,
+        changes: {
+          comments: [...state.entities[postId].comments, action.payload],
+        },
+      });
+    },
+  },
   extraReducers: {
     [requestSliceOfPosts.pending as any]: (state: FeedState) => {
       state.postsLoading = "loading";
@@ -103,5 +157,14 @@ export const {
   selectAll: selectAllPosts,
   selectById: selectPostById,
 } = postsAdapter.getSelectors((state: RootState) => state.feed);
+
+export const {
+  likePost,
+  unlikePost,
+  bookmarkPost,
+  unbookmarkPost,
+  setCommentInput,
+  addComment,
+} = feedSlice.actions;
 
 export default feedSlice.reducer;

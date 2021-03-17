@@ -3,8 +3,14 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { RiBookmarkFill, RiBookmarkLine } from "react-icons/ri";
-import { useDispatch } from "react-redux";
-import { IPost } from "../../redux/feed/feed.slice";
+import {
+  bookmarkPost,
+  IPost,
+  likePost,
+  unbookmarkPost,
+  unlikePost,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch } from "../../redux/hooks";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -26,19 +32,19 @@ const PostActions = ({
   onPostPageClose,
   full,
 }: PostActionsProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {
     isOpen: isActionsOpen,
     onOpen: onActionsOpen,
     onClose: onActionsClose,
   } = useDisclosure();
-  const isLiked: boolean | undefined = false;
-  const isBookmarked: boolean | undefined = false;
+  const isLiked: boolean = post.isLiked;
+  const isBookmarked: boolean = post.isBookmarked;
   const likeHandler = () => {
-    // dispatch(setIsLiked(post.id, !isLiked));
+    dispatch(isLiked ? unlikePost(post.id) : likePost(post.id));
   };
   const toggleBookmarkHandler = () => {
-    // dispatch(setIsBookmarked(post.id, !isBookmarked));
+    dispatch(isBookmarked ? unbookmarkPost(post.id) : bookmarkPost(post.id));
   };
   const toggleInputFocusHandler = () => {
     if (inputRef.current) inputRef.current.focus();

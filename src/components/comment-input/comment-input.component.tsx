@@ -5,8 +5,13 @@ import {
   InputRightElement,
   Text,
 } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
-import { useAppSelector } from "../../redux/hooks";
+import {
+  addComment,
+  IPost,
+  selectPostById,
+  setCommentInput,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
 import EmojiPopover from "../emoji-popover/emoji-popover.component";
@@ -17,14 +22,28 @@ interface CommentInputProps {
 }
 
 const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
-  const dispatch = useDispatch();
-  const commentInput: string | undefined = "";
+  const dispatch = useAppDispatch();
+  const state: RootState = useAppSelector((state: RootState) => state);
+  const postData: unknown = selectPostById(state, postId);
+  const post: IPost = postData as IPost;
+  const commentInput: string | undefined = (post as IPost).commentInput;
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
   const addCommentHandler = () => {
     if (user && commentInput) {
-      // dispatch(addComment(postId, user, commentInput));
+      dispatch(
+        addComment({
+          id: post.comments.length,
+          authorId: user.userId,
+          postId: post.id,
+          writedAt: new Date().toISOString(),
+          isLiked: false,
+          likersIds: [],
+          content: commentInput,
+          replies: [],
+        })
+      );
       // dispatch(clearCommentInput(postId));
     }
   };
@@ -44,7 +63,9 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
           ref={inputRef}
           value={commentInput ? commentInput : ""}
           onChange={(event) => {
-            // dispatch(changeCommentInput(postId, event.target.value))
+            dispatch(
+              setCommentInput({ postId, commentInput: event.target.value })
+            );
           }}
           onKeyDown={(event) => {
             if (event.key === "Enter") addCommentHandler();

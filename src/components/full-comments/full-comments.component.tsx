@@ -58,7 +58,11 @@ const FullComments = ({ comments }: FullCommentsProps) => {
         return (
           <Flex key={index} mt="1rem">
             <Avatar
-              src={(authorData as IAuthorData).avatarUrl}
+              src={
+                (authorData as IAuthorData)?.avatarUrl
+                  ? (authorData as IAuthorData)?.avatarUrl
+                  : ""
+              }
               h="2rem"
               w="2rem"
               d="inline"

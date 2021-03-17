@@ -33,6 +33,7 @@ const PostComments = ({
             </Box>
           ) : index === 2 ? (
             <Text
+              key={index}
               color="#adadad"
               fontSize="sm"
               cursor="pointer"

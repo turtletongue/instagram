@@ -1,4 +1,6 @@
 import { Box, Flex, Spacer, Text } from "@chakra-ui/layout";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
 import ControlFollowingButton from "../control-following-button/control-following-button.component";
 import ProfileParams from "../profile-params/profile-params.component";
@@ -8,7 +10,9 @@ interface ProfileDataProps {
 }
 
 const ProfileData = ({ user }: ProfileDataProps) => {
-  const currentUserId: string | undefined = "1";
+  const currentUserId: string | undefined = useAppSelector(
+    (state: RootState) => state.user.currentUser?.userId
+  );
   return (
     <Box>
       <Flex align="center">

@@ -1,10 +1,9 @@
 import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
 import { Fragment } from "react";
-import { useDispatch } from "react-redux";
 import { IPost } from "../../redux/feed/feed.slice";
-import { togglePostDataVisibility } from "../../redux/feed/posts.actions";
-import { useAppSelector } from "../../redux/hooks";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
+import { togglePostHoverById } from "../../redux/user-page/user-page.slice";
 import MinPostData from "../min-post-data/min-post-data.component";
 import PostContent from "../post-content/post-content.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -14,7 +13,7 @@ interface UserPostsProps {
 }
 
 const UserPosts = ({ posts }: UserPostsProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const hoveredPostsIds: number[] = useAppSelector(
     (state: RootState) => state.userPage.hoveredPostsIds
   );
@@ -44,8 +43,8 @@ const UserPosts = ({ posts }: UserPostsProps) => {
               key={index}
               maxW="18rem"
               position="relative"
-              onMouseEnter={() => dispatch(togglePostDataVisibility(post.id))}
-              onMouseLeave={() => dispatch(togglePostDataVisibility(post.id))}
+              onMouseEnter={() => dispatch(togglePostHoverById(post.id))}
+              onMouseLeave={() => dispatch(togglePostHoverById(post.id))}
               onClick={onPostPageOpen}
             >
               <PostContent
