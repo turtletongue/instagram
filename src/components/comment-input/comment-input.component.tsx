@@ -7,6 +7,7 @@ import {
 } from "@chakra-ui/react";
 import {
   addComment,
+  clearCommentInput,
   IPost,
   selectPostById,
   setCommentInput,
@@ -19,6 +20,7 @@ import EmojiPopover from "../emoji-popover/emoji-popover.component";
 interface CommentInputProps {
   postId: number;
   inputRef: any;
+  userPage?: boolean;
 }
 
 const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
@@ -26,7 +28,7 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
   const state: RootState = useAppSelector((state: RootState) => state);
   const postData: unknown = selectPostById(state, postId);
   const post: IPost = postData as IPost;
-  const commentInput: string | undefined = (post as IPost).commentInput;
+  const commentInput: string | undefined = (post as IPost)?.commentInput;
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
@@ -34,7 +36,7 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
     if (user && commentInput) {
       dispatch(
         addComment({
-          id: post.comments.length,
+          id: post.comments.length + 1,
           authorId: user.userId,
           postId: post.id,
           writedAt: new Date().toISOString(),
@@ -44,7 +46,7 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
           replies: [],
         })
       );
-      // dispatch(clearCommentInput(postId));
+      dispatch(clearCommentInput(postId));
     }
   };
   return (

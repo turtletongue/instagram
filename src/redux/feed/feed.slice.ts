@@ -42,6 +42,12 @@ interface ICommentInput {
   commentInput: string;
 }
 
+interface ICommentLike {
+  postId: number;
+  commentId: number;
+  likerId: string;
+}
+
 export const requestSliceOfPosts = createAsyncThunk(
   "feed/requestSliceOfPostsStatus",
   async (requestOptions: RequestOptions, thunkAPI) => {
@@ -87,7 +93,7 @@ const feedSlice = createSlice({
         id: action.payload,
         changes: {
           isLiked: true,
-          likesCount: state.entities[action.payload].likesCount + 1,
+          likesCount: state.entities[action.payload]?.likesCount + 1,
         },
       });
     },
@@ -96,7 +102,7 @@ const feedSlice = createSlice({
         id: action.payload,
         changes: {
           isLiked: false,
-          likesCount: state.entities[action.payload].likesCount - 1,
+          likesCount: state.entities[action.payload]?.likesCount - 1,
         },
       });
     },
@@ -126,6 +132,48 @@ const feedSlice = createSlice({
         changes: {
           comments: [...state.entities[postId].comments, action.payload],
         },
+      });
+    },
+    likeComment: (state: FeedState, action: PayloadAction<ICommentLike>) => {
+      const { postId, commentId, likerId } = action.payload;
+      postsAdapter.updateOne(state, {
+        id: postId,
+        changes: {
+          comments: state.entities[postId].comments.map((comment: IComment) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: true,
+                  likersIds: [...comment.likersIds, likerId],
+                }
+              : comment
+          ),
+        },
+      });
+    },
+    unlikeComment: (state: FeedState, action: PayloadAction<ICommentLike>) => {
+      const { postId, commentId, likerId } = action.payload;
+      postsAdapter.updateOne(state, {
+        id: postId,
+        changes: {
+          comments: state.entities[postId].comments.map((comment: IComment) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: false,
+                  likersIds: comment.likersIds.filter(
+                    (currentLikerId: string) => currentLikerId !== likerId
+                  ),
+                }
+              : comment
+          ),
+        },
+      });
+    },
+    clearCommentInput: (state: FeedState, action: PayloadAction<number>) => {
+      postsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: { commentInput: "" },
       });
     },
   },
@@ -165,6 +213,9 @@ export const {
   unbookmarkPost,
   setCommentInput,
   addComment,
+  likeComment,
+  unlikeComment,
+  clearCommentInput,
 } = feedSlice.actions;
 
 export default feedSlice.reducer;

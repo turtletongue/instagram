@@ -4,8 +4,14 @@ import { Flex, Spacer } from "@chakra-ui/layout";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/popover";
 import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
-import { useDispatch } from "react-redux";
-import { IEmoji } from "../../redux/emojies/emojies.interfaces";
+import { IEmoji } from "../../redux/emojies/emojies.slice";
+import {
+  IPost,
+  selectPostById,
+  setCommentInput,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
@@ -13,16 +19,21 @@ interface EmojiPopoverProps {
 }
 
 const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
-  const dispatch = useDispatch();
-  const emojies: IEmoji[] = [];
-  const commentInput: string | undefined = "";
+  const dispatch = useAppDispatch();
+  const state: RootState = useAppSelector((state: RootState) => state);
+  const emojies: IEmoji[] = useAppSelector(
+    (state: RootState) => state.emojies.emojiesData
+  );
+  const postData: unknown = selectPostById(state, postId);
+  const post: IPost = postData as IPost;
+  const commentInput: string = post?.commentInput;
   const emojiPickHandler = (emoji: IEmoji) => {
-    // dispatch(
-    //   changeCommentInput(
-    //     postId,
-    //     (commentInput ? commentInput : "") + emoji.content
-    //   )
-    // );
+    dispatch(
+      setCommentInput({
+        postId,
+        commentInput: (commentInput ? commentInput : "") + emoji.content,
+      })
+    );
   };
   return (
     <Popover>

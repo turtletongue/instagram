@@ -15,9 +15,10 @@ import Time from "../time/time.component";
 
 interface FullCommentsProps {
   comments: IComment[];
+  userPage?: boolean;
 }
 
-const FullComments = ({ comments }: FullCommentsProps) => {
+const FullComments = ({ comments, userPage }: FullCommentsProps) => {
   const dispatch = useAppDispatch();
   const state = useAppSelector((state: RootState) => state);
   useEffect(() => {
@@ -68,7 +69,7 @@ const FullComments = ({ comments }: FullCommentsProps) => {
               d="inline"
             />
             <Box ml="1rem" w="16rem">
-              <Comment comment={comment} w="80%" full />
+              <Comment comment={comment} w="80%" full userPage={userPage} />
               <Time timeAgo={timeAgo} />
             </Box>
           </Flex>

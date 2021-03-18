@@ -13,7 +13,8 @@ import { RootState } from "../../redux/store";
 import {
   POSTS,
   requestUserData,
-  requestUserPosts,
+  requestUserPagePosts,
+  selectAllUserPagePosts,
 } from "../../redux/user-page/user-page.slice";
 import { IUser } from "../../redux/user/user.slice";
 
@@ -33,7 +34,7 @@ const UserPage = () => {
       })
     );
     dispatch(
-      requestUserPosts({
+      requestUserPagePosts({
         testData: [
           {
             id: 32324,
@@ -54,7 +55,7 @@ const UserPage = () => {
             comments: [
               {
                 id: 1,
-                postId: 32323,
+                postId: 32324,
                 authorId: "lindsayjmariiiie",
                 content: "@lindsayjmarie",
                 writedAt: new Date(2021, 2, 5).toISOString(),
@@ -64,7 +65,7 @@ const UserPage = () => {
               },
               {
                 id: 2,
-                postId: 32323,
+                postId: 32324,
                 authorId: "lindsayjmarie",
                 content: "Hello there!",
                 writedAt: new Date(2021, 2, 5).toISOString(),
@@ -78,17 +79,20 @@ const UserPage = () => {
       })
     );
   }, [dispatch, userId]);
+  const state: RootState = useAppSelector((state: RootState) => state);
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.userPage.user
   );
   const category: string = useAppSelector(
     (state: RootState) => state.userPage.category
   );
-  const userPosts: IPost[] = useAppSelector(
-    (state: RootState) => state.userPage.userPosts
+  const userPagePostsData: unknown[] = selectAllUserPagePosts(state.userPage);
+  const userPagePosts: IPost[] = userPagePostsData as IPost[];
+  const userPosts: IPost[] = userPagePosts.filter(
+    (post: IPost) => post.author.userId === user?.userId
   );
-  const savedPosts: IPost[] = useAppSelector(
-    (state: RootState) => state.userPage.userSaved
+  const savedPosts: IPost[] = userPagePosts.filter(
+    (post: IPost) => post.isBookmarked
   );
   return (
     <>

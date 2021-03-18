@@ -11,6 +11,12 @@ import {
   unlikePost,
 } from "../../redux/feed/feed.slice";
 import { useAppDispatch } from "../../redux/hooks";
+import {
+  bookmarkUserPagePost,
+  likeUserPagePost,
+  unbookmarkUserPagePost,
+  unlikeUserPagePost,
+} from "../../redux/user-page/user-page.slice";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -22,6 +28,8 @@ interface PostActionsProps {
   onPostPageOpen: () => void;
   onPostPageClose: () => void;
   full?: boolean;
+  userPage?: boolean;
+  onMainPageModalClose?: () => void;
 }
 
 const PostActions = ({
@@ -31,6 +39,8 @@ const PostActions = ({
   onPostPageOpen,
   onPostPageClose,
   full,
+  userPage,
+  onMainPageModalClose,
 }: PostActionsProps) => {
   const dispatch = useAppDispatch();
   const {
@@ -41,10 +51,28 @@ const PostActions = ({
   const isLiked: boolean = post.isLiked;
   const isBookmarked: boolean = post.isBookmarked;
   const likeHandler = () => {
-    dispatch(isLiked ? unlikePost(post.id) : likePost(post.id));
+    dispatch(
+      userPage
+        ? isLiked
+          ? unlikeUserPagePost(post.id)
+          : likeUserPagePost(post.id)
+        : isLiked
+        ? unlikePost(post.id)
+        : likePost(post.id)
+    );
   };
   const toggleBookmarkHandler = () => {
-    dispatch(isBookmarked ? unbookmarkPost(post.id) : bookmarkPost(post.id));
+    if (userPage && isBookmarked && onMainPageModalClose)
+      onMainPageModalClose();
+    dispatch(
+      userPage
+        ? isBookmarked
+          ? unbookmarkUserPagePost(post.id)
+          : bookmarkUserPagePost(post.id)
+        : isBookmarked
+        ? unbookmarkPost(post.id)
+        : bookmarkPost(post.id)
+    );
   };
   const toggleInputFocusHandler = () => {
     if (inputRef.current) inputRef.current.focus();

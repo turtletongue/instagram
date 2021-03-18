@@ -6,6 +6,7 @@ import HomePage from "./pages/homepage/homepage.component";
 import PostPage from "./pages/post-page/post-page.component";
 import SignIn from "./pages/signIn/signIn.component";
 import UserPage from "./pages/user-page/user-page.component";
+import { requestEmojies } from "./redux/emojies/emojies.slice";
 import { requestSliceOfPosts } from "./redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
@@ -63,7 +64,17 @@ const App = () => {
         },
       })
     );
-    // dispatch(fetchEmojies());
+    dispatch(
+      requestEmojies({
+        testData: [
+          { id: 1, content: "😀" },
+          { id: 2, content: "🤩" },
+          { id: 3, content: "☺" },
+          { id: 4, content: "👺" },
+          { id: 5, content: "❤" },
+        ],
+      })
+    );
   }, [dispatch]);
   const isAuth: boolean = useAppSelector((state: RootState) =>
     state.user.currentUser ? true : false

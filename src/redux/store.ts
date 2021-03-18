@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import emojiesReducer from "./emojies/emojies.slice";
 import feedReducer from "./feed/feed.slice";
 import fullCommentsReducer from "./full-comments/full-comments.slice";
 import postPageReducer from "./post-page/post-page.slice";
@@ -16,6 +17,7 @@ const store = configureStore({
     fullComments: fullCommentsReducer,
     userPage: userPageReducer,
     postPage: postPageReducer,
+    emojies: emojiesReducer,
   },
 });
 

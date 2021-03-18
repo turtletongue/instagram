@@ -38,6 +38,7 @@ const UserPosts = ({ posts }: UserPostsProps) => {
               post={post}
               isOpen={isPostPageOpen}
               onClose={onPostPageClose}
+              userPage
             />
             <Box
               key={index}
