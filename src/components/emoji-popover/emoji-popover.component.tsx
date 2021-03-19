@@ -12,27 +12,37 @@ import {
 } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
+import {
+  selectUserPagePostById,
+  setUserPageCommentInput,
+} from "../../redux/user-page/user-page.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
   postId: number;
+  userPage?: boolean;
 }
 
-const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
+const EmojiPopover = ({ postId, userPage }: EmojiPopoverProps) => {
   const dispatch = useAppDispatch();
   const state: RootState = useAppSelector((state: RootState) => state);
   const emojies: IEmoji[] = useAppSelector(
     (state: RootState) => state.emojies.emojiesData
   );
-  const postData: unknown = selectPostById(state, postId);
+  const postData: unknown = userPage
+    ? selectUserPagePostById(state, postId)
+    : selectPostById(state, postId);
   const post: IPost = postData as IPost;
   const commentInput: string = post?.commentInput;
   const emojiPickHandler = (emoji: IEmoji) => {
+    const commentContent = {
+      postId,
+      commentInput: (commentInput ? commentInput : "") + emoji.content,
+    };
     dispatch(
-      setCommentInput({
-        postId,
-        commentInput: (commentInput ? commentInput : "") + emoji.content,
-      })
+      userPage
+        ? setUserPageCommentInput(commentContent)
+        : setCommentInput(commentContent)
     );
   };
   return (

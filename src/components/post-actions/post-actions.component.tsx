@@ -40,7 +40,6 @@ const PostActions = ({
   onPostPageClose,
   full,
   userPage,
-  onMainPageModalClose,
 }: PostActionsProps) => {
   const dispatch = useAppDispatch();
   const {
@@ -62,8 +61,6 @@ const PostActions = ({
     );
   };
   const toggleBookmarkHandler = () => {
-    if (userPage && isBookmarked && onMainPageModalClose)
-      onMainPageModalClose();
     dispatch(
       userPage
         ? isBookmarked

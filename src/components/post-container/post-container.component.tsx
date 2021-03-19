@@ -14,15 +14,9 @@ interface PostContainerProps {
   post: IPost;
   full?: boolean;
   userPage?: boolean;
-  onMainPageModalClose?: () => void;
 }
 
-const PostContainer = ({
-  post,
-  full,
-  userPage,
-  onMainPageModalClose,
-}: PostContainerProps) => {
+const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
   const inputRef: any = useRef(null);
   const timeAgo: string = findTimeDifference(
     new Date(Date.parse(post.createdAt))
@@ -60,7 +54,6 @@ const PostContainer = ({
                     onPostPageClose={onPostPageClose}
                     full
                     userPage={userPage}
-                    onMainPageModalClose={onMainPageModalClose}
                   />
                   <Time timeAgo={timeAgo} />
                 </Box>

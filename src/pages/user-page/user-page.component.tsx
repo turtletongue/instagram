@@ -86,7 +86,7 @@ const UserPage = () => {
   const category: string = useAppSelector(
     (state: RootState) => state.userPage.category
   );
-  const userPagePostsData: unknown[] = selectAllUserPagePosts(state.userPage);
+  const userPagePostsData: unknown[] = selectAllUserPagePosts(state);
   const userPagePosts: IPost[] = userPagePostsData as IPost[];
   const userPosts: IPost[] = userPagePosts.filter(
     (post: IPost) => post.author.userId === user?.userId

@@ -15,7 +15,6 @@ export interface IComment {
   postId: number;
   writedAt: string;
   isLiked: boolean;
-  likersIds: string[];
   content: string;
   replies: IComment[];
 }
@@ -89,22 +88,26 @@ const feedSlice = createSlice({
   initialState,
   reducers: {
     likePost: (state: FeedState, action: PayloadAction<number>) => {
-      postsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: {
-          isLiked: true,
-          likesCount: state.entities[action.payload]?.likesCount + 1,
-        },
-      });
+      if (state.entities[action.payload]) {
+        postsAdapter.updateOne(state, {
+          id: action.payload,
+          changes: {
+            isLiked: true,
+            likesCount: state.entities[action.payload].likesCount + 1,
+          },
+        });
+      }
     },
     unlikePost: (state: FeedState, action: PayloadAction<number>) => {
-      postsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: {
-          isLiked: false,
-          likesCount: state.entities[action.payload]?.likesCount - 1,
-        },
-      });
+      if (state.entities[action.payload]) {
+        postsAdapter.updateOne(state, {
+          id: action.payload,
+          changes: {
+            isLiked: false,
+            likesCount: state.entities[action.payload].likesCount - 1,
+          },
+        });
+      }
     },
     bookmarkPost: (state: FeedState, action: PayloadAction<number>) => {
       postsAdapter.updateOne(state, {
@@ -127,48 +130,50 @@ const feedSlice = createSlice({
     },
     addComment: (state: FeedState, action: PayloadAction<IComment>) => {
       const { postId } = action.payload;
-      postsAdapter.updateOne(state, {
-        id: postId,
-        changes: {
-          comments: [...state.entities[postId].comments, action.payload],
-        },
-      });
+      if (state.entities[postId]) {
+        postsAdapter.updateOne(state, {
+          id: postId,
+          changes: {
+            comments: [...state.entities[postId].comments, action.payload],
+          },
+        });
+      }
     },
     likeComment: (state: FeedState, action: PayloadAction<ICommentLike>) => {
-      const { postId, commentId, likerId } = action.payload;
-      postsAdapter.updateOne(state, {
-        id: postId,
-        changes: {
-          comments: state.entities[postId].comments.map((comment: IComment) =>
-            comment.id === commentId
-              ? {
-                  ...comment,
-                  isLiked: true,
-                  likersIds: [...comment.likersIds, likerId],
-                }
-              : comment
-          ),
-        },
-      });
+      const { postId, commentId } = action.payload;
+      if (state.entities[postId]) {
+        postsAdapter.updateOne(state, {
+          id: postId,
+          changes: {
+            comments: state.entities[postId].comments.map((comment: IComment) =>
+              comment.id === commentId
+                ? {
+                    ...comment,
+                    isLiked: true,
+                  }
+                : comment
+            ),
+          },
+        });
+      }
     },
     unlikeComment: (state: FeedState, action: PayloadAction<ICommentLike>) => {
-      const { postId, commentId, likerId } = action.payload;
-      postsAdapter.updateOne(state, {
-        id: postId,
-        changes: {
-          comments: state.entities[postId].comments.map((comment: IComment) =>
-            comment.id === commentId
-              ? {
-                  ...comment,
-                  isLiked: false,
-                  likersIds: comment.likersIds.filter(
-                    (currentLikerId: string) => currentLikerId !== likerId
-                  ),
-                }
-              : comment
-          ),
-        },
-      });
+      const { postId, commentId } = action.payload;
+      if (state.entities[postId]) {
+        postsAdapter.updateOne(state, {
+          id: postId,
+          changes: {
+            comments: state.entities[postId].comments.map((comment: IComment) =>
+              comment.id === commentId
+                ? {
+                    ...comment,
+                    isLiked: false,
+                  }
+                : comment
+            ),
+          },
+        });
+      }
     },
     clearCommentInput: (state: FeedState, action: PayloadAction<number>) => {
       postsAdapter.updateOne(state, {

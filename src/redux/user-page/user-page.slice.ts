@@ -7,6 +7,7 @@ import {
 } from "@reduxjs/toolkit";
 import { IComment, IPost } from "../feed/feed.slice";
 import { RequestOptions } from "../interfaces";
+import { RootState } from "../store";
 import { IUser } from "../user/user.slice";
 
 export const POSTS: string = "POSTS";
@@ -17,6 +18,11 @@ interface ICommentLike {
   postId: number;
   commentId: number;
   likerId: string;
+}
+
+interface ICommentInput {
+  postId: number;
+  commentInput: string;
 }
 
 interface UserPageState {
@@ -101,19 +107,29 @@ const userPageSlice = createSlice({
       else state.hoveredPostsIds.push(action.payload);
     },
     likeUserPagePost: (state: UserPageState, action: PayloadAction<number>) => {
-      userPagePostsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: { isLiked: true },
-      });
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: action.payload,
+          changes: {
+            isLiked: true,
+            likesCount: state.entities[action.payload].likesCount + 1,
+          },
+        });
+      }
     },
     unlikeUserPagePost: (
       state: UserPageState,
       action: PayloadAction<number>
     ) => {
-      userPagePostsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: { isLiked: false },
-      });
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: action.payload,
+          changes: {
+            isLiked: false,
+            likesCount: state.entities[action.payload].likesCount - 1,
+          },
+        });
+      }
     },
     bookmarkUserPagePost: (
       state: UserPageState,
@@ -137,7 +153,7 @@ const userPageSlice = createSlice({
       state: UserPageState,
       action: PayloadAction<ICommentLike>
     ) => {
-      const { postId, commentId, likerId } = action.payload;
+      const { postId, commentId } = action.payload;
       const post: IPost = state.entities[postId];
       userPagePostsAdapter.updateOne(state, {
         id: postId,
@@ -148,7 +164,6 @@ const userPageSlice = createSlice({
                   ? {
                       ...comment,
                       isLiked: true,
-                      likersIds: [...comment.likersIds, likerId],
                     }
                   : comment
               )
@@ -160,7 +175,7 @@ const userPageSlice = createSlice({
       state: UserPageState,
       action: PayloadAction<ICommentLike>
     ) => {
-      const { postId, commentId, likerId } = action.payload;
+      const { postId, commentId } = action.payload;
       const post: IPost = state.entities[postId];
       userPagePostsAdapter.updateOne(state, {
         id: postId,
@@ -171,14 +186,44 @@ const userPageSlice = createSlice({
                   ? {
                       ...comment,
                       isLiked: false,
-                      likersIds: comment.likersIds.filter(
-                        (currentLikerId: string) => currentLikerId !== likerId
-                      ),
                     }
                   : comment
               )
             : [],
         },
+      });
+    },
+    setUserPageCommentInput: (
+      state: UserPageState,
+      action: PayloadAction<ICommentInput>
+    ) => {
+      const { postId, commentInput } = action.payload;
+      userPagePostsAdapter.updateOne(state, {
+        id: postId,
+        changes: { commentInput },
+      });
+    },
+    addUserPageComment: (
+      state: UserPageState,
+      action: PayloadAction<IComment>
+    ) => {
+      const { postId } = action.payload;
+      if (state.entities[postId]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: postId,
+          changes: {
+            comments: [...state.entities[postId].comments, action.payload],
+          },
+        });
+      }
+    },
+    clearUserPageCommentInput: (
+      state: UserPageState,
+      action: PayloadAction<number>
+    ) => {
+      userPagePostsAdapter.updateOne(state, {
+        id: action.payload,
+        changes: { commentInput: "" },
       });
     },
   },
@@ -225,7 +270,7 @@ const userPageSlice = createSlice({
 export const {
   selectById: selectUserPagePostById,
   selectAll: selectAllUserPagePosts,
-} = userPagePostsAdapter.getSelectors();
+} = userPagePostsAdapter.getSelectors((state: RootState) => state.userPage);
 
 export const {
   showPosts,
@@ -237,6 +282,9 @@ export const {
   bookmarkUserPagePost,
   likeUserPageComment,
   unlikeUserPageComment,
+  setUserPageCommentInput,
+  addUserPageComment,
+  clearUserPageCommentInput,
 } = userPageSlice.actions;
 
 export default userPageSlice.reducer;

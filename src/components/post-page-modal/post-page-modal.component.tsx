@@ -27,12 +27,7 @@ const PostPageModal = ({
         bgColor="transparent"
       >
         <ModalBody p={0} m="auto">
-          <PostContainer
-            post={post}
-            full
-            userPage={userPage}
-            onMainPageModalClose={onClose}
-          />
+          <PostContainer post={post} full userPage={userPage} />
         </ModalBody>
       </ModalContent>
     </Modal>
