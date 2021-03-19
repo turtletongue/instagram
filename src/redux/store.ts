@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import emojiesReducer from "./emojies/emojies.slice";
 import feedReducer from "./feed/feed.slice";
 import fullCommentsReducer from "./full-comments/full-comments.slice";
+import headerReducer from "./header/header.slice";
 import postPageReducer from "./post-page/post-page.slice";
 import searchInputReducer from "./search-input/search-input.slice";
 import signInReducer from "./signin/signin.slice";
@@ -18,6 +19,7 @@ const store = configureStore({
     userPage: userPageReducer,
     postPage: postPageReducer,
     emojies: emojiesReducer,
+    header: headerReducer,
   },
 });
 

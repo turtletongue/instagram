@@ -9,13 +9,14 @@ import { ReactNode } from "react";
 
 interface ActivityPopoverProps {
   children: ReactNode;
+  [propName: string]: any;
 }
 
-const ActivityPopover = ({ children }: ActivityPopoverProps) => {
+const ActivityPopover = ({ children, ...otherProps }: ActivityPopoverProps) => {
   return (
-    <Popover>
+    <Popover {...otherProps}>
       <PopoverTrigger>{children}</PopoverTrigger>
-      <PopoverContent>
+      <PopoverContent sx={{ "&:focus": { boxShadow: "none" } }}>
         <PopoverArrow />
         <PopoverBody></PopoverBody>
       </PopoverContent>

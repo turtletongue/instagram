@@ -1,4 +1,4 @@
-import { Center, Flex, Icon, Spacer } from "@chakra-ui/react";
+import { Box, Center, Flex, Icon, Spacer } from "@chakra-ui/react";
 import {
   AiFillHeart,
   AiFillHome,
@@ -6,18 +6,25 @@ import {
   AiOutlineHome,
 } from "react-icons/ai";
 import { Link, useHistory } from "react-router-dom";
-import { useAppSelector } from "../../redux/hooks";
+import {
+  hideActivities,
+  showActivities,
+} from "../../redux/header/header.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
+import ActivityPopover from "../activity-popover/activity-popover.component";
 import Avatar from "../avatar/avatar.component";
 
 const IconsGroup = () => {
   const history = useHistory();
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
-  const isActivityOpen: boolean = false;
+  const isActivitiesOpen: boolean = useAppSelector(
+    (state: RootState) => state.header.isActivitiesOpen
+  );
   return (
     <Flex align="center" minW="7rem">
       <Link to="/">
@@ -31,13 +38,20 @@ const IconsGroup = () => {
       <Spacer />
       {user ? (
         <>
-          <Icon
-            as={isActivityOpen ? AiFillHeart : AiOutlineHeart}
-            h={6}
-            w={6}
-            cursor="pointer"
-            onClick={() => {}} //toggle activity
-          />
+          <ActivityPopover
+            isOpen={isActivitiesOpen}
+            onOpen={() => dispatch(showActivities())}
+            onClose={() => dispatch(hideActivities())}
+          >
+            <Box>
+              <Icon
+                as={isActivitiesOpen ? AiFillHeart : AiOutlineHeart}
+                h={6}
+                w={6}
+                cursor="pointer"
+              />
+            </Box>
+          </ActivityPopover>
           <Spacer />
           <Center w="1.7rem" h="1.7rem">
             <Link to={`/${user.userId}/`}>
