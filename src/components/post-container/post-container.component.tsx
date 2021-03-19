@@ -1,6 +1,6 @@
 import { Box, Flex, useDisclosure } from "@chakra-ui/react";
 import { useRef } from "react";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { IPost } from "../../redux/feed/feed.slice";
 import findTimeDifference from "../../utils/findTimeDifference.util";
 import CommentInput from "../comment-input/comment-input.component";
 import FullComments from "../full-comments/full-comments.component";
@@ -13,11 +13,14 @@ import Time from "../time/time.component";
 interface PostContainerProps {
   post: IPost;
   full?: boolean;
+  userPage?: boolean;
 }
 
-const PostContainer = ({ post, full }: PostContainerProps) => {
+const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
   const inputRef: any = useRef(null);
-  const timeAgo: string = findTimeDifference(post.date);
+  const timeAgo: string = findTimeDifference(
+    new Date(Date.parse(post.createdAt))
+  );
   const {
     isOpen: isPostPageOpen,
     onOpen: onPostPageOpen,
@@ -34,10 +37,13 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
       {full ? (
         <>
           <Flex>
-            <PostContent w="40rem" imageUrl={post.imageUrl} />
+            <PostContent
+              w="40rem"
+              imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
+            />
             <Box w="20rem" borderLeftWidth="1px">
               <PostHeader h="4.5rem" author={post.author} postId={post.id} />
-              <FullComments comments={post.comments} />
+              <FullComments comments={post.comments} userPage={userPage} />
               <Box h="35%">
                 <Box p="0.8rem" bgColor="white" borderTopWidth="1px">
                   <PostActions
@@ -47,10 +53,15 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
                     onPostPageOpen={onPostPageOpen}
                     onPostPageClose={onPostPageClose}
                     full
+                    userPage={userPage}
                   />
                   <Time timeAgo={timeAgo} />
                 </Box>
-                <CommentInput inputRef={inputRef} postId={post.id} />
+                <CommentInput
+                  inputRef={inputRef}
+                  postId={post.id}
+                  userPage={userPage}
+                />
               </Box>
             </Box>
           </Flex>
@@ -58,7 +69,9 @@ const PostContainer = ({ post, full }: PostContainerProps) => {
       ) : (
         <>
           <PostHeader author={post.author} postId={post.id} />
-          <PostContent imageUrl={post.imageUrl} />
+          <PostContent
+            imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
+          />
           <PostFooter
             inputRef={inputRef}
             post={post}

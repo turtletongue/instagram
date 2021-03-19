@@ -1,7 +1,9 @@
 import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
-import { useDispatch } from "react-redux";
-import { togglePostDataVisibility } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
+import { Fragment } from "react";
+import { IPost } from "../../redux/feed/feed.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { togglePostHoverById } from "../../redux/user-page/user-page.slice";
 import MinPostData from "../min-post-data/min-post-data.component";
 import PostContent from "../post-content/post-content.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -11,7 +13,10 @@ interface UserPostsProps {
 }
 
 const UserPosts = ({ posts }: UserPostsProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
+  const hoveredPostsIds: number[] = useAppSelector(
+    (state: RootState) => state.userPage.hoveredPostsIds
+  );
   const {
     isOpen: isPostPageOpen,
     onOpen: onPostPageOpen,
@@ -26,29 +31,31 @@ const UserPosts = ({ posts }: UserPostsProps) => {
       mt="1rem"
     >
       {posts.map((post: IPost, index: number) => {
+        const isHovered: boolean = hoveredPostsIds.includes(post.id);
         return (
-          <>
+          <Fragment key={index}>
             <PostPageModal
               post={post}
               isOpen={isPostPageOpen}
               onClose={onPostPageClose}
+              userPage
             />
             <Box
               key={index}
               maxW="18rem"
               position="relative"
-              onMouseEnter={() => dispatch(togglePostDataVisibility(post.id))}
-              onMouseLeave={() => dispatch(togglePostDataVisibility(post.id))}
+              onMouseEnter={() => dispatch(togglePostHoverById(post.id))}
+              onMouseLeave={() => dispatch(togglePostHoverById(post.id))}
               onClick={onPostPageOpen}
             >
               <PostContent
-                imageUrl={post.imageUrl}
+                imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
                 cursor="pointer"
-                filter={post.isDataVisible ? "brightness(40%)" : ""}
+                filter={isHovered ? "brightness(40%)" : ""}
               />
-              {post.isDataVisible ? <MinPostData post={post} /> : <></>}
+              {isHovered ? <MinPostData post={post} /> : <></>}
             </Box>
-          </>
+          </Fragment>
         );
       })}
     </SimpleGrid>

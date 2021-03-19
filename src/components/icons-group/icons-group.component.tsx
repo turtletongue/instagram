@@ -1,23 +1,29 @@
-import { Center, Flex, Icon, Spacer } from "@chakra-ui/react";
+import { Box, Center, Flex, Icon, Spacer } from "@chakra-ui/react";
 import {
   AiFillHeart,
   AiFillHome,
   AiOutlineHeart,
   AiOutlineHome,
 } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
 import { Link, useHistory } from "react-router-dom";
-import { toggleActivity } from "../../redux/menu/menu.actions";
-import { State } from "../../redux/store";
-import { IUser } from "../../redux/users/users.interfaces";
+import {
+  hideActivities,
+  showActivities,
+} from "../../redux/header/header.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { IUser } from "../../redux/user/user.slice";
+import ActivityPopover from "../activity-popover/activity-popover.component";
 import Avatar from "../avatar/avatar.component";
 
 const IconsGroup = () => {
   const history = useHistory();
-  const dispatch = useDispatch();
-  const user: IUser | null = useSelector((state: State) => state.signIn.user);
-  const isActivityOpen: boolean = useSelector(
-    (state: State) => state.menu.isActivityOpen
+  const dispatch = useAppDispatch();
+  const user: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  const isActivitiesOpen: boolean = useAppSelector(
+    (state: RootState) => state.header.isActivitiesOpen
   );
   return (
     <Flex align="center" minW="7rem">
@@ -32,20 +38,29 @@ const IconsGroup = () => {
       <Spacer />
       {user ? (
         <>
-          <Icon
-            as={isActivityOpen ? AiFillHeart : AiOutlineHeart}
-            h={6}
-            w={6}
-            cursor="pointer"
-            onClick={() => dispatch(toggleActivity())}
-          />
+          <ActivityPopover
+            isOpen={isActivitiesOpen}
+            onOpen={() => dispatch(showActivities())}
+            onClose={() => dispatch(hideActivities())}
+          >
+            <Box>
+              <Icon
+                as={isActivitiesOpen ? AiFillHeart : AiOutlineHeart}
+                h={6}
+                w={6}
+                cursor="pointer"
+              />
+            </Box>
+          </ActivityPopover>
           <Spacer />
           <Center w="1.7rem" h="1.7rem">
-            <Link to={`/${user.id}/`}>
+            <Link to={`/${user.userId}/`}>
               <Avatar
-                src={user?.avatar ? user?.avatar : null}
+                src={user.avatarUrl}
                 borderWidth={
-                  history.location.pathname === `/${user.id}/` ? "0.1rem" : 0
+                  history.location.pathname === `/${user.userId}/`
+                    ? "0.1rem"
+                    : 0
                 }
                 borderColor="black"
                 borderStyle="solid"

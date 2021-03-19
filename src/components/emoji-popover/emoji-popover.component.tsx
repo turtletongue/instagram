@@ -4,32 +4,45 @@ import { Flex, Spacer } from "@chakra-ui/layout";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/popover";
 import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
-import { useDispatch, useSelector } from "react-redux";
-import { IEmoji } from "../../redux/emojies/emojies.interfaces";
-import { changeCommentInput } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
+import { IEmoji } from "../../redux/emojies/emojies.slice";
+import {
+  IPost,
+  selectPostById,
+  setCommentInput,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import {
+  selectUserPagePostById,
+  setUserPageCommentInput,
+} from "../../redux/user-page/user-page.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
-  postId: string;
+  postId: number;
+  userPage?: boolean;
 }
 
-const EmojiPopover = ({ postId }: EmojiPopoverProps) => {
-  const dispatch = useDispatch();
-  const emojies: IEmoji[] = useSelector(
-    (state: State) => state.emojies.emojiesData
+const EmojiPopover = ({ postId, userPage }: EmojiPopoverProps) => {
+  const dispatch = useAppDispatch();
+  const state: RootState = useAppSelector((state: RootState) => state);
+  const emojies: IEmoji[] = useAppSelector(
+    (state: RootState) => state.emojies.emojiesData
   );
-  const commentInput: string | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => p.id === postId)?.commentInput
-  );
+  const postData: unknown = userPage
+    ? selectUserPagePostById(state, postId)
+    : selectPostById(state, postId);
+  const post: IPost = postData as IPost;
+  const commentInput: string = post?.commentInput;
   const emojiPickHandler = (emoji: IEmoji) => {
+    const commentContent = {
+      postId,
+      commentInput: (commentInput ? commentInput : "") + emoji.content,
+    };
     dispatch(
-      changeCommentInput(
-        postId,
-        (commentInput ? commentInput : "") + emoji.content
-      )
+      userPage
+        ? setUserPageCommentInput(commentContent)
+        : setCommentInput(commentContent)
     );
   };
   return (

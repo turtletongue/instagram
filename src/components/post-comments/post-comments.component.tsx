@@ -1,11 +1,11 @@
 import { Box, Text } from "@chakra-ui/react";
-import { IComment } from "../../redux/posts/posts.interfaces";
+import { IComment } from "../../redux/feed/feed.slice";
 import findTimeDifference from "../../utils/findTimeDifference.util";
 import Comment from "../comment/comment.component";
 import Time from "../time/time.component";
 
 interface PostCommentsProps {
-  postDate: Date;
+  postDate: string;
   comments: IComment[];
   onPostPageOpen: () => void;
 }
@@ -15,7 +15,7 @@ const PostComments = ({
   comments,
   onPostPageOpen,
 }: PostCommentsProps) => {
-  const timeAgo: string = findTimeDifference(postDate);
+  const timeAgo: string = findTimeDifference(new Date(Date.parse(postDate)));
   return (
     <>
       <Box>
@@ -33,6 +33,7 @@ const PostComments = ({
             </Box>
           ) : index === 2 ? (
             <Text
+              key={index}
               color="#adadad"
               fontSize="sm"
               cursor="pointer"

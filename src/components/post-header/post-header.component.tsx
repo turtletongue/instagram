@@ -1,13 +1,13 @@
 import { Flex, Icon, Spacer, Text, useDisclosure } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { Link } from "react-router-dom";
-import { IUser } from "../../redux/users/users.interfaces";
+import { IUser } from "../../redux/user/user.slice";
 import Avatar from "../avatar/avatar.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 
 interface PostHeaderProps {
   author: IUser;
-  postId: string;
+  postId: number;
   [propName: string]: any;
 }
 
@@ -31,10 +31,10 @@ const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
         headerOptions
       />
       <Flex align="center">
-        <Link to={`/${author.id}/`}>
-          <Avatar src={author.avatar} w="2rem" h="2rem" />
+        <Link to={`/${author.userId}/`}>
+          <Avatar src={author.avatarUrl} w="2rem" h="2rem" />
         </Link>
-        <Link to={`/${author.id}/`}>
+        <Link to={`/${author.userId}/`}>
           <Text
             ml="0.8rem"
             fontSize="sm"
@@ -49,7 +49,7 @@ const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
               },
             }}
           >
-            {author.id}
+            {author.userId}
           </Text>
         </Link>
       </Flex>

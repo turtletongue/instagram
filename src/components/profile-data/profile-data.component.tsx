@@ -1,7 +1,7 @@
 import { Box, Flex, Spacer, Text } from "@chakra-ui/layout";
-import { useSelector } from "react-redux";
-import { State } from "../../redux/store";
-import { IUser } from "../../redux/users/users.interfaces";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import { IUser } from "../../redux/user/user.slice";
 import ControlFollowingButton from "../control-following-button/control-following-button.component";
 import ProfileParams from "../profile-params/profile-params.component";
 
@@ -10,16 +10,16 @@ interface ProfileDataProps {
 }
 
 const ProfileData = ({ user }: ProfileDataProps) => {
-  const currentUserId: string | undefined = useSelector(
-    (state: State) => state.signIn.user?.id
+  const currentUserId: string | undefined = useAppSelector(
+    (state: RootState) => state.user.currentUser?.userId
   );
   return (
     <Box>
       <Flex align="center">
         <Text fontSize="3xl" fontWeight="200">
-          {user.id}
+          {user.userId}
         </Text>
-        {currentUserId === user.id ? (
+        {currentUserId === user.userId ? (
           <ProfileParams />
         ) : (
           <ControlFollowingButton isFollowed={false} />

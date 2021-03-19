@@ -1,46 +1,30 @@
-import { applyMiddleware, combineReducers, createStore, Store } from "redux";
-import logger from "redux-logger";
-import thunk from "redux-thunk";
-import activitiesReducer, { ActivityState } from "./activity/activity.reducer";
-import emojiesReducer, { EmojiesState } from "./emojies/emojies.reducer";
-import menuReducer, { MenuState } from "./menu/menu.reducer";
-import postsReducer, { PostsState } from "./posts/posts.reducer";
-import searchInputReducer, {
-  SearchInputState,
-} from "./search-input/search-input.reducer";
-import signInReducer, { SignInState } from "./signin/signin.reducer";
-import userPageReducer, { UserPageState } from "./user-page/user-page.reducer";
-import usersReducer, { UsersState } from "./users/users.reducer";
+import { configureStore } from "@reduxjs/toolkit";
+import emojiesReducer from "./emojies/emojies.slice";
+import feedReducer from "./feed/feed.slice";
+import fullCommentsReducer from "./full-comments/full-comments.slice";
+import headerReducer from "./header/header.slice";
+import postPageReducer from "./post-page/post-page.slice";
+import searchInputReducer from "./search-input/search-input.slice";
+import signInReducer from "./signin/signin.slice";
+import userPageReducer from "./user-page/user-page.slice";
+import userReducer from "./user/user.slice";
 
-const middlewares: any[] = [thunk];
-
-if (process.env.NODE_ENV !== "production") {
-  middlewares.push(logger);
-}
-
-export interface State {
-  signIn: SignInState;
-  searchInput: SearchInputState;
-  menu: MenuState;
-  posts: PostsState;
-  emojies: EmojiesState;
-  users: UsersState;
-  userPage: UserPageState;
-  actiivities: ActivityState;
-}
-
-const store: Store = createStore(
-  combineReducers({
+const store = configureStore({
+  reducer: {
     signIn: signInReducer,
+    user: userReducer,
     searchInput: searchInputReducer,
-    menu: menuReducer,
-    posts: postsReducer,
-    emojies: emojiesReducer,
-    users: usersReducer,
+    feed: feedReducer,
+    fullComments: fullCommentsReducer,
     userPage: userPageReducer,
-    activities: activitiesReducer,
-  }),
-  applyMiddleware(...middlewares)
-);
+    postPage: postPageReducer,
+    emojies: emojiesReducer,
+    header: headerReducer,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;
 
 export default store;

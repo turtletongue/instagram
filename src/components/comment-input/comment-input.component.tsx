@@ -5,33 +5,59 @@ import {
   InputRightElement,
   Text,
 } from "@chakra-ui/react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   addComment,
-  changeCommentInput,
   clearCommentInput,
-} from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
-import { IUser } from "../../redux/users/users.interfaces";
+  IComment,
+  IPost,
+  selectPostById,
+  setCommentInput,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
+import {
+  addUserPageComment,
+  clearUserPageCommentInput,
+  selectUserPagePostById,
+  setUserPageCommentInput,
+} from "../../redux/user-page/user-page.slice";
+import { IUser } from "../../redux/user/user.slice";
 import EmojiPopover from "../emoji-popover/emoji-popover.component";
 
 interface CommentInputProps {
-  postId: string;
+  postId: number;
   inputRef: any;
+  userPage?: boolean;
 }
 
-const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
-  const dispatch = useDispatch();
-  const commentInput: string | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => p.id === postId)?.commentInput
+const CommentInput = ({ postId, inputRef, userPage }: CommentInputProps) => {
+  const dispatch = useAppDispatch();
+  const state: RootState = useAppSelector((state: RootState) => state);
+  const postData: unknown = userPage
+    ? selectUserPagePostById(state, postId)
+    : selectPostById(state, postId);
+  const post: IPost = postData as IPost;
+  const commentInput: string | undefined = (post as IPost)?.commentInput;
+  const user: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
   );
-  const user: IUser | null = useSelector((state: State) => state.signIn.user);
   const addCommentHandler = () => {
     if (user && commentInput) {
-      dispatch(addComment(postId, user, commentInput));
-      dispatch(clearCommentInput(postId));
+      const commentData: IComment = {
+        id: post.comments.length + 1,
+        authorId: user.userId,
+        postId: post.id,
+        writedAt: new Date().toISOString(),
+        isLiked: false,
+        content: commentInput,
+        replies: [],
+      };
+      dispatch(
+        userPage ? addUserPageComment(commentData) : addComment(commentData)
+      );
+      dispatch(
+        userPage ? clearUserPageCommentInput(postId) : clearCommentInput(postId)
+      );
     }
   };
   return (
@@ -44,14 +70,19 @@ const CommentInput = ({ postId, inputRef }: CommentInputProps) => {
         bgColor="white"
       >
         <InputLeftElement>
-          <EmojiPopover postId={postId} />
+          <EmojiPopover postId={postId} userPage={userPage} />
         </InputLeftElement>
         <Input
           ref={inputRef}
           value={commentInput ? commentInput : ""}
-          onChange={(event) =>
-            dispatch(changeCommentInput(postId, event.target.value))
-          }
+          onChange={(event) => {
+            const commentInput = { postId, commentInput: event.target.value };
+            dispatch(
+              userPage
+                ? setUserPageCommentInput(commentInput)
+                : setCommentInput(commentInput)
+            );
+          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") addCommentHandler();
           }}

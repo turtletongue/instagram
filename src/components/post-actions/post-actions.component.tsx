@@ -3,10 +3,20 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { RiBookmarkFill, RiBookmarkLine } from "react-icons/ri";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsBookmarked, setIsLiked } from "../../redux/posts/posts.actions";
-import { IPost } from "../../redux/posts/posts.interfaces";
-import { State } from "../../redux/store";
+import {
+  bookmarkPost,
+  IPost,
+  likePost,
+  unbookmarkPost,
+  unlikePost,
+} from "../../redux/feed/feed.slice";
+import { useAppDispatch } from "../../redux/hooks";
+import {
+  bookmarkUserPagePost,
+  likeUserPagePost,
+  unbookmarkUserPagePost,
+  unlikeUserPagePost,
+} from "../../redux/user-page/user-page.slice";
 import MotionBox from "../motion-box/motion-box.component";
 import PostActionsModal from "../post-actions-modal/post-actions-modal.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -18,6 +28,8 @@ interface PostActionsProps {
   onPostPageOpen: () => void;
   onPostPageClose: () => void;
   full?: boolean;
+  userPage?: boolean;
+  onMainPageModalClose?: () => void;
 }
 
 const PostActions = ({
@@ -27,30 +39,37 @@ const PostActions = ({
   onPostPageOpen,
   onPostPageClose,
   full,
+  userPage,
 }: PostActionsProps) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const {
     isOpen: isActionsOpen,
     onOpen: onActionsOpen,
     onClose: onActionsClose,
   } = useDisclosure();
-  const isLiked: boolean | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => {
-        return post.id === p.id;
-      })?.isLiked
-  );
-  const isBookmarked: boolean | undefined = useSelector(
-    (state: State) =>
-      state.posts.postsData.find((p: IPost) => {
-        return post.id === p.id;
-      })?.isBookmarked
-  );
+  const isLiked: boolean = post.isLiked;
+  const isBookmarked: boolean = post.isBookmarked;
   const likeHandler = () => {
-    dispatch(setIsLiked(post.id, !isLiked));
+    dispatch(
+      userPage
+        ? isLiked
+          ? unlikeUserPagePost(post.id)
+          : likeUserPagePost(post.id)
+        : isLiked
+        ? unlikePost(post.id)
+        : likePost(post.id)
+    );
   };
   const toggleBookmarkHandler = () => {
-    dispatch(setIsBookmarked(post.id, !isBookmarked));
+    dispatch(
+      userPage
+        ? isBookmarked
+          ? unbookmarkUserPagePost(post.id)
+          : bookmarkUserPagePost(post.id)
+        : isBookmarked
+        ? unbookmarkPost(post.id)
+        : bookmarkPost(post.id)
+    );
   };
   const toggleInputFocusHandler = () => {
     if (inputRef.current) inputRef.current.focus();
@@ -112,7 +131,9 @@ const PostActions = ({
         fontSize="sm"
         color="#2a2a2a"
       >
-        {`${post.likes.toLocaleString("en")} like${post.likes > 1 ? "s" : ""}`}
+        {`${post.likesCount.toLocaleString("en")} like${
+          post.likesCount > 1 ? "s" : ""
+        }`}
       </Text>
     </Box>
   );
