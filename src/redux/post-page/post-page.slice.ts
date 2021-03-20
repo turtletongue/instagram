@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IPost } from "../feed/feed.slice";
+import { IComment, IPost } from "../feed/feed.slice";
 import { RequestOptions } from "../interfaces";
 
 interface PostPageState {
@@ -36,7 +36,75 @@ export const requestPostById = createAsyncThunk(
 const postPageSlice = createSlice({
   name: "postPage",
   initialState,
-  reducers: {},
+  reducers: {
+    likePostPagePost: (state: PostPageState) => {
+      if (state.post) {
+        state.post.isLiked = true;
+        state.post.likesCount += 1;
+      }
+    },
+    unlikePostPagePost: (state: PostPageState) => {
+      if (state.post) {
+        state.post.isLiked = false;
+        state.post.likesCount -= 1;
+      }
+    },
+    bookmarkPostPagePost: (state: PostPageState) => {
+      if (state.post) {
+        state.post.isBookmarked = true;
+      }
+    },
+    unbookmarkPostPagePost: (state: PostPageState) => {
+      if (state.post) {
+        state.post.isBookmarked = false;
+      }
+    },
+    likePostPageComment: (
+      state: PostPageState,
+      action: PayloadAction<number>
+    ) => {
+      if (state.post) {
+        state.post.comments = state.post.comments.map((comment: IComment) =>
+          comment.id === action.payload
+            ? { ...comment, isLiked: true }
+            : comment
+        );
+      }
+    },
+    unlikePostPageComment: (
+      state: PostPageState,
+      action: PayloadAction<number>
+    ) => {
+      if (state.post) {
+        state.post.comments = state.post.comments.map((comment: IComment) =>
+          comment.id === action.payload
+            ? { ...comment, isLiked: false }
+            : comment
+        );
+      }
+    },
+    setPostPageCommentInput: (
+      state: PostPageState,
+      action: PayloadAction<string>
+    ) => {
+      if (state.post) {
+        state.post.commentInput = action.payload;
+      }
+    },
+    clearPostPageCommentInput: (state: PostPageState) => {
+      if (state.post) {
+        state.post.commentInput = "";
+      }
+    },
+    addPostPageComment: (
+      state: PostPageState,
+      action: PayloadAction<IComment>
+    ) => {
+      if (state.post) {
+        state.post.comments.push(action.payload);
+      }
+    },
+  },
   extraReducers: {
     [requestPostById.pending as any]: (state: PostPageState) => {
       state.postLoading = "loading";
@@ -59,5 +127,17 @@ const postPageSlice = createSlice({
     },
   },
 });
+
+export const {
+  likePostPageComment,
+  likePostPagePost,
+  unbookmarkPostPagePost,
+  unlikePostPageComment,
+  unlikePostPagePost,
+  bookmarkPostPagePost,
+  setPostPageCommentInput,
+  clearPostPageCommentInput,
+  addPostPageComment,
+} = postPageSlice.actions;
 
 export default postPageSlice.reducer;

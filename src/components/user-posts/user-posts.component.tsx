@@ -1,5 +1,6 @@
 import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
 import { Fragment } from "react";
+import { USER_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
@@ -38,7 +39,7 @@ const UserPosts = ({ posts }: UserPostsProps) => {
               post={post}
               isOpen={isPostPageOpen}
               onClose={onPostPageClose}
-              userPage
+              page={USER_PAGE}
             />
             <Box
               key={index}

@@ -6,15 +6,10 @@ interface PostPageModalProps {
   post: IPost;
   isOpen: boolean;
   onClose: () => void;
-  userPage?: boolean;
+  page?: string;
 }
 
-const PostPageModal = ({
-  post,
-  isOpen,
-  onClose,
-  userPage,
-}: PostPageModalProps) => {
+const PostPageModal = ({ post, isOpen, onClose, page }: PostPageModalProps) => {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="5xl">
       <ModalOverlay />
@@ -27,7 +22,7 @@ const PostPageModal = ({
         bgColor="transparent"
       >
         <ModalBody p={0} m="auto">
-          <PostContainer post={post} full userPage={userPage} />
+          <PostContainer post={post} full page={page} />
         </ModalBody>
       </ModalContent>
     </Modal>

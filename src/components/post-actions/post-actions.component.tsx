@@ -3,6 +3,7 @@ import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { FaRegComment } from "react-icons/fa";
 import { IoPaperPlaneOutline } from "react-icons/io5";
 import { RiBookmarkFill, RiBookmarkLine } from "react-icons/ri";
+import { POST_PAGE, USER_PAGE } from "../../constants";
 import {
   bookmarkPost,
   IPost,
@@ -11,6 +12,12 @@ import {
   unlikePost,
 } from "../../redux/feed/feed.slice";
 import { useAppDispatch } from "../../redux/hooks";
+import {
+  bookmarkPostPagePost,
+  likePostPagePost,
+  unbookmarkPostPagePost,
+  unlikePostPagePost,
+} from "../../redux/post-page/post-page.slice";
 import {
   bookmarkUserPagePost,
   likeUserPagePost,
@@ -28,7 +35,7 @@ interface PostActionsProps {
   onPostPageOpen: () => void;
   onPostPageClose: () => void;
   full?: boolean;
-  userPage?: boolean;
+  page?: string;
   onMainPageModalClose?: () => void;
 }
 
@@ -39,7 +46,7 @@ const PostActions = ({
   onPostPageOpen,
   onPostPageClose,
   full,
-  userPage,
+  page,
 }: PostActionsProps) => {
   const dispatch = useAppDispatch();
   const {
@@ -50,26 +57,40 @@ const PostActions = ({
   const isLiked: boolean = post.isLiked;
   const isBookmarked: boolean = post.isBookmarked;
   const likeHandler = () => {
-    dispatch(
-      userPage
-        ? isLiked
-          ? unlikeUserPagePost(post.id)
-          : likeUserPagePost(post.id)
-        : isLiked
-        ? unlikePost(post.id)
-        : likePost(post.id)
-    );
+    switch (page) {
+      case USER_PAGE:
+        dispatch(
+          isLiked ? unlikeUserPagePost(post.id) : likeUserPagePost(post.id)
+        );
+        break;
+      case POST_PAGE:
+        dispatch(isLiked ? unlikePostPagePost() : likePostPagePost());
+        break;
+      default:
+        dispatch(isLiked ? unlikePost(post.id) : likePost(post.id));
+        break;
+    }
   };
   const toggleBookmarkHandler = () => {
-    dispatch(
-      userPage
-        ? isBookmarked
-          ? unbookmarkUserPagePost(post.id)
-          : bookmarkUserPagePost(post.id)
-        : isBookmarked
-        ? unbookmarkPost(post.id)
-        : bookmarkPost(post.id)
-    );
+    switch (page) {
+      case USER_PAGE:
+        dispatch(
+          isBookmarked
+            ? unbookmarkUserPagePost(post.id)
+            : bookmarkUserPagePost(post.id)
+        );
+        break;
+      case POST_PAGE:
+        dispatch(
+          isBookmarked ? unbookmarkPostPagePost() : bookmarkPostPagePost()
+        );
+        break;
+      default:
+        dispatch(
+          isBookmarked ? unbookmarkPost(post.id) : bookmarkPost(post.id)
+        );
+        break;
+    }
   };
   const toggleInputFocusHandler = () => {
     if (inputRef.current) inputRef.current.focus();

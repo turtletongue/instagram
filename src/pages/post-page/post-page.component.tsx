@@ -4,6 +4,7 @@ import { useParams } from "react-router";
 import Header from "../../components/header/header.component";
 import LoadingScreen from "../../components/loading-screen/loading-screen.component";
 import PostContainer from "../../components/post-container/post-container.component";
+import { POST_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { requestPostById } from "../../redux/post-page/post-page.slice";
@@ -77,7 +78,7 @@ const PostPage = () => {
           p="3rem 0 1rem 0"
         >
           {post ? (
-            <PostContainer post={post} full />
+            <PostContainer post={post} full page={POST_PAGE} />
           ) : (
             <Text fontSize="3xl" color="gray.500" fontWeight="500">
               POST NOT FOUND

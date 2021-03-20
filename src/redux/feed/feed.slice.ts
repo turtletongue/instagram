@@ -3,7 +3,7 @@ import {
   createEntityAdapter,
   createSlice,
   EntityId,
-  PayloadAction,
+  PayloadAction
 } from "@reduxjs/toolkit";
 import { RequestOptions } from "../interfaces";
 import { RootState } from "../store";
@@ -36,7 +36,7 @@ interface IPostsResponse {
   postsSlice: number;
 }
 
-interface ICommentInput {
+export interface ICommentInput {
   postId: number;
   commentInput: string;
 }
@@ -44,7 +44,6 @@ interface ICommentInput {
 interface ICommentLike {
   postId: number;
   commentId: number;
-  likerId: string;
 }
 
 export const requestSliceOfPosts = createAsyncThunk(

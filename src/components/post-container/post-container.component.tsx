@@ -13,10 +13,10 @@ import Time from "../time/time.component";
 interface PostContainerProps {
   post: IPost;
   full?: boolean;
-  userPage?: boolean;
+  page?: string;
 }
 
-const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
+const PostContainer = ({ post, full, page }: PostContainerProps) => {
   const inputRef: any = useRef(null);
   const timeAgo: string = findTimeDifference(
     new Date(Date.parse(post.createdAt))
@@ -43,7 +43,7 @@ const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
             />
             <Box w="20rem" borderLeftWidth="1px">
               <PostHeader h="4.5rem" author={post.author} postId={post.id} />
-              <FullComments comments={post.comments} userPage={userPage} />
+              <FullComments comments={post.comments} page={page} />
               <Box h="35%">
                 <Box p="0.8rem" bgColor="white" borderTopWidth="1px">
                   <PostActions
@@ -52,16 +52,12 @@ const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
                     isPostPageOpen={isPostPageOpen}
                     onPostPageOpen={onPostPageOpen}
                     onPostPageClose={onPostPageClose}
+                    page={page}
                     full
-                    userPage={userPage}
                   />
                   <Time timeAgo={timeAgo} />
                 </Box>
-                <CommentInput
-                  inputRef={inputRef}
-                  postId={post.id}
-                  userPage={userPage}
-                />
+                <CommentInput inputRef={inputRef} post={post} page={page} />
               </Box>
             </Box>
           </Flex>
@@ -79,7 +75,7 @@ const PostContainer = ({ post, full, userPage }: PostContainerProps) => {
             onPostPageOpen={onPostPageOpen}
             onPostPageClose={onPostPageClose}
           />
-          <CommentInput inputRef={inputRef} postId={post.id} />
+          <CommentInput inputRef={inputRef} post={post} />
         </>
       )}
     </Box>

@@ -4,46 +4,45 @@ import { Flex, Spacer } from "@chakra-ui/layout";
 import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/popover";
 import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
+import { POST_PAGE, USER_PAGE } from "../../constants";
 import { IEmoji } from "../../redux/emojies/emojies.slice";
-import {
-  IPost,
-  selectPostById,
-  setCommentInput,
-} from "../../redux/feed/feed.slice";
+import { IPost, setCommentInput } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setPostPageCommentInput } from "../../redux/post-page/post-page.slice";
 import { RootState } from "../../redux/store";
-import {
-  selectUserPagePostById,
-  setUserPageCommentInput,
-} from "../../redux/user-page/user-page.slice";
+import { setUserPageCommentInput } from "../../redux/user-page/user-page.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface EmojiPopoverProps {
-  postId: number;
-  userPage?: boolean;
+  post: IPost;
+  page?: string;
 }
 
-const EmojiPopover = ({ postId, userPage }: EmojiPopoverProps) => {
+const EmojiPopover = ({ post, page }: EmojiPopoverProps) => {
   const dispatch = useAppDispatch();
-  const state: RootState = useAppSelector((state: RootState) => state);
   const emojies: IEmoji[] = useAppSelector(
     (state: RootState) => state.emojies.emojiesData
   );
-  const postData: unknown = userPage
-    ? selectUserPagePostById(state, postId)
-    : selectPostById(state, postId);
-  const post: IPost = postData as IPost;
-  const commentInput: string = post?.commentInput;
+  const commentInput: string = post.commentInput;
   const emojiPickHandler = (emoji: IEmoji) => {
     const commentContent = {
-      postId,
+      postId: post.id,
       commentInput: (commentInput ? commentInput : "") + emoji.content,
     };
-    dispatch(
-      userPage
-        ? setUserPageCommentInput(commentContent)
-        : setCommentInput(commentContent)
-    );
+    switch (page) {
+      case USER_PAGE:
+        dispatch(setUserPageCommentInput(commentContent));
+        break;
+      case POST_PAGE:
+        dispatch(
+          setPostPageCommentInput(
+            (commentInput ? commentInput : "") + emoji.content
+          )
+        );
+        break;
+      default:
+        dispatch(setCommentInput(commentContent));
+    }
   };
   return (
     <Popover>
