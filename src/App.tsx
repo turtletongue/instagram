@@ -6,12 +6,11 @@ import HomePage from "./pages/homepage/homepage.component";
 import PostPage from "./pages/post-page/post-page.component";
 import SignIn from "./pages/signIn/signIn.component";
 import UserPage from "./pages/user-page/user-page.component";
+import { requestLastActivities } from "./redux/activities/activities.slice";
 import { requestEmojies } from "./redux/emojies/emojies.slice";
 import { requestSliceOfPosts } from "./redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
-// import { fetchEmojies } from "./redux/emojies/emojies.actions";
-// import { fetchPosts } from "./redux/posts/posts.actions";
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -72,6 +71,23 @@ const App = () => {
           { id: 3, content: "☺" },
           { id: 4, content: "👺" },
           { id: 5, content: "❤" },
+        ],
+      })
+    );
+    dispatch(
+      requestLastActivities({
+        testData: [
+          {
+            author: {
+              userId: "alternative.disney",
+              avatarUrl:
+                "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
+              fullname: "Alternative Disney",
+            },
+            type: "LIKE",
+            activityReceiverContent: "nice",
+            postId: 32323,
+          },
         ],
       })
     );
