@@ -1,38 +1,36 @@
-import { Button } from "@chakra-ui/button";
-import FollowedIcon from "../followed-icon/followed-icon.component";
+import { useDisclosure } from "@chakra-ui/hooks";
+import { IUser } from "../../redux/user/user.slice";
+import FollowButton from "../follow-button/follow-button.component";
+import UnfollowButton from "../unfollow-button/unfollow-button.component";
+import UnfollowModal from "../unfollow-modal/unfollow-modal.component";
 
 interface ControlFollowingButtonProps {
   isFollowed: boolean;
+  user: IUser;
 }
 
 const ControlFollowingButton = ({
   isFollowed,
+  user,
 }: ControlFollowingButtonProps) => {
+  const {
+    isOpen: isUnfollowModalOpen,
+    onOpen: onUnfollowModalOpen,
+    onClose: onUnfollowModalClose,
+  } = useDisclosure();
   return (
-    <Button
-      leftIcon={isFollowed ? <FollowedIcon /> : undefined}
-      ml="1rem"
-      size="sm"
-      bgColor={isFollowed ? "#fafafa" : "#0095f6"}
-      color={isFollowed ? "black" : "white"}
-      borderWidth={isFollowed ? "1px" : "0"}
-      borderColor="blackAlpha.600"
-      borderRadius="5px"
-      sx={{
-        "&:hover": {
-          bgColor: isFollowed ? "#fafafa" : "#0095f6",
-        },
-        "&:focus": {
-          boxShadow: "none",
-        },
-        "&:active": {
-          boxShadow: "none",
-          opacity: 0.6,
-        },
-      }}
-    >
-      {isFollowed ? "" : "Follow"}
-    </Button>
+    <>
+      <UnfollowModal
+        isOpen={isUnfollowModalOpen}
+        onClose={onUnfollowModalClose}
+        user={user}
+      />
+      {isFollowed ? (
+        <UnfollowButton onUnfollowModalOpen={onUnfollowModalOpen} />
+      ) : (
+        <FollowButton user={user} />
+      )}
+    </>
   );
 };
 

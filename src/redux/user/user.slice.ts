@@ -6,6 +6,8 @@ export interface IUser {
   avatarUrl: string;
   fullname?: string;
   description?: string;
+  followers?: IUser[];
+  following?: IUser[];
 }
 
 interface UserState {

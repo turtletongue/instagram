@@ -32,7 +32,14 @@ const ActivityPopover = ({ children, ...otherProps }: ActivityPopoverProps) => {
             This Month
           </Text>
         </PopoverHeader>
-        <PopoverBody w="100%">
+        <PopoverBody
+          w="100%"
+          overflowY="scroll"
+          sx={{
+            scrollbarWidth: "none",
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
           {lastActivities.map((activity: IActivity, index: number) => {
             return <Activity key={index} data={activity} />;
           })}
