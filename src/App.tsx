@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Route } from "react-router";
 import { Switch } from "react-router-dom";
 import Fonts from "./components/fonts/fonts.component";
+import EditProfilePage from "./pages/edit-profile-page/edit-profile-page.component";
 import HomePage from "./pages/homepage/homepage.component";
 import PostPage from "./pages/post-page/post-page.component";
 import SignIn from "./pages/signIn/signIn.component";
@@ -104,6 +105,9 @@ const App = () => {
         <Switch>
           <Route exact path="/">
             <HomePage />
+          </Route>
+          <Route path="/accounts/edit">
+            <EditProfilePage />
           </Route>
           <Route path="/p/:postId">
             <PostPage />

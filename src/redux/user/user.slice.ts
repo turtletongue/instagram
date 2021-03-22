@@ -46,7 +46,12 @@ export const requestSignIn = createAsyncThunk(
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logOut: (state: UserState) => {
+      state.currentUser = null;
+      state.isLoggedIn = false;
+    },
+  },
   extraReducers: {
     [requestSignIn.pending as any]: (state: UserState) => {
       state.signInLoading = "loading";
@@ -69,5 +74,7 @@ const userSlice = createSlice({
     },
   },
 });
+
+export const { logOut } = userSlice.actions;
 
 export default userSlice.reducer;
