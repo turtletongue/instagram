@@ -27,9 +27,9 @@ interface ICommentInput {
 
 interface UserPageState {
   category: string;
-  hoveredPostsIds: number[];
   user: IUser | null;
   userLoading: string;
+  hoveredPostId: number | null;
   ids: EntityId[];
   entities: any;
   userPagePostsLoading: string;
@@ -40,8 +40,8 @@ const userPagePostsAdapter = createEntityAdapter();
 
 const initialState: UserPageState = userPagePostsAdapter.getInitialState({
   category: POSTS,
-  hoveredPostsIds: [],
   user: null,
+  hoveredPostId: null,
   userLoading: "idle",
   userPagePostsLoading: "idle",
   errorMessage: null,
@@ -95,16 +95,11 @@ const userPageSlice = createSlice({
     showSaved: (state: UserPageState) => {
       state.category = SAVED;
     },
-    togglePostHoverById: (
-      state: UserPageState,
-      action: PayloadAction<number>
-    ) => {
-      const hoveredPostIndex: number = state.hoveredPostsIds.findIndex(
-        (hoveredPostId: number) => hoveredPostId === action.payload
-      );
-      if (hoveredPostIndex !== -1)
-        state.hoveredPostsIds.splice(hoveredPostIndex, 1);
-      else state.hoveredPostsIds.push(action.payload);
+    hoverPostById: (state: UserPageState, action: PayloadAction<number>) => {
+      state.hoveredPostId = action.payload;
+    },
+    blurPosts: (state: UserPageState) => {
+      state.hoveredPostId = null;
     },
     likeUserPagePost: (state: UserPageState, action: PayloadAction<number>) => {
       if (state.entities[action.payload]) {
@@ -275,7 +270,8 @@ export const {
 export const {
   showPosts,
   showSaved,
-  togglePostHoverById,
+  hoverPostById,
+  blurPosts,
   likeUserPagePost,
   unlikeUserPagePost,
   unbookmarkUserPagePost,

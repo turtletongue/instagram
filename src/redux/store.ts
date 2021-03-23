@@ -5,6 +5,7 @@ import feedReducer from "./feed/feed.slice";
 import fullCommentsReducer from "./full-comments/full-comments.slice";
 import headerReducer from "./header/header.slice";
 import postPageReducer from "./post-page/post-page.slice";
+import profileEditPageReducer from "./profile-edit-page/profile-edit-page.slice";
 import searchInputReducer from "./search-input/search-input.slice";
 import signInReducer from "./signin/signin.slice";
 import userPageReducer from "./user-page/user-page.slice";
@@ -22,6 +23,7 @@ const store = configureStore({
     emojies: emojiesReducer,
     header: headerReducer,
     activities: activitiesReducer,
+    profileEditPage: profileEditPageReducer,
   },
 });
 

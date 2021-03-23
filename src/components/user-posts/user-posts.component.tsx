@@ -4,7 +4,10 @@ import { USER_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
-import { togglePostHoverById } from "../../redux/user-page/user-page.slice";
+import {
+  blurPosts,
+  hoverPostById,
+} from "../../redux/user-page/user-page.slice";
 import MinPostData from "../min-post-data/min-post-data.component";
 import PostContent from "../post-content/post-content.component";
 import PostPageModal from "../post-page-modal/post-page-modal.component";
@@ -15,8 +18,8 @@ interface UserPostsProps {
 
 const UserPosts = ({ posts }: UserPostsProps) => {
   const dispatch = useAppDispatch();
-  const hoveredPostsIds: number[] = useAppSelector(
-    (state: RootState) => state.userPage.hoveredPostsIds
+  const hoveredPostId: number | null = useAppSelector(
+    (state: RootState) => state.userPage.hoveredPostId
   );
   const {
     isOpen: isPostPageOpen,
@@ -32,7 +35,7 @@ const UserPosts = ({ posts }: UserPostsProps) => {
       mt="1rem"
     >
       {posts.map((post: IPost, index: number) => {
-        const isHovered: boolean = hoveredPostsIds.includes(post.id);
+        const isHovered: boolean = post.id === hoveredPostId;
         return (
           <Fragment key={index}>
             <PostPageModal
@@ -45,8 +48,8 @@ const UserPosts = ({ posts }: UserPostsProps) => {
               key={index}
               maxW="18rem"
               position="relative"
-              onMouseEnter={() => dispatch(togglePostHoverById(post.id))}
-              onMouseLeave={() => dispatch(togglePostHoverById(post.id))}
+              onMouseOver={() => dispatch(hoverPostById(post.id))}
+              onMouseLeave={() => dispatch(blurPosts())}
               onClick={onPostPageOpen}
             >
               <PostContent
