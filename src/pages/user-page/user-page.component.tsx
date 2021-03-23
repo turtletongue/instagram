@@ -1,8 +1,10 @@
+import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Center, Divider, Flex, Spacer, Text } from "@chakra-ui/layout";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import Avatar from "../../components/avatar/avatar.component";
 import Categories from "../../components/categories/categories.component";
+import ChangePhotoModal from "../../components/change-photo-modal/change-photo-modal.component";
 import Header from "../../components/header/header.component";
 import NoPostsBanner from "../../components/no-posts-banner/no-posts-banner.component";
 import ProfileData from "../../components/profile-data/profile-data.component";
@@ -122,6 +124,11 @@ const UserPage = () => {
   const savedPosts: IPost[] = userPagePosts.filter(
     (post: IPost) => post.isBookmarked
   );
+  const {
+    isOpen: isChangePhotoModalOpen,
+    onOpen: onChangePhotoModalOpen,
+    onClose: onChangePhotoModalClose,
+  } = useDisclosure();
   return (
     <>
       <Header />
@@ -133,8 +140,17 @@ const UserPage = () => {
       >
         {user ? (
           <>
+            <ChangePhotoModal
+              isOpen={isChangePhotoModalOpen}
+              onClose={onChangePhotoModalClose}
+            />
             <Flex align="center" ml="4rem" maxW="33rem">
-              <Avatar w="9rem" h="9rem" src={user.avatarUrl} />
+              <Avatar
+                w="9rem"
+                h="9rem"
+                src={user.avatarUrl}
+                onClick={onChangePhotoModalOpen}
+              />
               <Spacer />
               <ProfileData user={user} postsCount={userPosts.length} />
             </Flex>

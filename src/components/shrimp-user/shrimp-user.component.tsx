@@ -5,7 +5,6 @@ import Avatar from "../avatar/avatar.component";
 
 interface ShrimpUserProps {
   user: IUser;
-  following?: boolean;
 }
 
 const ShrimpUser = ({ user }: ShrimpUserProps) => {
