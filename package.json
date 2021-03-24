@@ -1,56 +1,40 @@
 {
   "name": "instagram",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@chakra-ui/react": "^1.3.3",
-    "@emotion/react": "^11.1.5",
-    "@emotion/styled": "^11.1.5",
-    "@reduxjs/toolkit": "^1.5.0",
-    "@testing-library/jest-dom": "^5.11.9",
-    "@testing-library/react": "^11.2.5",
-    "@testing-library/user-event": "^12.8.0",
-    "@types/jest": "^26.0.20",
-    "@types/node": "^14.14.31",
-    "@types/react": "^17.0.2",
-    "@types/react-dom": "^17.0.1",
-    "@types/react-redux": "^7.1.16",
-    "@types/react-router-dom": "^5.1.7",
-    "@types/redux": "^3.6.0",
-    "framer-motion": "^3.10.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-easy-emoji": "^1.4.0",
-    "react-icons": "^4.2.0",
-    "react-redux": "^7.2.2",
-    "react-router-dom": "^5.2.0",
-    "react-scripts": "4.0.3",
-    "redux": "^4.0.5",
-    "typescript": "^4.2.2",
-    "web-vitals": "^1.1.0"
-  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "cd client && npm start",
+    "server": "nodemon server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm run build",
+    "start": "node server.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PlatonSterh/instagram.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PlatonSterh/instagram/issues"
+  },
+  "homepage": "https://github.com/PlatonSterh/instagram#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "express": "^4.17.1",
+    "express-graphql": "^0.12.0",
+    "express-validator": "^6.10.0",
+    "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.6.2"
+  },
+  "devDependencies": {
+    "concurrently": "^6.0.0",
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.7"
   }
 }
