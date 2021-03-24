@@ -2,14 +2,15 @@
   "name": "instagram",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd client && npm start",
+    "build-server": "tsc",
     "server": "nodemon server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "build": "cd client && npm run build",
-    "start": "node server.js"
+    "build": "tsc && cd client && npm run build",
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
   "devDependencies": {
     "concurrently": "^6.0.0",
     "dotenv": "^8.2.0",
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "typescript": "^4.2.3"
   }
 }

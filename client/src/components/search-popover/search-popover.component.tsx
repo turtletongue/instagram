@@ -44,9 +44,8 @@ const SearchPopover = ({
         <PopoverBody h="100%" overflowY="scroll" p="0.5rem 0">
           {searchedUsers.map((searchedUser: IUser, index: number) => {
             return (
-              <Link to={`/${searchedUser.userId}/`}>
+              <Link to={`/${searchedUser.userId}/`} key={index}>
                 <Flex
-                  key={index}
                   onClick={() => dispatch(closePopover())}
                   align="center"
                   p="0.5rem"
