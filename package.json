@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "cd client && npm start",
-    "build-server": "tsc",
-    "server": "nodemon server.js",
+    "tsc": "tsc",
+    "server": "nodemon -r dotenv/config dist/server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "build": "tsc && cd client && npm run build",
     "start": "node dist/server.js"
@@ -24,16 +24,22 @@
   },
   "homepage": "https://github.com/PlatonSterh/instagram#readme",
   "dependencies": {
+    "@types/jsonwebtoken": "^8.5.1",
     "bcrypt": "^5.0.1",
     "express": "^4.17.1",
     "express-graphql": "^0.12.0",
-    "express-validator": "^6.10.0",
     "graphql": "^15.5.0",
     "jsonwebtoken": "^8.5.1",
     "mysql2": "^2.2.5",
-    "sequelize": "^6.6.2"
+    "sequelize": "^6.6.2",
+    "validator": "^13.5.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "@types/express": "^4.17.11",
+    "@types/express-graphql": "^0.9.0",
+    "@types/node": "^14.14.35",
+    "@types/sequelize": "^4.28.9",
     "concurrently": "^6.0.0",
     "dotenv": "^8.2.0",
     "nodemon": "^2.0.7",
