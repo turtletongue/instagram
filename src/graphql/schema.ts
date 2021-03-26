@@ -1,6 +1,19 @@
 import { buildSchema } from "graphql";
 
 export default buildSchema(`
+  type Bookmark {
+    id: ID!
+    postId: Int!
+    userId: Int!
+  }
+
+  type Like {
+    id: ID!
+    postId: Int
+    commentId: Int
+    userId: Int!
+  }
+
   type Comment {
     id: ID!
     content: String!
@@ -48,6 +61,12 @@ export default buildSchema(`
     createPost(postInput: PostInputData): Post!
     createComment(commentInput: CommentInputData): Comment!
     follow(followerId: Int!, followingId: Int!): Boolean!
+    likePost(postId: Int!, userId: Int!): Like!
+    likeComment(commentId: Int!, postId: Int!, userId: Int!): Like!
+    unlikePost(postId: Int!, userId: Int!): Boolean!
+    unlikeComment(commentId: Int!, postId: Int!, userId: Int!): Boolean!
+    bookmarkPost(postId: Int!, userId: Int!): Bookmark!
+    unbookmarkPost(postId: Int!, userId: Int!): Boolean!
   }
 
   type AuthData {
@@ -57,7 +76,12 @@ export default buildSchema(`
 
   type RootQuery {
     login(username: String!, password: String!): AuthData!
-    getFollowingPosts(username: String!): [Post!]!
+    getFollowingPosts(username: String!, slice: Int!): [Post!]!
+    isUserLikePost(userId: Int!, postId: Int!): Boolean!
+    isUserLikeComment(userId: Int!, postId: Int!, commentId: Int!): Boolean!
+    getUserBookmarkedPosts(userId: Int!): [Post!]!
+    getUserPosts(userId: Int!): [Post!]!
+    getPostComments(postId: Int!): [Comment!]!
   }
 
   schema {

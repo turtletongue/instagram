@@ -1,9 +1,13 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
+import Bookmark from "../models/Bookmark";
 import Followers from "../models/Followers";
+import Like from "../models/Like";
 import Post from "../models/Post";
 import User from "../models/User";
+
+const MAX_FOLLOWING_POSTS_COUNT = 5;
 
 interface IUser {
   id: number;
@@ -19,6 +23,25 @@ interface IPost {
   imageUrl: string;
   createdAt: string;
   likesCount: number;
+}
+
+interface IComment {
+  id: number;
+  content: string;
+  createdAt: string;
+}
+
+interface ILike {
+  id: number;
+  postId: number;
+  commentId?: number;
+  userId: number;
+}
+
+interface IBookmark {
+  id: number;
+  postId: number;
+  userId: number;
 }
 
 type CreateUserArgs = {
@@ -51,13 +74,53 @@ type CommentArgs = {
   };
 };
 
-type getFollowingPosts = {
+type GetFollowingPostsArgs = {
   username: string;
+  slice: number;
 };
 
 type FollowArgs = {
   followerId: number;
   followingId: number;
+};
+
+type LikePostArgs = {
+  postId: number;
+  userId: number;
+};
+
+type LikeCommentArgs = {
+  commentId: number;
+  postId: number;
+  userId: number;
+};
+
+type IsUserLikedPostArgs = {
+  userId: number;
+  postId: number;
+};
+
+type IsUserLikedCommentArgs = {
+  userId: number;
+  postId: number;
+  commentId: number;
+};
+
+type BookmarkPostArgs = {
+  postId: number;
+  userId: number;
+};
+
+type GetUserBookmarkedPostsArgs = {
+  userId: number;
+};
+
+type GetUserPostsArgs = {
+  userId: number;
+};
+
+type GetPostCommentsArgs = {
+  postId: number;
 };
 
 class ValidationError extends Error {
@@ -164,7 +227,8 @@ export default {
   },
   getFollowingPosts: async ({
     username,
-  }: getFollowingPosts): Promise<any[]> => {
+    slice,
+  }: GetFollowingPostsArgs): Promise<any[]> => {
     const followingsData: any = await User.findOne({
       where: { username },
       include: ["following", "followers"],
@@ -182,6 +246,156 @@ export default {
         );
       })
     );
-    return followingsPosts;
+    const start: number =
+      slice * MAX_FOLLOWING_POSTS_COUNT - MAX_FOLLOWING_POSTS_COUNT;
+    const end: number =
+      slice * MAX_FOLLOWING_POSTS_COUNT -
+      MAX_FOLLOWING_POSTS_COUNT +
+      MAX_FOLLOWING_POSTS_COUNT;
+    return followingsPosts.slice(start, end);
+  },
+  likePost: async ({ postId, userId }: LikePostArgs) => {
+    const like: any = await Like.findOne({ where: { postId, userId } });
+    if (like) {
+      throw new Error("Like is exist already.");
+    }
+
+    const createdLikeData: any = await Like.create({ postId, userId });
+    const createdLike: ILike = createdLikeData.dataValues as ILike;
+    return createdLike;
+  },
+  likeComment: async ({ commentId, postId, userId }: LikeCommentArgs) => {
+    const like: any = await Like.findOne({
+      where: { commentId, postId, userId },
+    });
+    if (like) {
+      throw new Error("Like is exist already.");
+    }
+
+    const createdLikeData: any = await Like.create({
+      commentId,
+      postId,
+      userId,
+    });
+    const createdLike: ILike = createdLikeData.dataValues as ILike;
+    return createdLike;
+  },
+  unlikePost: async ({ postId, userId }: LikePostArgs) => {
+    const like: any = await Like.findOne({ where: { postId, userId } });
+    if (!like) {
+      throw new Error("Like isn't exist.");
+    }
+
+    await like.destroy();
+    return true;
+  },
+  unlikeComment: async ({ commentId, postId, userId }: LikeCommentArgs) => {
+    const like: any = await Like.findOne({
+      where: { commentId, postId, userId },
+    });
+    if (!like) {
+      throw new Error("Like isn't exist.");
+    }
+
+    await like.destroy();
+    return true;
+  },
+  isUserLikePost: async ({ userId, postId }: IsUserLikedPostArgs) => {
+    const like: any = await Like.findOne({ where: { userId, postId } });
+    if (!like) {
+      return false;
+    }
+
+    return true;
+  },
+  isUserLikeComment: async ({
+    userId,
+    postId,
+    commentId,
+  }: IsUserLikedCommentArgs) => {
+    const like: any = await Like.findOne({
+      where: { userId, postId, commentId },
+    });
+    if (!like) {
+      return false;
+    }
+
+    return true;
+  },
+  bookmarkPost: async ({ postId, userId }: BookmarkPostArgs) => {
+    const bookmark: any = await Bookmark.findOne({ where: { postId, userId } });
+    if (bookmark) {
+      throw new Error("Bookmark is exist already.");
+    }
+
+    const createdBookmarkData: any = await Bookmark.create({ postId, userId });
+    const createdBookmark: IBookmark = createdBookmarkData.dataValues as IBookmark;
+    return createdBookmark;
+  },
+  unbookmarkPost: async ({ postId, userId }: BookmarkPostArgs) => {
+    const bookmark: any = await Bookmark.findOne({ where: { postId, userId } });
+    if (!bookmark) {
+      throw new Error("Bookmark isn't exist.");
+    }
+
+    await bookmark.destroy();
+    return true;
+  },
+  getUserBookmarkedPosts: async ({ userId }: GetUserBookmarkedPostsArgs) => {
+    const user: any = await User.findOne({
+      where: { id: userId },
+      include: ["bookmarked"],
+    });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const bookmarkedPostsIds: any[] = user.dataValues.bookmarked;
+    const bookmarkedPosts: IPost[] = [];
+
+    await Promise.all(
+      bookmarkedPostsIds.map(async (bookmarkedPostId: any) => {
+        const postData: any = await Post.findOne({
+          where: { id: bookmarkedPostId.dataValues.postId },
+        });
+        if (postData) {
+          bookmarkedPosts.push({
+            ...postData.dataValues,
+            createdAt: postData.createdAt.toISOString(),
+          });
+        }
+      })
+    );
+    return bookmarkedPosts;
+  },
+  getUserPosts: async ({ userId }: GetUserPostsArgs) => {
+    const user: any = await User.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new Error("User not found.");
+    }
+
+    const postsData: any[] = await user.getPosts();
+    const posts: IPost[] = postsData.map((postData: any) => ({
+      ...postData.dataValues,
+      createdAt: postData.createdAt.toISOString(),
+      updatedAt: postData.updatedAt.toISOString(),
+    }));
+
+    return posts;
+  },
+  getPostComments: async ({ postId }: GetPostCommentsArgs) => {
+    const post: any = await Post.findOne({ where: { id: postId } });
+    if (!post) {
+      throw new Error("Post not found.");
+    }
+
+    const commentsData: any[] = await post.getComments();
+    const comments: IComment[] = commentsData.map((commentData: any) => ({
+      ...commentData.dataValues,
+      createdAt: commentData.createdAt.toISOString(),
+      updatedAt: commentData.updatedAt.toISOString(),
+    }));
+
+    return comments;
   },
 };
