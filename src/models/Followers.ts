@@ -1,7 +1,13 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
 
-const Followers = sequelize.define("users_followers", {
+export interface FollowersInstance extends Model {
+  id: number;
+  followerId: number;
+  followingId: number;
+}
+
+const Followers = sequelize.define<FollowersInstance>("users_followers", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

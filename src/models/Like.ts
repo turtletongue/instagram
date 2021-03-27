@@ -1,7 +1,11 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
 
-const Like = sequelize.define("like", {
+export interface LikeInstance extends Model {
+  id: number;
+}
+
+const Like = sequelize.define<LikeInstance>("like", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

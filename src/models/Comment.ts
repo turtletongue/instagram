@@ -1,7 +1,15 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
 
-const Comment = sequelize.define("comment", {
+export interface CommentInstance extends Model {
+  id: number;
+  content: string;
+  authorName: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const Comment = sequelize.define<CommentInstance>("comment", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

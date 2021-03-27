@@ -1,27 +1,21 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
-import Bookmark from "../models/Bookmark";
+import { AuthRequest } from "../middleware/auth";
+import Bookmark, { BookmarkInstance } from "../models/Bookmark";
+import { CommentInstance } from "../models/Comment";
 import Followers from "../models/Followers";
-import Like from "../models/Like";
-import Post from "../models/Post";
-import User from "../models/User";
+import Like, { LikeInstance } from "../models/Like";
+import Post, { PostInstance } from "../models/Post";
+import User, { UserInstance } from "../models/User";
 
 const MAX_FOLLOWING_POSTS_COUNT = 5;
-
-interface IUser {
-  id: number;
-  name?: string;
-  username: string;
-  bio?: string;
-  avatarUrl?: string;
-  password: string;
-}
 
 interface IPost {
   id: number;
   imageUrl: string;
   createdAt: string;
+  updatedAt: string;
   likesCount: number;
 }
 
@@ -29,19 +23,7 @@ interface IComment {
   id: number;
   content: string;
   createdAt: string;
-}
-
-interface ILike {
-  id: number;
-  postId: number;
-  commentId?: number;
-  userId: number;
-}
-
-interface IBookmark {
-  id: number;
-  postId: number;
-  userId: number;
+  updatedAt: string;
 }
 
 type CreateUserArgs = {
@@ -55,10 +37,7 @@ type CreateUserArgs = {
 };
 
 type CreatePostArgs = {
-  postInput: {
-    imageUrl: string;
-    username: string;
-  };
+  imageUrl: string;
 };
 
 type LoginArgs = {
@@ -69,30 +48,25 @@ type LoginArgs = {
 type CommentArgs = {
   commentInput: {
     content: string;
-    username: string;
     postId: number;
   };
 };
 
 type GetFollowingPostsArgs = {
-  username: string;
   slice: number;
 };
 
 type FollowArgs = {
-  followerId: number;
   followingId: number;
 };
 
 type LikePostArgs = {
   postId: number;
-  userId: number;
 };
 
 type LikeCommentArgs = {
   commentId: number;
   postId: number;
-  userId: number;
 };
 
 type IsUserLikedPostArgs = {
@@ -108,7 +82,6 @@ type IsUserLikedCommentArgs = {
 
 type BookmarkPostArgs = {
   postId: number;
-  userId: number;
 };
 
 type GetUserBookmarkedPostsArgs = {
@@ -121,6 +94,30 @@ type GetUserPostsArgs = {
 
 type GetPostCommentsArgs = {
   postId: number;
+};
+
+type GetPostByIdArgs = {
+  postId: number;
+};
+
+type GetUserByIdArgs = {
+  userId: number;
+};
+
+type UpdateUserDataArgs = {
+  updateUserDataInput: {
+    id: number;
+    name?: string;
+    username: string;
+    bio?: string;
+    avatarUrl?: string;
+  };
+};
+
+type UpdatePasswordArgs = {
+  userId: number;
+  oldPassword: string;
+  newPassword: string;
 };
 
 class ValidationError extends Error {
@@ -138,10 +135,16 @@ class InvalidInputError extends Error {
   }
 }
 
+class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
 export default {
   createUser: async ({ userInput }: CreateUserArgs) => {
     const errors: ValidationError[] = [];
-    const existingUser = await User.findOne({
+    const existingUser: UserInstance = await User.findOne({
       where: { username: userInput.username },
     });
     if (existingUser) throw new Error("User exist already!");
@@ -157,41 +160,52 @@ export default {
       throw new InvalidInputError("Invalid input.", errors);
     }
     const hashedPassword: string = await bcrypt.hash(userInput.password, 12);
-    const createdUser = await User.create({
+    const createdUser: UserInstance = await User.create({
       ...userInput,
       password: hashedPassword,
     });
     return createdUser;
   },
-  createPost: async ({ postInput }: CreatePostArgs) => {
-    const author: any = await User.findOne({
-      where: { username: postInput.username },
-    });
+  createPost: async ({ imageUrl }: CreatePostArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const author: UserInstance = await User.findByPk(req.userId);
     if (!author) throw new Error("Author of post didn't exist.");
     const errors: ValidationError[] = [];
-    if (!validator.isURL(postInput.imageUrl)) {
+    if (!validator.isURL(imageUrl)) {
       errors.push(new ValidationError("Image URL should be URL."));
     }
     if (errors.length > 0) {
       throw new InvalidInputError("Invalid input.", errors);
     }
 
-    const createdPost = await author.createPost({
-      imageUrl: postInput.imageUrl,
+    const createdPost: { dataValues: PostInstance } = await author.createPost({
+      imageUrl: imageUrl,
       likesCount: 0,
     });
     return {
-      ...createdPost.dataValues,
+      id: createdPost.dataValues.id,
+      imageUrl: createdPost.dataValues.imageUrl,
+      likesCount: createdPost.dataValues.likesCount,
       createdAt: createdPost.dataValues.createdAt.toISOString(),
+      updatedAt: createdPost.dataValues.updatedAt.toISOString(),
     };
   },
-  createComment: async ({
-    commentInput: { content, username, postId },
-  }: CommentArgs) => {
-    console.log(postId);
-    const post: any = await Post.findOne({ where: { id: postId } });
+  createComment: async (
+    { commentInput: { content, postId } }: CommentArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const post: PostInstance = await Post.findByPk(postId);
     if (!post) {
       throw new Error("Post not found.");
+    }
+    const user: UserInstance = await User.findByPk(req.userId);
+    if (!user) {
+      throw new Error("User not found.");
     }
     const errors: ValidationError[] = [];
     if (!validator.isLength(content, { max: 1024 })) {
@@ -200,48 +214,59 @@ export default {
     if (errors.length > 0) {
       throw new InvalidInputError("Invalid input.", errors);
     }
-    const createdComment = post.createComment({
-      authorName: username,
+    const createdComment: CommentInstance = post.createComment({
+      authorName: user.username,
       content,
     });
     return createdComment;
   },
   login: async ({ username, password }: LoginArgs) => {
-    const userData: any = await User.findOne({ where: { username } });
-    const user: IUser = userData.dataValues as IUser;
-    if (!user) {
+    const userData: UserInstance = await User.findOne({ where: { username } });
+    if (!userData) {
       throw new Error("User not found.");
     }
-    const isEqual: boolean = await bcrypt.compare(password, user.password);
+    const isEqual: boolean = await bcrypt.compare(password, userData.password);
     if (!isEqual) {
       throw new Error("Wrong password.");
     }
-    const token = jwt.sign({ username }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    return { token, username };
+    const token: string = jwt.sign(
+      { userId: userData.id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
+    return { token, userId: userData.id };
   },
-  follow: async ({ followerId, followingId }: FollowArgs) => {
-    await Followers.create({ followerId, followingId });
+  follow: async ({ followingId }: FollowArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new Error("Not authenticated.");
+    }
+    await Followers.create({ followerId: req.userId, followingId });
     return true;
   },
-  getFollowingPosts: async ({
-    username,
-    slice,
-  }: GetFollowingPostsArgs): Promise<any[]> => {
-    const followingsData: any = await User.findOne({
-      where: { username },
+  getFollowingPosts: async (
+    { slice }: GetFollowingPostsArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const followings: UserInstance = await User.findOne({
+      where: { id: req.userId },
       include: ["following", "followers"],
     });
-    const followings: IUser[] = followingsData.dataValues.following as IUser[];
     const followingsPosts: IPost[] = [];
     await Promise.all(
-      followings.map(async (following: any) => {
-        const posts: any = await following.getPosts();
+      followings.following.map(async (following: UserInstance) => {
+        const posts: PostInstance[] = await following.getPosts();
         followingsPosts.push(
-          ...posts.map((post: any) => ({
-            ...post.dataValues,
-            createdAt: post.dataValues.createdAt.toISOString(),
+          ...posts.map((post: PostInstance) => ({
+            id: post.id,
+            imageUrl: post.imageUrl,
+            likesCount: post.likesCount,
+            createdAt: post.createdAt.toISOString(),
+            updatedAt: post.updatedAt.toISOString(),
           }))
         );
       })
@@ -252,46 +277,83 @@ export default {
       slice * MAX_FOLLOWING_POSTS_COUNT -
       MAX_FOLLOWING_POSTS_COUNT +
       MAX_FOLLOWING_POSTS_COUNT;
+    followingsPosts.sort(
+      (a: IPost, b: IPost) =>
+        Number(new Date(a.createdAt)) - Number(new Date(b.createdAt))
+    );
     return followingsPosts.slice(start, end);
   },
-  likePost: async ({ postId, userId }: LikePostArgs) => {
-    const like: any = await Like.findOne({ where: { postId, userId } });
-    if (like) {
-      throw new Error("Like is exist already.");
+  likePost: async ({ postId }: LikePostArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
     }
-
-    const createdLikeData: any = await Like.create({ postId, userId });
-    const createdLike: ILike = createdLikeData.dataValues as ILike;
-    return createdLike;
-  },
-  likeComment: async ({ commentId, postId, userId }: LikeCommentArgs) => {
-    const like: any = await Like.findOne({
-      where: { commentId, postId, userId },
+    const post: PostInstance = await Post.findByPk(postId);
+    if (!post) {
+      throw new Error("Post not found.");
+    }
+    const like: LikeInstance = await Like.findOne({
+      where: { postId, userId: req.userId },
     });
     if (like) {
       throw new Error("Like is exist already.");
     }
 
-    const createdLikeData: any = await Like.create({
+    await post.increment("likesCount", { by: 1 });
+    const createdLike: LikeInstance = await Like.create({
+      postId,
+      userId: req.userId,
+    });
+    return createdLike;
+  },
+  likeComment: async (
+    { commentId, postId }: LikeCommentArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const like: LikeInstance = await Like.findOne({
+      where: { commentId, postId, userId: req.userId },
+    });
+    if (like) {
+      throw new Error("Like is exist already.");
+    }
+
+    const createdLike: LikeInstance = await Like.create({
       commentId,
       postId,
-      userId,
+      userId: req.userId,
     });
-    const createdLike: ILike = createdLikeData.dataValues as ILike;
     return createdLike;
   },
-  unlikePost: async ({ postId, userId }: LikePostArgs) => {
-    const like: any = await Like.findOne({ where: { postId, userId } });
+  unlikePost: async ({ postId }: LikePostArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const post: PostInstance = await Post.findByPk(postId);
+    if (!post) {
+      throw new Error("Post not found.");
+    }
+    const like: LikeInstance = await Like.findOne({
+      where: { postId, userId: req.userId },
+    });
     if (!like) {
       throw new Error("Like isn't exist.");
     }
 
+    await post.decrement("likesCount", { by: 1 });
     await like.destroy();
     return true;
   },
-  unlikeComment: async ({ commentId, postId, userId }: LikeCommentArgs) => {
-    const like: any = await Like.findOne({
-      where: { commentId, postId, userId },
+  unlikeComment: async (
+    { commentId, postId }: LikeCommentArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const like: LikeInstance = await Like.findOne({
+      where: { commentId, postId, userId: req.userId },
     });
     if (!like) {
       throw new Error("Like isn't exist.");
@@ -301,7 +363,9 @@ export default {
     return true;
   },
   isUserLikePost: async ({ userId, postId }: IsUserLikedPostArgs) => {
-    const like: any = await Like.findOne({ where: { userId, postId } });
+    const like: LikeInstance = await Like.findOne({
+      where: { userId, postId },
+    });
     if (!like) {
       return false;
     }
@@ -313,7 +377,7 @@ export default {
     postId,
     commentId,
   }: IsUserLikedCommentArgs) => {
-    const like: any = await Like.findOne({
+    const like: LikeInstance = await Like.findOne({
       where: { userId, postId, commentId },
     });
     if (!like) {
@@ -322,18 +386,30 @@ export default {
 
     return true;
   },
-  bookmarkPost: async ({ postId, userId }: BookmarkPostArgs) => {
-    const bookmark: any = await Bookmark.findOne({ where: { postId, userId } });
+  bookmarkPost: async ({ postId }: BookmarkPostArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const bookmark: BookmarkInstance = await Bookmark.findOne({
+      where: { postId, userId: req.userId },
+    });
     if (bookmark) {
       throw new Error("Bookmark is exist already.");
     }
 
-    const createdBookmarkData: any = await Bookmark.create({ postId, userId });
-    const createdBookmark: IBookmark = createdBookmarkData.dataValues as IBookmark;
+    const createdBookmark: BookmarkInstance = await Bookmark.create({
+      postId,
+      userId: req.userId,
+    });
     return createdBookmark;
   },
-  unbookmarkPost: async ({ postId, userId }: BookmarkPostArgs) => {
-    const bookmark: any = await Bookmark.findOne({ where: { postId, userId } });
+  unbookmarkPost: async ({ postId }: BookmarkPostArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const bookmark: BookmarkInstance = await Bookmark.findOne({
+      where: { postId, userId: req.userId },
+    });
     if (!bookmark) {
       throw new Error("Bookmark isn't exist.");
     }
@@ -341,27 +417,33 @@ export default {
     await bookmark.destroy();
     return true;
   },
-  getUserBookmarkedPosts: async ({ userId }: GetUserBookmarkedPostsArgs) => {
-    const user: any = await User.findOne({
-      where: { id: userId },
+  getUserBookmarkedPosts: async (args: any, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const user: UserInstance = await User.findOne({
+      where: { id: req.userId },
       include: ["bookmarked"],
     });
     if (!user) {
       throw new Error("User not found.");
     }
 
-    const bookmarkedPostsIds: any[] = user.dataValues.bookmarked;
+    const postsBookmarks: BookmarkInstance[] = user.bookmarked;
     const bookmarkedPosts: IPost[] = [];
 
     await Promise.all(
-      bookmarkedPostsIds.map(async (bookmarkedPostId: any) => {
-        const postData: any = await Post.findOne({
-          where: { id: bookmarkedPostId.dataValues.postId },
+      postsBookmarks.map(async (postBookmark: BookmarkInstance) => {
+        const postData: PostInstance = await Post.findOne({
+          where: { id: postBookmark.postId },
         });
         if (postData) {
           bookmarkedPosts.push({
-            ...postData.dataValues,
+            id: postData.id,
+            imageUrl: postData.imageUrl,
+            likesCount: postData.likesCount,
             createdAt: postData.createdAt.toISOString(),
+            updatedAt: postData.updatedAt.toISOString(),
           });
         }
       })
@@ -369,14 +451,16 @@ export default {
     return bookmarkedPosts;
   },
   getUserPosts: async ({ userId }: GetUserPostsArgs) => {
-    const user: any = await User.findOne({ where: { id: userId } });
+    const user: UserInstance = await User.findOne({ where: { id: userId } });
     if (!user) {
       throw new Error("User not found.");
     }
 
-    const postsData: any[] = await user.getPosts();
-    const posts: IPost[] = postsData.map((postData: any) => ({
-      ...postData.dataValues,
+    const postsData: PostInstance[] = await user.getPosts();
+    const posts: IPost[] = postsData.map((postData: PostInstance) => ({
+      id: postData.id,
+      imageUrl: postData.imageUrl,
+      likesCount: postData.likesCount,
       createdAt: postData.createdAt.toISOString(),
       updatedAt: postData.updatedAt.toISOString(),
     }));
@@ -384,18 +468,66 @@ export default {
     return posts;
   },
   getPostComments: async ({ postId }: GetPostCommentsArgs) => {
-    const post: any = await Post.findOne({ where: { id: postId } });
+    const post: PostInstance = await Post.findOne({ where: { id: postId } });
     if (!post) {
       throw new Error("Post not found.");
     }
 
-    const commentsData: any[] = await post.getComments();
-    const comments: IComment[] = commentsData.map((commentData: any) => ({
-      ...commentData.dataValues,
-      createdAt: commentData.createdAt.toISOString(),
-      updatedAt: commentData.updatedAt.toISOString(),
-    }));
+    const commentsData: CommentInstance[] = await post.getComments();
+    const comments: IComment[] = commentsData.map(
+      (commentData: CommentInstance) => ({
+        id: commentData.id,
+        content: commentData.content,
+        createdAt: commentData.createdAt.toISOString(),
+        updatedAt: commentData.updatedAt.toISOString(),
+      })
+    );
 
     return comments;
+  },
+  getPostById: async ({ postId }: GetPostByIdArgs) => {
+    const post: PostInstance = await Post.findOne({ where: { id: postId } });
+    return post;
+  },
+  getUserById: async ({ userId }: GetUserByIdArgs) => {
+    const user: UserInstance = await User.findOne({ where: { id: userId } });
+    return { ...user, password: "" };
+  },
+  updateUserData: async (
+    {
+      updateUserDataInput: { name, username, bio, avatarUrl },
+    }: UpdateUserDataArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const existingUser: UserInstance = await User.findByPk(req.userId);
+    if (!existingUser) {
+      throw new Error("User not found.");
+    }
+    await existingUser.update({ values: { name, username, bio, avatarUrl } });
+    return true;
+  },
+  updatePassword: async (
+    { oldPassword, newPassword }: UpdatePasswordArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const existingUser: UserInstance = await User.findByPk(req.userId);
+    if (!existingUser) {
+      throw new Error("User not found.");
+    }
+    const password: string = existingUser.password;
+    const isEquel: boolean = await bcrypt.compare(oldPassword, password);
+    if (!isEquel) {
+      throw new Error("Wrong password.");
+    }
+    const hashedPassword: string = await bcrypt.hash(newPassword, 12);
+    existingUser.password = hashedPassword;
+    await existingUser.save();
+    return true;
   },
 };

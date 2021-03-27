@@ -1,7 +1,22 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
+import { BookmarkInstance } from "./Bookmark";
 
-const User = sequelize.define("user", {
+export interface UserInstance extends Model {
+  id: number;
+  username: string;
+  name?: string;
+  bio?: string;
+  getPosts: Function;
+  avatarUrl?: string;
+  password: string;
+  createPost: Function;
+  following?: UserInstance[];
+  followers?: UserInstance[];
+  bookmarked?: BookmarkInstance[];
+}
+
+const User = sequelize.define<UserInstance>("user", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

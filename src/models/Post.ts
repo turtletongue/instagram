@@ -1,7 +1,17 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
 
-const Post = sequelize.define("post", {
+export interface PostInstance extends Model {
+  id: number;
+  imageUrl: string;
+  likesCount: number;
+  createComment: Function;
+  getComments: Function;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const Post = sequelize.define<PostInstance>("post", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

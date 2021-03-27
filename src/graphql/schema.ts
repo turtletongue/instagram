@@ -37,6 +37,11 @@ export default buildSchema(`
     posts: [Post!]!
   }
 
+  type AuthData {
+    token: String!
+    userId: Int!
+  }
+
   input UserInputData {
     name: String
     username: String!
@@ -45,43 +50,43 @@ export default buildSchema(`
     password: String!
   }
 
-  input PostInputData {
-    imageUrl: String!
-    username: String!
-  }
-
   input CommentInputData {
     content: String!
-    username: String!
     postId: Int!
+  }
+
+  input UpdateUserData {
+    name: String
+    username: String!
+    bio: String
+    avatarUrl: String
   }
 
   type RootMutation {
     createUser(userInput: UserInputData): User!
-    createPost(postInput: PostInputData): Post!
+    createPost(imageUrl: String!): Post!
     createComment(commentInput: CommentInputData): Comment!
-    follow(followerId: Int!, followingId: Int!): Boolean!
-    likePost(postId: Int!, userId: Int!): Like!
-    likeComment(commentId: Int!, postId: Int!, userId: Int!): Like!
-    unlikePost(postId: Int!, userId: Int!): Boolean!
-    unlikeComment(commentId: Int!, postId: Int!, userId: Int!): Boolean!
-    bookmarkPost(postId: Int!, userId: Int!): Bookmark!
-    unbookmarkPost(postId: Int!, userId: Int!): Boolean!
-  }
-
-  type AuthData {
-    token: String!
-    username: String!
+    follow(followingId: Int!): Boolean!
+    likePost(postId: Int!): Like!
+    likeComment(commentId: Int!, postId: Int!): Like!
+    unlikePost(postId: Int!): Boolean!
+    unlikeComment(commentId: Int!, postId: Int!): Boolean!
+    bookmarkPost(postId: Int!): Bookmark!
+    unbookmarkPost(postId: Int!): Boolean!
+    updateUserData(updateUserDataInput: UpdateUserData): Boolean!
+    updatePassword(oldPassword: String!, newPassword: String!): Boolean!
   }
 
   type RootQuery {
     login(username: String!, password: String!): AuthData!
-    getFollowingPosts(username: String!, slice: Int!): [Post!]!
+    getFollowingPosts(slice: Int!): [Post!]!
     isUserLikePost(userId: Int!, postId: Int!): Boolean!
     isUserLikeComment(userId: Int!, postId: Int!, commentId: Int!): Boolean!
-    getUserBookmarkedPosts(userId: Int!): [Post!]!
+    getUserBookmarkedPosts: [Post!]!
     getUserPosts(userId: Int!): [Post!]!
     getPostComments(postId: Int!): [Comment!]!
+    getPostById(postId: Int!): Post
+    getUserById(userId: Int!): User
   }
 
   schema {

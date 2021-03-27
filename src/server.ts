@@ -2,6 +2,7 @@ import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import graphqlResolver from "./graphql/resolvers";
 import graphqlSchema from "./graphql/schema";
+import auth from "./middleware/auth";
 import Bookmark from "./models/Bookmark";
 import Comment from "./models/Comment";
 import Like from "./models/Like";
@@ -10,6 +11,8 @@ import User from "./models/User";
 import sequelize from "./utils/database";
 
 const app = express();
+
+app.use(auth);
 
 app.use(
   "/graphql",

@@ -1,7 +1,12 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import sequelize from "../utils/database";
 
-const Bookmark = sequelize.define("bookmark", {
+export interface BookmarkInstance extends Model {
+  id: number;
+  postId: number;
+}
+
+const Bookmark = sequelize.define<BookmarkInstance>("bookmark", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
