@@ -37,6 +37,13 @@ export default buildSchema(`
     posts: [Post!]!
   }
 
+  type Activity {
+    id: ID!
+    content: String!
+    authorId: String!
+    createdAt: String!
+  }
+
   type AuthData {
     token: String!
     userId: Int!
@@ -75,6 +82,7 @@ export default buildSchema(`
     unbookmarkPost(postId: Int!): Boolean!
     updateUserData(updateUserDataInput: UpdateUserData): Boolean!
     updatePassword(oldPassword: String!, newPassword: String!): Boolean!
+    createActivity(receiverId: Int!, content: String!): Activity!
   }
 
   type RootQuery {
@@ -87,6 +95,7 @@ export default buildSchema(`
     getPostComments(postId: Int!): [Comment!]!
     getPostById(postId: Int!): Post
     getUserById(userId: Int!): User
+    getUserActivities: [Activity!]!
   }
 
   schema {

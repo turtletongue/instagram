@@ -8,9 +8,11 @@ export interface UserInstance extends Model {
   name?: string;
   bio?: string;
   getPosts: Function;
+  getActivities: Function;
   avatarUrl?: string;
   password: string;
   createPost: Function;
+  createActivity: Function;
   following?: UserInstance[];
   followers?: UserInstance[];
   bookmarked?: BookmarkInstance[];

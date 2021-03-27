@@ -8,7 +8,6 @@ import EditProfilePage from "./pages/profile-edit-page/profile-edit-page.compone
 import SignIn from "./pages/signIn/signIn.component";
 import UserPage from "./pages/user-page/user-page.component";
 import { requestLastActivities } from "./redux/activities/activities.slice";
-import { requestEmojies } from "./redux/emojies/emojies.slice";
 import { requestSliceOfPosts } from "./redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
@@ -62,17 +61,6 @@ const App = () => {
           ],
           postsSlice: 0,
         },
-      })
-    );
-    dispatch(
-      requestEmojies({
-        testData: [
-          { id: 1, content: "😀" },
-          { id: 2, content: "🤩" },
-          { id: 3, content: "☺" },
-          { id: 4, content: "👺" },
-          { id: 5, content: "❤" },
-        ],
       })
     );
     dispatch(

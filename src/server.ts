@@ -3,6 +3,7 @@ import { graphqlHTTP } from "express-graphql";
 import graphqlResolver from "./graphql/resolvers";
 import graphqlSchema from "./graphql/schema";
 import auth from "./middleware/auth";
+import Activity from "./models/Activity";
 import Bookmark from "./models/Bookmark";
 import Comment from "./models/Comment";
 import Like from "./models/Like";
@@ -36,6 +37,8 @@ Like.belongsTo(User);
 Post.hasMany(Bookmark);
 Bookmark.belongsTo(Post, { constraints: true, onDelete: "CASCADE" });
 User.hasMany(Bookmark, { as: "bookmarked" });
+User.hasMany(Activity);
+Activity.belongsTo(User, { constraints: true, onDelete: "CASCADE" });
 Bookmark.belongsTo(User, {
   constraints: true,
   onDelete: "CASCADE",

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import validator from "validator";
 import { AuthRequest } from "../middleware/auth";
+import { ActivityInstance } from "../models/Activity";
 import Bookmark, { BookmarkInstance } from "../models/Bookmark";
 import { CommentInstance } from "../models/Comment";
 import Followers from "../models/Followers";
@@ -9,7 +10,8 @@ import Like, { LikeInstance } from "../models/Like";
 import Post, { PostInstance } from "../models/Post";
 import User, { UserInstance } from "../models/User";
 
-const MAX_FOLLOWING_POSTS_COUNT = 5;
+const MAX_FOLLOWING_POSTS_COUNT: number = 5;
+const MS_IN_MOUNTH: number = 1000 * 60 * 60 * 24 * 7 * 4;
 
 interface IPost {
   id: number;
@@ -118,6 +120,15 @@ type UpdatePasswordArgs = {
   userId: number;
   oldPassword: string;
   newPassword: string;
+};
+
+type CreateActivityArgs = {
+  receiverId: number;
+  content: string;
+};
+
+type GetUserActivitiesArgs = {
+  userId: number;
 };
 
 class ValidationError extends Error {
@@ -279,7 +290,7 @@ export default {
       MAX_FOLLOWING_POSTS_COUNT;
     followingsPosts.sort(
       (a: IPost, b: IPost) =>
-        Number(new Date(a.createdAt)) - Number(new Date(b.createdAt))
+        Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
     );
     return followingsPosts.slice(start, end);
   },
@@ -529,5 +540,41 @@ export default {
     existingUser.password = hashedPassword;
     await existingUser.save();
     return true;
+  },
+  createActivity: async (
+    { receiverId, content }: CreateActivityArgs,
+    req: AuthRequest
+  ) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const receiver: UserInstance = await User.findByPk(receiverId);
+    if (!receiver) {
+      throw new Error("User not found.");
+    }
+    const createdActivity: ActivityInstance = await receiver.createActivity({
+      content,
+      authorId: req.userId,
+    });
+
+    return createdActivity;
+  },
+  getUserActivities: async (args: any, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    const user: UserInstance = await User.findByPk(req.userId);
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    const activities: ActivityInstance[] = await user.getActivities({
+      order: [["createdAt", "DESC"]],
+    });
+    const filteredActivities: ActivityInstance[] = activities.filter(
+      (activity: ActivityInstance) =>
+        Number(activity.createdAt) > Number(Date.now()) - MS_IN_MOUNTH
+    );
+
+    return filteredActivities;
   },
 };
