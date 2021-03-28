@@ -29,7 +29,7 @@ const Categories = () => {
             color={activeCategory === POSTS ? "" : "#939393"}
           />
         </Category>
-        {pageOwner?.userId === loggedUser?.userId ? (
+        {pageOwner?.id === loggedUser?.id ? (
           <>
             <Spacer />
             <Category category={SAVED} isActive={activeCategory === SAVED}>

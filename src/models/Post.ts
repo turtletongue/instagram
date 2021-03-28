@@ -6,6 +6,7 @@ export interface PostInstance extends Model {
   imageUrl: string;
   likesCount: number;
   createComment: Function;
+  userId: number;
   getComments: Function;
   createdAt: Date;
   updatedAt: Date;

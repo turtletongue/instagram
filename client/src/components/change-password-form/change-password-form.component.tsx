@@ -32,7 +32,7 @@ const ChangePasswordForm = ({ user }: ChangePasswordFormProps) => {
       <Flex w="60%" align="center">
         <Avatar src={user.avatarUrl} h="2.5rem" w="2.5rem" />
         <Text ml="1.5rem" fontSize="2xl" fontWeight="400">
-          {user.userId}
+          {user.username}
         </Text>
       </Flex>
       <Flex pt="1rem" w="80%" align="center">

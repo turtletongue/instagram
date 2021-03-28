@@ -44,7 +44,7 @@ const SearchPopover = ({
         <PopoverBody h="100%" overflowY="scroll" p="0.5rem 0">
           {searchedUsers.map((searchedUser: IUser, index: number) => {
             return (
-              <Link to={`/${searchedUser.userId}/`} key={index}>
+              <Link to={`/${searchedUser.username}/`} key={index}>
                 <Flex
                   onClick={() => dispatch(closePopover())}
                   align="center"
@@ -59,11 +59,11 @@ const SearchPopover = ({
                   <Avatar src={searchedUser.avatarUrl} w="2.6rem" h="2.6rem" />
                   <Box ml="0.7rem">
                     <Text fontSize="sm" fontWeight="500">
-                      {searchedUser.userId}
+                      {searchedUser.username}
                     </Text>
-                    {searchedUser.fullname ? (
+                    {searchedUser.name ? (
                       <Text fontSize="sm" color="#929292">
-                        {searchedUser.fullname}
+                        {searchedUser.name}
                       </Text>
                     ) : (
                       <></>

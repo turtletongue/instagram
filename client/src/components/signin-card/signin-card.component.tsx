@@ -10,6 +10,7 @@ import {
   InputRightElement,
   Spinner,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import { MouseEvent, useEffect } from "react";
 import { AiFillFacebook } from "react-icons/ai";
@@ -18,7 +19,6 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   changeLoginInput,
   changePasswordInput,
-  clearInputs,
   hidePassword,
   showPassword,
 } from "../../redux/signin/signin.slice";
@@ -29,6 +29,7 @@ import Logo from "../logo/logo.component";
 
 const SignInCard = () => {
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const login: string = useAppSelector(
     (state: RootState) => state.signIn.login
   );
@@ -38,36 +39,30 @@ const SignInCard = () => {
   const isPasswordVisible: boolean = useAppSelector(
     (state: RootState) => state.signIn.isPasswordVisible
   );
-  const isSignInPending: boolean = false;
+  const errorMessage: string | null = useAppSelector(
+    (state: RootState) => state.user.errorMessage
+  );
+  const isSignInPending: boolean = useAppSelector(
+    (state: RootState) => state.user.signInLoading === "loading"
+  );
   const isFormDataValid: boolean =
     (login && password.length) >= MIN_PASSWORD_LENGTH;
 
   const submitHandler = (event: React.MouseEvent) => {
     event.preventDefault();
     if (!isFormDataValid) return;
-    dispatch(
-      requestSignIn({
-        testData: {
-          userId: "lustervolt",
-          avatarUrl:
-            "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-          fullname: "Volt Luster",
-          following: [
-            {
-              userId: "lustervolt1",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-            {
-              userId: "lustervolt2",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-          ],
-        },
-      })
-    );
+    dispatch(requestSignIn({ input: { username: login, password } }));
   };
+
+  useEffect(() => {
+    if (errorMessage) {
+      toast({
+        title: "Sign In error",
+        status: "error",
+        description: "Check that your username and password are correct.",
+      });
+    }
+  }, [dispatch, toast, errorMessage]);
 
   useEffect(() => {
     const listener: EventListener = (event: any) => {
@@ -172,7 +167,6 @@ const SignInCard = () => {
           cursor={isFormDataValid ? "pointer" : "default"}
           onClick={(event: MouseEvent) => {
             submitHandler(event);
-            dispatch(clearInputs());
           }}
           borderRadius="3px"
           mt="1rem"

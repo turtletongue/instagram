@@ -31,10 +31,10 @@ const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
         headerOptions
       />
       <Flex align="center">
-        <Link to={`/${author.userId}/`}>
+        <Link to={`/${author.username}/`}>
           <Avatar src={author.avatarUrl} w="2rem" h="2rem" />
         </Link>
-        <Link to={`/${author.userId}/`}>
+        <Link to={`/${author.username}/`}>
           <Text
             ml="0.8rem"
             fontSize="sm"
@@ -49,7 +49,7 @@ const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
               },
             }}
           >
-            {author.userId}
+            {author.username}
           </Text>
         </Link>
       </Flex>

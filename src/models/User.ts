@@ -16,6 +16,7 @@ export interface UserInstance extends Model {
   following?: UserInstance[];
   followers?: UserInstance[];
   bookmarked?: BookmarkInstance[];
+  dataValues?: UserInstance;
 }
 
 const User = sequelize.define<UserInstance>("user", {

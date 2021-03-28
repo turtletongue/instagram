@@ -50,7 +50,7 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
           />
           <Box ml="1.5rem">
             <Text fontSize="xl" fontWeight="400">
-              {user.userId}
+              {user.username}
             </Text>
             <Text
               cursor="pointer"

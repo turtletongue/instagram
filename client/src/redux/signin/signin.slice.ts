@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestOptions } from "../interfaces";
+import { SERVER_URL } from "../../constants";
+import { GraphqlQuery, RequestOptions } from "../interfaces";
 
 interface SignInState {
   images: string[];
@@ -21,19 +22,40 @@ const initialState: SignInState = {
   isPasswordVisible: false,
 };
 
+interface SliderImagesJSON {
+  data: {
+    sliderImages: { imageUrl: string }[];
+  };
+}
+
 export const requestSliderImages = createAsyncThunk(
   "signIn/requestImagesStatus",
   async (requestOptions: RequestOptions, thunkAPI) => {
     if (requestOptions.testData) {
       return requestOptions.testData;
     }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        {
+          sliderImages {
+            imageUrl
+          }
+        }
+      `,
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: requestOptions.query,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      return data;
+      const json: SliderImagesJSON = await res.json();
+      return json.data.sliderImages.map(
+        (sliderImage: { imageUrl: string }) => sliderImage.imageUrl
+      );
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 import { graphqlHTTP } from "express-graphql";
 import graphqlResolver from "./graphql/resolvers";
@@ -13,8 +14,11 @@ import sequelize from "./utils/database";
 
 const app = express();
 
+app.use(cors({ origin: "http://localhost:3000" }));
+
 app.use(auth);
 
+app.options("/graphql", cors({ origin: "http://localhost:3000" }));
 app.use(
   "/graphql",
   graphqlHTTP({

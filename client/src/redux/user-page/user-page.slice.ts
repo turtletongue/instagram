@@ -17,7 +17,7 @@ export const SAVED: string = "SAVED";
 interface ICommentLike {
   postId: number;
   commentId: number;
-  likerId: string;
+  likerId: number;
 }
 
 interface ICommentInput {
@@ -56,7 +56,7 @@ export const requestUserPagePosts = createAsyncThunk(
     try {
       const res = await fetch("URL", {
         method: "POST",
-        body: requestOptions.query,
+        body: JSON.stringify(requestOptions.query),
       });
       const data = await res.json();
       return data;
@@ -75,7 +75,7 @@ export const requestUserData = createAsyncThunk(
     try {
       const res = await fetch("URL", {
         method: "POST",
-        body: requestOptions.query,
+        body: JSON.stringify(requestOptions.query),
       });
       const data = await res.json();
       return data;

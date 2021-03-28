@@ -3,20 +3,20 @@ import {
   createEntityAdapter,
   createSlice,
   EntityId,
-  PayloadAction
+  PayloadAction,
 } from "@reduxjs/toolkit";
-import { RequestOptions } from "../interfaces";
+import { SERVER_URL } from "../../constants";
+import { GraphqlQuery, RequestOptions } from "../interfaces";
 import { RootState } from "../store";
 import { IUser } from "../user/user.slice";
 
 export interface IComment {
   id: number;
-  authorId: string;
-  postId: number;
-  writedAt: string;
+  authorName: string;
+  createdAt: string;
   isLiked: boolean;
   content: string;
-  replies: IComment[];
+  postId: number;
 }
 
 export interface IPost {
@@ -31,11 +31,6 @@ export interface IPost {
   commentInput: string;
 }
 
-interface IPostsResponse {
-  posts: IPost[];
-  postsSlice: number;
-}
-
 export interface ICommentInput {
   postId: number;
   commentInput: string;
@@ -46,20 +41,53 @@ interface ICommentLike {
   commentId: number;
 }
 
+interface FollowingPostsJSON {
+  data: {
+    getFollowingPosts: IPost[];
+  };
+}
+
 export const requestSliceOfPosts = createAsyncThunk(
   "feed/requestSliceOfPostsStatus",
   async (requestOptions: RequestOptions, thunkAPI) => {
     if (requestOptions.testData) {
       return { ...requestOptions.testData, commentInput: "" };
     }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        query GetFollowingPosts($slice: Int!) {
+          getFollowingPosts(slice: $slice) {
+            id
+            imageUrl
+            createdAt
+            likesCount
+            comments {
+              id
+              content
+              isLiked
+              authorName
+              createdAt
+              postId
+            }
+          }
+        }
+      `,
+      variables: {
+        slice: requestOptions.input.slice,
+      },
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: requestOptions.query,
+        headers: {
+          Authorization: `Bearer ${requestOptions.input.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      data.commentInput = "";
-      return data;
+      const json: FollowingPostsJSON = await res.json();
+      return json.data.getFollowingPosts;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -78,7 +106,7 @@ export const postsAdapter = createEntityAdapter();
 
 const initialState: FeedState = postsAdapter.getInitialState({
   postsLoading: "idle",
-  lastPostsSlice: -1,
+  lastPostsSlice: 0,
   errorMessage: null,
 });
 
@@ -180,6 +208,9 @@ const feedSlice = createSlice({
         changes: { commentInput: "" },
       });
     },
+    incrementPostSlice: (state: FeedState) => {
+      state.lastPostsSlice++;
+    },
   },
   extraReducers: {
     [requestSliceOfPosts.pending as any]: (state: FeedState) => {
@@ -188,10 +219,9 @@ const feedSlice = createSlice({
     },
     [requestSliceOfPosts.fulfilled as any]: (
       state: FeedState,
-      action: PayloadAction<IPostsResponse>
+      action: PayloadAction<IPost[]>
     ) => {
-      const { posts, postsSlice } = action.payload;
-      state.lastPostsSlice = postsSlice;
+      const posts = action.payload;
       postsAdapter.upsertMany(state, posts);
       state.postsLoading = "idle";
     },
@@ -220,6 +250,7 @@ export const {
   likeComment,
   unlikeComment,
   clearCommentInput,
+  incrementPostSlice,
 } = feedSlice.actions;
 
 export default feedSlice.reducer;

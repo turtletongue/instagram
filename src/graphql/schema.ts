@@ -18,6 +18,10 @@ export default buildSchema(`
     id: ID!
     content: String!
     createdAt: String!
+    userId: Int!
+    isLiked: Boolean!
+    authorName: String!
+    postId: Int!
   }
 
   type Post {
@@ -25,6 +29,8 @@ export default buildSchema(`
     imageUrl: String!
     createdAt: String!
     likesCount: Int!
+    userId: Int!
+    comments: [Comment!]!
   }
 
   type User {
@@ -34,6 +40,8 @@ export default buildSchema(`
     bio: String
     avatarUrl: String
     password: String!
+    following: [User!]
+    followers: [User!]
     posts: [Post!]!
   }
 
@@ -47,6 +55,11 @@ export default buildSchema(`
   type AuthData {
     token: String!
     userId: Int!
+  }
+
+  type SliderImage {
+    id: ID!
+    imageUrl: String!
   }
 
   input UserInputData {
@@ -89,13 +102,14 @@ export default buildSchema(`
     login(username: String!, password: String!): AuthData!
     getFollowingPosts(slice: Int!): [Post!]!
     isUserLikePost(userId: Int!, postId: Int!): Boolean!
+    isUserBookmarkPost(userId: Int!, postId: Int!): Boolean!
     isUserLikeComment(userId: Int!, postId: Int!, commentId: Int!): Boolean!
     getUserBookmarkedPosts: [Post!]!
     getUserPosts(userId: Int!): [Post!]!
-    getPostComments(postId: Int!): [Comment!]!
     getPostById(postId: Int!): Post
     getUserById(userId: Int!): User
     getUserActivities: [Activity!]!
+    sliderImages: [SliderImage!]!
   }
 
   schema {

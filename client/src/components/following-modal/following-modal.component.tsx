@@ -69,8 +69,8 @@ const FollowingModal = ({
               user.following.map((following: IUser, index: number) => {
                 const isFollowed: boolean = currentLoggedUser?.following
                   ? currentLoggedUser.following
-                      .map((f: IUser) => f.userId)
-                      .includes(following.userId)
+                      .map((f: IUser) => f.id)
+                      .includes(following.id)
                   : false;
                 return (
                   <Flex align="center" key={index}>

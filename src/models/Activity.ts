@@ -8,7 +8,7 @@ export interface ActivityInstance extends Model {
   createdAt: Date;
 }
 
-const Activity = sequelize.define("activity", {
+const Activity = sequelize.define<ActivityInstance>("activity", {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,

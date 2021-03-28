@@ -24,7 +24,7 @@ export const requestLastActivities = createAsyncThunk(
     try {
       const res = await fetch("URL", {
         method: "POST",
-        body: requestOptions.query,
+        body: JSON.stringify(requestOptions.query),
       });
       const data = await res.json();
       return data;

@@ -8,6 +8,7 @@ import { CommentInstance } from "../models/Comment";
 import Followers from "../models/Followers";
 import Like, { LikeInstance } from "../models/Like";
 import Post, { PostInstance } from "../models/Post";
+import SliderImage from "../models/SliderImage";
 import User, { UserInstance } from "../models/User";
 
 const MAX_FOLLOWING_POSTS_COUNT: number = 5;
@@ -19,13 +20,18 @@ interface IPost {
   createdAt: string;
   updatedAt: string;
   likesCount: number;
+  comments: IComment[];
+  userId?: number;
 }
 
 interface IComment {
   id: number;
   content: string;
+  isLiked: boolean;
   createdAt: string;
   updatedAt: string;
+  authorName: string;
+  postId: number;
 }
 
 type CreateUserArgs = {
@@ -271,14 +277,44 @@ export default {
     await Promise.all(
       followings.following.map(async (following: UserInstance) => {
         const posts: PostInstance[] = await following.getPosts();
-        followingsPosts.push(
-          ...posts.map((post: PostInstance) => ({
-            id: post.id,
-            imageUrl: post.imageUrl,
-            likesCount: post.likesCount,
-            createdAt: post.createdAt.toISOString(),
-            updatedAt: post.updatedAt.toISOString(),
-          }))
+        await Promise.all(
+          posts.map(async (post: PostInstance) => {
+            const commentsData: CommentInstance[] = await post.getComments();
+            const comments: IComment[] = [];
+            await Promise.all(
+              commentsData.map(async (commentData: CommentInstance) => {
+                let isLiked: boolean = false;
+                const like: LikeInstance = await Like.findOne({
+                  where: {
+                    postId: post.id,
+                    commentId: commentData.id,
+                    userId: req.userId,
+                  },
+                });
+                if (like) {
+                  isLiked = true;
+                }
+                comments.push({
+                  id: commentData.id,
+                  content: commentData.content,
+                  isLiked,
+                  postId: post.id,
+                  authorName: commentData.authorName,
+                  createdAt: commentData.createdAt.toISOString(),
+                  updatedAt: commentData.updatedAt.toISOString(),
+                });
+              })
+            );
+            followingsPosts.push({
+              id: post.id,
+              imageUrl: post.imageUrl,
+              likesCount: post.likesCount,
+              userId: post.userId,
+              comments,
+              createdAt: post.createdAt.toISOString(),
+              updatedAt: post.updatedAt.toISOString(),
+            });
+          })
         );
       })
     );
@@ -383,6 +419,16 @@ export default {
 
     return true;
   },
+  isUserBookmarkPost: async ({ userId, postId }: IsUserLikedPostArgs) => {
+    const bookmark: BookmarkInstance = await Bookmark.findOne({
+      where: { userId, postId },
+    });
+    if (!bookmark) {
+      return false;
+    }
+
+    return true;
+  },
   isUserLikeComment: async ({
     userId,
     postId,
@@ -448,11 +494,13 @@ export default {
         const postData: PostInstance = await Post.findOne({
           where: { id: postBookmark.postId },
         });
+        const comments: IComment[] = (await postData.getComments()) as IComment[];
         if (postData) {
           bookmarkedPosts.push({
             id: postData.id,
             imageUrl: postData.imageUrl,
             likesCount: postData.likesCount,
+            comments,
             createdAt: postData.createdAt.toISOString(),
             updatedAt: postData.updatedAt.toISOString(),
           });
@@ -468,41 +516,40 @@ export default {
     }
 
     const postsData: PostInstance[] = await user.getPosts();
-    const posts: IPost[] = postsData.map((postData: PostInstance) => ({
-      id: postData.id,
-      imageUrl: postData.imageUrl,
-      likesCount: postData.likesCount,
-      createdAt: postData.createdAt.toISOString(),
-      updatedAt: postData.updatedAt.toISOString(),
-    }));
-
-    return posts;
-  },
-  getPostComments: async ({ postId }: GetPostCommentsArgs) => {
-    const post: PostInstance = await Post.findOne({ where: { id: postId } });
-    if (!post) {
-      throw new Error("Post not found.");
-    }
-
-    const commentsData: CommentInstance[] = await post.getComments();
-    const comments: IComment[] = commentsData.map(
-      (commentData: CommentInstance) => ({
-        id: commentData.id,
-        content: commentData.content,
-        createdAt: commentData.createdAt.toISOString(),
-        updatedAt: commentData.updatedAt.toISOString(),
+    const posts: IPost[] = [];
+    await Promise.all(
+      postsData.map(async (postData: PostInstance) => {
+        const comments: IComment[] = (await postData.getComments()) as IComment[];
+        return {
+          id: postData.id,
+          imageUrl: postData.imageUrl,
+          likesCount: postData.likesCount,
+          comments,
+          createdAt: postData.createdAt.toISOString(),
+          updatedAt: postData.updatedAt.toISOString(),
+        };
       })
     );
 
-    return comments;
+    return posts;
   },
   getPostById: async ({ postId }: GetPostByIdArgs) => {
     const post: PostInstance = await Post.findOne({ where: { id: postId } });
     return post;
   },
   getUserById: async ({ userId }: GetUserByIdArgs) => {
-    const user: UserInstance = await User.findOne({ where: { id: userId } });
-    return { ...user, password: "" };
+    const user: UserInstance = await User.findOne({
+      where: { id: userId },
+      include: ["following", "followers"],
+    });
+    user.followers = user.followers.map(
+      (follower: UserInstance) => follower.dataValues
+    );
+    user.following = user.following.map(
+      (following: UserInstance) => following.dataValues
+    );
+    user.password = "";
+    return user.dataValues;
   },
   updateUserData: async (
     {
@@ -576,5 +623,10 @@ export default {
     );
 
     return filteredActivities;
+  },
+  sliderImages: async () => {
+    const sliderImages = await SliderImage.findAll();
+    if (!sliderImages) return [];
+    return sliderImages;
   },
 };

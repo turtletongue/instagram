@@ -119,7 +119,7 @@ const UserPage = () => {
   const userPagePostsData: unknown[] = selectAllUserPagePosts(state);
   const userPagePosts: IPost[] = userPagePostsData as IPost[];
   const userPosts: IPost[] = userPagePosts.filter(
-    (post: IPost) => post.author.userId === user?.userId
+    (post: IPost) => post.author.id === user?.id
   );
   const savedPosts: IPost[] = userPagePosts.filter(
     (post: IPost) => post.isBookmarked

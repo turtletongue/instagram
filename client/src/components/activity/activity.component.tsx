@@ -19,10 +19,10 @@ const Activity = ({ data, ...otherProps }: ActivityProps) => {
   }
   return (
     <Flex cursor="pointer" align="center" {...otherProps}>
-      <Link to={`/${data.author.userId}`}>
+      <Link to={`/${data.author.username}`}>
         <Avatar src={data.author?.avatarUrl} h="2rem" w="2rem" />
       </Link>
-      <Link to={`/${data.author.userId}`}>
+      <Link to={`/${data.author.username}`}>
         <Text
           ml="0.6rem"
           fontSize="xs"
@@ -34,7 +34,7 @@ const Activity = ({ data, ...otherProps }: ActivityProps) => {
             },
           }}
         >
-          {data.author.userId.trim()}
+          {data.author.username}
         </Text>
       </Link>
       {data.postId ? (

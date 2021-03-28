@@ -12,13 +12,7 @@ import SliderImage from "../slider-image/slider-image.component";
 const MockupSlider = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
-    const testData = [
-      "https://www.instagram.com/static/images/homepage/screenshot2.jpg/6f03eb85463c.jpg",
-      "https://www.instagram.com/static/images/homepage/screenshot1.jpg/d6bf0c928b5a.jpg",
-      "https://www.instagram.com/static/images/homepage/screenshot3.jpg/f0c687aa6ec2.jpg",
-      "https://www.instagram.com/static/images/homepage/screenshot5.jpg/0a2d3016f375.jpg",
-    ];
-    dispatch(requestSliderImages({ testData }));
+    dispatch(requestSliderImages({}));
     const intervalId = setInterval(() => dispatch(nextSlide()), 5000);
     return () => clearInterval(intervalId);
   }, [dispatch]);

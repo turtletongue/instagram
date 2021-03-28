@@ -49,8 +49,8 @@ const FollowersModal = ({ isOpen, onClose, user }: FollowersModalProps) => {
             user.followers.map((follower: IUser, index: number) => {
               const isFollowed: boolean = currentLoggedUser?.following
                 ? currentLoggedUser.following
-                    .map((f: IUser) => f.userId)
-                    .includes(follower.userId)
+                    .map((f: IUser) => f.id)
+                    .includes(follower.id)
                 : false;
               return (
                 <Flex align="center" key={index}>

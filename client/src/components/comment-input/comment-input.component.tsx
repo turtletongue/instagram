@@ -44,12 +44,11 @@ const CommentInput = ({ post, inputRef, page }: CommentInputProps) => {
     if (user && commentInput) {
       const commentData: IComment = {
         id: post.comments.length + 1,
-        authorId: user.userId,
+        authorName: user.username,
         postId: post.id,
-        writedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         isLiked: false,
         content: commentInput,
-        replies: [],
       };
       switch (page) {
         case USER_PAGE:

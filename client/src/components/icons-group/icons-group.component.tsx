@@ -54,11 +54,11 @@ const IconsGroup = () => {
           </ActivityPopover>
           <Spacer />
           <Center w="1.7rem" h="1.7rem">
-            <Link to={`/${user.userId}/`}>
+            <Link to={`/${user.username}/`}>
               <Avatar
                 src={user.avatarUrl}
                 borderWidth={
-                  history.location.pathname === `/${user.userId}/`
+                  history.location.pathname === `/${user.username}/`
                     ? "0.1rem"
                     : 0
                 }

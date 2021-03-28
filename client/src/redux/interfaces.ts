@@ -1,4 +1,10 @@
 export interface RequestOptions {
   testData?: any;
-  query?: any;
+  query?: GraphqlQuery;
+  input?: any;
+}
+
+export interface GraphqlQuery {
+  query: string;
+  variables?: any;
 }

@@ -10,11 +10,11 @@ interface ShrimpUserProps {
 const ShrimpUser = ({ user }: ShrimpUserProps) => {
   return (
     <Flex align="center" mt="1rem">
-      <Link to={`/${user.userId}`}>
+      <Link to={`/${user.username}`}>
         <Avatar src={user.avatarUrl} h="1.8rem" w="1.8rem" />
       </Link>
       <Box ml="0.7rem">
-        <Link to={`/${user.userId}`}>
+        <Link to={`/${user.username}`}>
           <Text
             fontSize="sm"
             fontWeight="500"
@@ -28,12 +28,12 @@ const ShrimpUser = ({ user }: ShrimpUserProps) => {
               },
             }}
           >
-            {user.userId}
+            {user.username}
           </Text>
         </Link>
-        {user.fullname ? (
+        {user.name ? (
           <Text fontSize="sm" color="#a2a2a2">
-            {user.fullname}
+            {user.name}
           </Text>
         ) : (
           <></>

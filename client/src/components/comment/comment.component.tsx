@@ -42,7 +42,7 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
       const commentLike = {
         postId,
         commentId: comment.id,
-        likerId: user.userId,
+        likerId: user.id,
       };
       switch (page) {
         case USER_PAGE:
@@ -72,7 +72,7 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
       <EmojiText fontSize="sm" maxW="30rem" overflow="hidden" {...otherProps}>
         <chakra.span
           as={Link}
-          to={`/${comment.authorId}/`}
+          to={`/${comment.authorName}/`}
           fontSize="sm"
           fontWeight="500"
           color="#2a2a2a"
@@ -86,7 +86,7 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
             },
           }}
         >
-          {comment.authorId}
+          {comment.authorName}
         </chakra.span>
         {comment.content}
       </EmojiText>

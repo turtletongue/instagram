@@ -13,11 +13,11 @@ const CurrentUser = () => {
     <Box position="fixed" mt="6rem" left="52rem">
       {user ? (
         <Flex align="center">
-          <Link to={`/${user.userId}/`}>
+          <Link to={`/${user.username}/`}>
             <Avatar src={user.avatarUrl} w="3.5rem" h="3.5rem" />
           </Link>
           <Flex direction="column" ml="1rem">
-            <Link to={`/${user.userId}/`}>
+            <Link to={`/${user.username}/`}>
               <Text
                 fontSize="sm"
                 fontWeight="500"
@@ -28,11 +28,11 @@ const CurrentUser = () => {
                   },
                 }}
               >
-                {user.userId}
+                {user.username}
               </Text>
             </Link>
             <Text color="#929292" fontSize="sm">
-              {user.fullname ? user.fullname : ""}
+              {user.name ? user.name : ""}
             </Text>
           </Flex>
         </Flex>

@@ -30,10 +30,10 @@ const ProfileData = ({ user, postsCount }: ProfileDataProps) => {
   let isPageOfLoggedUser: boolean = false;
   let isFollowed: boolean = false;
   if (currentUser) {
-    isPageOfLoggedUser = currentUser.userId === user.userId;
+    isPageOfLoggedUser = currentUser.id === user.id;
     isFollowed = currentUser?.following
       ? currentUser.following.findIndex(
-          (followingUser: IUser) => followingUser.userId === user.userId
+          (followingUser: IUser) => followingUser.id === user.id
         ) !== -1
       : false;
   }
@@ -52,7 +52,7 @@ const ProfileData = ({ user, postsCount }: ProfileDataProps) => {
       />
       <Flex align="center">
         <Text fontSize="3xl" fontWeight="200">
-          {user.userId}
+          {user.username}
         </Text>
         {isPageOfLoggedUser ? (
           <ProfileParams />
@@ -93,8 +93,8 @@ const ProfileData = ({ user, postsCount }: ProfileDataProps) => {
         </Box>
       </Flex>
       <Box mt="1rem">
-        <Text fontWeight="500">{user.fullname}</Text>
-        <Text>{user.description}</Text>
+        <Text fontWeight="500">{user.name}</Text>
+        <Text>{user.bio}</Text>
       </Box>
     </Box>
   );

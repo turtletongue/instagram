@@ -20,7 +20,7 @@ const UnfollowModal = ({ isOpen, onClose, user }: UnfollowModalProps) => {
             <Avatar src={user.avatarUrl} w="5rem" h="5rem" />
           </Flex>
           <Text textAlign="center" fontSize="sm" mb="1rem">
-            Unfollow @{user.userId}?
+            Unfollow @{user.username}?
           </Text>
           <Divider />
           <ModalItem>

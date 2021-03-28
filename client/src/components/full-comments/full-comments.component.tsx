@@ -53,9 +53,9 @@ const FullComments = ({ comments, page }: FullCommentsProps) => {
     >
       {comments.map((comment: IComment, index: number) => {
         const timeAgo: string = findTimeDifference(
-          new Date(Date.parse(comment.writedAt))
+          new Date(Date.parse(comment.createdAt))
         );
-        const authorData: unknown = selectAuthorById(state, comment.authorId);
+        const authorData: unknown = selectAuthorById(state, comment.authorName);
         return (
           <Flex key={index} mt="1rem">
             <Avatar

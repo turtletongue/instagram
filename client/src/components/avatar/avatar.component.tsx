@@ -1,4 +1,4 @@
-import { Image } from "@chakra-ui/react";
+import { Circle, Image } from "@chakra-ui/react";
 
 interface AvatarProps {
   src: string | null;
@@ -7,18 +7,31 @@ interface AvatarProps {
 
 const Avatar = ({ src, ...otherProps }: AvatarProps) => {
   return (
-    <Image
-      src={src ? src : ""}
-      h="1.5rem"
-      w="1.5rem"
-      p="0.09rem"
-      borderRadius="5rem"
-      alt="User Avatar"
-      cursor="pointer"
-      boxSizing="unset"
-      userSelect="none"
-      {...otherProps}
-    />
+    <>
+      {src ? (
+        <Image
+          src={src ? src : ""}
+          h="1.5rem"
+          w="1.5rem"
+          p="0.09rem"
+          borderRadius="5rem"
+          alt="User Avatar"
+          cursor="pointer"
+          boxSizing="unset"
+          userSelect="none"
+          {...otherProps}
+        />
+      ) : (
+        <Circle
+          h="1.5rem"
+          w="1.5rem"
+          cursor="pointer"
+          boxSizing="unset"
+          p="0.09rem"
+          bgColor="#929292"
+        />
+      )}
+    </>
   );
 };
 
