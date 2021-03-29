@@ -37,10 +37,7 @@ const PostContainer = ({ post, full, page }: PostContainerProps) => {
       {full ? (
         <>
           <Flex>
-            <PostContent
-              w="40rem"
-              imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
-            />
+            <PostContent w="40rem" imageUrl={post.imageUrl} />
             <Box w="20rem" borderLeftWidth="1px">
               <PostHeader h="4.5rem" author={post.author} postId={post.id} />
               <FullComments comments={post.comments} page={page} />
@@ -65,9 +62,7 @@ const PostContainer = ({ post, full, page }: PostContainerProps) => {
       ) : (
         <>
           <PostHeader author={post.author} postId={post.id} />
-          <PostContent
-            imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
-          />
+          <PostContent imageUrl={post.imageUrl} />
           <PostFooter
             inputRef={inputRef}
             post={post}

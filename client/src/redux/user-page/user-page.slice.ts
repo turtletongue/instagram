@@ -5,8 +5,9 @@ import {
   EntityId,
   PayloadAction,
 } from "@reduxjs/toolkit";
+import { SERVER_URL } from "../../constants";
 import { IComment, IPost } from "../feed/feed.slice";
-import { RequestOptions } from "../interfaces";
+import { GraphqlQuery, RequestOptions } from "../interfaces";
 import { RootState } from "../store";
 import { IUser } from "../user/user.slice";
 
@@ -30,6 +31,7 @@ interface UserPageState {
   user: IUser | null;
   userLoading: string;
   hoveredPostId: number | null;
+  clickedPostId: number;
   ids: EntityId[];
   entities: any;
   userPagePostsLoading: string;
@@ -42,10 +44,17 @@ const initialState: UserPageState = userPagePostsAdapter.getInitialState({
   category: POSTS,
   user: null,
   hoveredPostId: null,
+  clickedPostId: -1,
   userLoading: "idle",
   userPagePostsLoading: "idle",
   errorMessage: null,
 });
+
+interface RequestUserPostsJSON {
+  data: {
+    getUserPosts: IPost[];
+  };
+}
 
 export const requestUserPagePosts = createAsyncThunk(
   "userPage/requestUserPostsStatus",
@@ -53,18 +62,62 @@ export const requestUserPagePosts = createAsyncThunk(
     if (requestOptions.testData) {
       return requestOptions.testData;
     }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        query GetUserPosts($username: String!) {
+          getUserPosts(username: $username) {
+            id
+            imageUrl
+            createdAt
+            likesCount
+            isLiked
+            isBookmarked
+            author {
+              id
+              avatarUrl
+              username
+            }
+            comments {
+              id
+              content
+              isLiked
+              authorName
+              createdAt
+              postId
+            }
+          }
+        }
+      `,
+      variables: {
+        username: requestOptions.input.username,
+      },
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: JSON.stringify(requestOptions.query),
+        headers: {
+          Authorization: `Bearer ${requestOptions.input.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      return data;
+      const json: RequestUserPostsJSON = await res.json();
+      return json.data.getUserPosts.map((post: any) => ({
+        ...post,
+        commentInput: "",
+      }));
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
+
+interface RequestUserDataJSON {
+  data: {
+    getUserByUsername: IUser;
+  };
+}
 
 export const requestUserData = createAsyncThunk(
   "userPage/requestUserDataStatus",
@@ -72,13 +125,47 @@ export const requestUserData = createAsyncThunk(
     if (requestOptions.testData) {
       return requestOptions.testData;
     }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        query GetUserByUsername($username: String!) {
+          getUserByUsername(username: $username) {
+            id
+            username
+            name
+            avatarUrl
+            bio
+            following {
+              id
+              username
+              name
+              avatarUrl
+              bio
+            }
+            followers {
+              id
+              username
+              name
+              avatarUrl
+              bio
+            }
+          }
+        }
+      `,
+      variables: {
+        username: requestOptions.input.username,
+      },
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: JSON.stringify(requestOptions.query),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      return data;
+      const json: RequestUserDataJSON = await res.json();
+      return json.data.getUserByUsername;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -97,6 +184,9 @@ const userPageSlice = createSlice({
     },
     hoverPostById: (state: UserPageState, action: PayloadAction<number>) => {
       state.hoveredPostId = action.payload;
+    },
+    setClickedPostId: (state: UserPageState, action: PayloadAction<number>) => {
+      state.clickedPostId = action.payload;
     },
     blurPosts: (state: UserPageState) => {
       state.hoveredPostId = null;
@@ -281,6 +371,7 @@ export const {
   setUserPageCommentInput,
   addUserPageComment,
   clearUserPageCommentInput,
+  setClickedPostId,
 } = userPageSlice.actions;
 
 export default userPageSlice.reducer;

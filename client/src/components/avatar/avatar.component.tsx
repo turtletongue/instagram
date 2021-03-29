@@ -29,6 +29,7 @@ const Avatar = ({ src, ...otherProps }: AvatarProps) => {
           boxSizing="unset"
           p="0.09rem"
           bgColor="#929292"
+          {...otherProps}
         />
       )}
     </>

@@ -75,7 +75,7 @@ const App = () => {
           <Route path="/p/:postId">
             <PostPage />
           </Route>
-          <Route path="/:userId">
+          <Route path="/:username">
             <UserPage />
           </Route>
         </Switch>

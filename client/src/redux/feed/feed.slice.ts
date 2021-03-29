@@ -23,7 +23,7 @@ export interface IPost {
   id: number;
   author: IUser;
   createdAt: string;
-  imagesUrls: string[];
+  imageUrl: string;
   likesCount: number;
   isLiked: boolean;
   isBookmarked: boolean;
@@ -87,7 +87,10 @@ export const requestSliceOfPosts = createAsyncThunk(
         body: JSON.stringify(graphqlQuery),
       });
       const json: FollowingPostsJSON = await res.json();
-      return json.data.getFollowingPosts;
+      return json.data.getFollowingPosts.map((post: any) => ({
+        ...post,
+        commentInput: "",
+      }));
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

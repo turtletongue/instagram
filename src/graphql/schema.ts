@@ -29,7 +29,9 @@ export default buildSchema(`
     imageUrl: String!
     createdAt: String!
     likesCount: Int!
-    userId: Int!
+    author: User!
+    isLiked: Boolean!
+    isBookmarked: Boolean!
     comments: [Comment!]!
   }
 
@@ -105,9 +107,10 @@ export default buildSchema(`
     isUserBookmarkPost(userId: Int!, postId: Int!): Boolean!
     isUserLikeComment(userId: Int!, postId: Int!, commentId: Int!): Boolean!
     getUserBookmarkedPosts: [Post!]!
-    getUserPosts(userId: Int!): [Post!]!
+    getUserPosts(username: String!): [Post!]!
     getPostById(postId: Int!): Post
     getUserById(userId: Int!): User
+    getUserByUsername(username: String!): User
     getUserActivities: [Activity!]!
     sliderImages: [SliderImage!]!
   }

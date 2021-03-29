@@ -17,6 +17,9 @@ const MS_IN_MOUNTH: number = 1000 * 60 * 60 * 24 * 7 * 4;
 interface IPost {
   id: number;
   imageUrl: string;
+  isLiked: boolean;
+  isBookmarked: boolean;
+  author: UserInstance;
   createdAt: string;
   updatedAt: string;
   likesCount: number;
@@ -92,16 +95,8 @@ type BookmarkPostArgs = {
   postId: number;
 };
 
-type GetUserBookmarkedPostsArgs = {
-  userId: number;
-};
-
 type GetUserPostsArgs = {
-  userId: number;
-};
-
-type GetPostCommentsArgs = {
-  postId: number;
+  username: string;
 };
 
 type GetPostByIdArgs = {
@@ -133,8 +128,8 @@ type CreateActivityArgs = {
   content: string;
 };
 
-type GetUserActivitiesArgs = {
-  userId: number;
+type GetUserByUsernameArgs = {
+  username: string;
 };
 
 class ValidationError extends Error {
@@ -279,6 +274,31 @@ export default {
         const posts: PostInstance[] = await following.getPosts();
         await Promise.all(
           posts.map(async (post: PostInstance) => {
+            const postAuthor: UserInstance = await User.findByPk(post.userId);
+            if (!postAuthor) {
+              throw new Error("Author of post not found.");
+            }
+            let isBookmarked: boolean = false;
+            const bookmark: BookmarkInstance = await Bookmark.findOne({
+              where: {
+                postId: post.id,
+                userId: req.userId,
+              },
+            });
+            if (bookmark) {
+              isBookmarked = true;
+            }
+            let isPostLiked: boolean = false;
+            const like: LikeInstance = await Like.findOne({
+              where: {
+                postId: post.id,
+                commentId: null,
+                userId: req.userId,
+              },
+            });
+            if (like) {
+              isPostLiked = true;
+            }
             const commentsData: CommentInstance[] = await post.getComments();
             const comments: IComment[] = [];
             await Promise.all(
@@ -311,6 +331,9 @@ export default {
               likesCount: post.likesCount,
               userId: post.userId,
               comments,
+              isLiked: isPostLiked,
+              isBookmarked,
+              author: postAuthor,
               createdAt: post.createdAt.toISOString(),
               updatedAt: post.updatedAt.toISOString(),
             });
@@ -494,13 +517,31 @@ export default {
         const postData: PostInstance = await Post.findOne({
           where: { id: postBookmark.postId },
         });
+        const postAuthor: UserInstance = await User.findByPk(postData.userId);
+        if (!postAuthor) {
+          throw new Error("Author of post not found.");
+        }
         const comments: IComment[] = (await postData.getComments()) as IComment[];
+        let isLiked: boolean = false;
+        const like: LikeInstance = await Like.findOne({
+          where: {
+            postId: postData.id,
+            commentId: null,
+            userId: req.userId,
+          },
+        });
+        if (like) {
+          isLiked = true;
+        }
         if (postData) {
           bookmarkedPosts.push({
             id: postData.id,
             imageUrl: postData.imageUrl,
             likesCount: postData.likesCount,
             comments,
+            isLiked,
+            isBookmarked: true,
+            author: postAuthor,
             createdAt: postData.createdAt.toISOString(),
             updatedAt: postData.updatedAt.toISOString(),
           });
@@ -509,8 +550,15 @@ export default {
     );
     return bookmarkedPosts;
   },
-  getUserPosts: async ({ userId }: GetUserPostsArgs) => {
-    const user: UserInstance = await User.findOne({ where: { id: userId } });
+  getUserPosts: async ({ username }: GetUserPostsArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new Error("Not authenticated.");
+    }
+    const requestedUser = await User.findByPk(req.userId);
+    if (!requestedUser) {
+      throw new Error("Request sender not found.");
+    }
+    const user: UserInstance = await User.findOne({ where: { username } });
     if (!user) {
       throw new Error("User not found.");
     }
@@ -519,18 +567,70 @@ export default {
     const posts: IPost[] = [];
     await Promise.all(
       postsData.map(async (postData: PostInstance) => {
-        const comments: IComment[] = (await postData.getComments()) as IComment[];
-        return {
+        const postAuthor: UserInstance = await User.findByPk(postData.userId);
+        if (!postAuthor) {
+          throw new Error("Author of post not found.");
+        }
+        let isLiked: boolean = false;
+        const like: LikeInstance = await Like.findOne({
+          where: {
+            postId: postData.id,
+            commentId: null,
+            userId: req.userId,
+          },
+        });
+        if (like) {
+          isLiked = true;
+        }
+        let isBookmarked: boolean = false;
+        const bookmark: BookmarkInstance = await Bookmark.findOne({
+          where: {
+            postId: postData.id,
+            userId: req.userId,
+          },
+        });
+        if (bookmark) {
+          isBookmarked = true;
+        }
+        const comments: IComment[] = [];
+        const commentsData: CommentInstance[] = await postData.getComments();
+        await Promise.all(
+          commentsData.map(async (commentData: CommentInstance) => {
+            let isLiked: boolean = false;
+            const like: LikeInstance = await Like.findOne({
+              where: {
+                postId: postData.id,
+                commentId: commentData.id,
+                userId: req.userId,
+              },
+            });
+            if (like) {
+              isLiked = true;
+            }
+            comments.push({
+              id: commentData.id,
+              content: commentData.content,
+              isLiked,
+              postId: postData.id,
+              authorName: commentData.authorName,
+              createdAt: commentData.createdAt.toISOString(),
+              updatedAt: commentData.updatedAt.toISOString(),
+            });
+          })
+        );
+        posts.push({
           id: postData.id,
           imageUrl: postData.imageUrl,
           likesCount: postData.likesCount,
           comments,
+          isLiked,
+          isBookmarked,
+          author: postAuthor,
           createdAt: postData.createdAt.toISOString(),
           updatedAt: postData.updatedAt.toISOString(),
-        };
+        });
       })
     );
-
     return posts;
   },
   getPostById: async ({ postId }: GetPostByIdArgs) => {
@@ -540,6 +640,20 @@ export default {
   getUserById: async ({ userId }: GetUserByIdArgs) => {
     const user: UserInstance = await User.findOne({
       where: { id: userId },
+      include: ["following", "followers"],
+    });
+    user.followers = user.followers.map(
+      (follower: UserInstance) => follower.dataValues
+    );
+    user.following = user.following.map(
+      (following: UserInstance) => following.dataValues
+    );
+    user.password = "";
+    return user.dataValues;
+  },
+  getUserByUsername: async ({ username }: GetUserByUsernameArgs) => {
+    const user: UserInstance = await User.findOne({
+      where: { username },
       include: ["following", "followers"],
     });
     user.followers = user.followers.map(
