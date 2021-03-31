@@ -1,12 +1,16 @@
 import { Box, Flex, useMediaQuery } from "@chakra-ui/react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import CurrentUser from "../../components/current-user/current-user.component";
 import Feed from "../../components/feed/feed.component";
 import Header from "../../components/header/header.component";
-import LoadingScreen from "../../components/loading-screen/loading-screen.component";
+import {
+  incrementPostSlice,
+  requestSliceOfPosts,
+} from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { clearInputs } from "../../redux/signin/signin.slice";
 import { RootState } from "../../redux/store";
+import { IUser } from "../../redux/user/user.slice";
 
 const HomePage = () => {
   const dispatch = useAppDispatch();
@@ -24,19 +28,42 @@ const HomePage = () => {
       dispatch(clearInputs());
     }
   }, [dispatch, isAuth]);
+
+  const userFollowing: IUser[] | undefined = useAppSelector(
+    (state: RootState) => state.user.currentUser?.following
+  );
+  const token: string | null = localStorage.getItem("authToken");
+  const slice: number = useAppSelector(
+    (state: RootState) => state.feed.lastPostsSlice
+  );
+  useEffect(() => {
+    dispatch(requestSliceOfPosts({ input: { slice, token } }));
+  }, [dispatch, slice, token, userFollowing]);
+
+  const scrollHandler = useCallback(() => {
+    const windowRelativeBottom: number = document.documentElement.getBoundingClientRect()
+      .bottom;
+    if (
+      windowRelativeBottom < document.documentElement.clientHeight + 100 &&
+      !isLoading
+    ) {
+      dispatch(incrementPostSlice());
+    }
+  }, [dispatch, isLoading]);
+
+  useEffect(() => {
+    document.addEventListener("scroll", scrollHandler);
+    return () => document.removeEventListener("scroll", scrollHandler);
+  }, [isLoading, scrollHandler]);
   return (
     <>
       <Header />
-      {!isLoading ? (
-        <Box w="100%" minH="100vh" bgColor="#fafafa">
-          <Flex>
-            <Feed />
-            {isLessThan820 ? <></> : <CurrentUser />}
-          </Flex>
-        </Box>
-      ) : (
-        <LoadingScreen />
-      )}
+      <Box w="100%" minH="100vh" bgColor="#fafafa">
+        <Flex>
+          <Feed />
+          {isLessThan820 ? <></> : <CurrentUser />}
+        </Flex>
+      </Box>
     </>
   );
 };

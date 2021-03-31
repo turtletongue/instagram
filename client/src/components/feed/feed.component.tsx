@@ -11,9 +11,14 @@ const Feed = () => {
   );
   return (
     <Box p={isLessThan820 ? "3rem 0 0 0" : "6rem 0 1rem 12rem"}>
-      {(posts as IPost[]).map((post, index) => {
-        return <PostContainer key={index} post={post} />;
-      })}
+      {(posts as IPost[])
+        .sort(
+          (a: IPost, b: IPost) =>
+            Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
+        )
+        .map((post, index) => {
+          return <PostContainer key={index} post={post} />;
+        })}
     </Box>
   );
 };

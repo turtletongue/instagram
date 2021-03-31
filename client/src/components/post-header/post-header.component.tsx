@@ -29,6 +29,7 @@ const PostHeader = ({ author, postId, ...otherProps }: PostHeaderProps) => {
         onClose={onClose}
         postId={postId}
         headerOptions
+        author={author}
       />
       <Flex align="center">
         <Link to={`/${author.username}/`}>

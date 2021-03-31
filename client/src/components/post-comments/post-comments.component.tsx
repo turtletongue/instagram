@@ -1,4 +1,5 @@
 import { Box, Text } from "@chakra-ui/react";
+import { Fragment } from "react";
 import { IComment } from "../../redux/feed/feed.slice";
 import findTimeDifference from "../../utils/findTimeDifference.util";
 import Comment from "../comment/comment.component";
@@ -42,7 +43,7 @@ const PostComments = ({
               View all {comments.length} comments
             </Text>
           ) : (
-            <></>
+            <Fragment key={index} />
           );
         })}
         <Time timeAgo={timeAgo} />

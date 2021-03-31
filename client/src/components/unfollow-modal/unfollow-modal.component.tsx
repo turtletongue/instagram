@@ -1,5 +1,7 @@
 import { Divider, Flex, Text } from "@chakra-ui/layout";
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/modal";
+import { useAppDispatch } from "../../redux/hooks";
+import { unfollow } from "../../redux/user-page/user-page.slice";
 import { IUser } from "../../redux/user/user.slice";
 import Avatar from "../avatar/avatar.component";
 import ModalItem from "../modal-item/modal-item.component";
@@ -11,6 +13,8 @@ interface UnfollowModalProps {
 }
 
 const UnfollowModal = ({ isOpen, onClose, user }: UnfollowModalProps) => {
+  const dispatch = useAppDispatch();
+  const token: string | null = localStorage.getItem("authToken");
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -23,7 +27,16 @@ const UnfollowModal = ({ isOpen, onClose, user }: UnfollowModalProps) => {
             Unfollow @{user.username}?
           </Text>
           <Divider />
-          <ModalItem>
+          <ModalItem
+            onClick={() => {
+              dispatch(
+                unfollow({
+                  input: { followingId: Number(user?.id), token },
+                })
+              );
+              onClose();
+            }}
+          >
             <Text
               textAlign="center"
               userSelect="none"

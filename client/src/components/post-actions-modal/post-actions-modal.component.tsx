@@ -1,14 +1,17 @@
-import { useClipboard } from "@chakra-ui/hooks";
+import { useClipboard, useDisclosure } from "@chakra-ui/hooks";
 import { Divider, Text } from "@chakra-ui/layout";
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/modal";
 import { useToast } from "@chakra-ui/toast";
+import { IUser } from "../../redux/user/user.slice";
 import ModalItem from "../modal-item/modal-item.component";
+import UnfollowModal from "../unfollow-modal/unfollow-modal.component";
 
 interface PostActionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   headerOptions?: boolean;
   postId: number;
+  author?: IUser;
 }
 
 const PostActionsModal = ({
@@ -16,6 +19,7 @@ const PostActionsModal = ({
   onClose,
   headerOptions,
   postId,
+  author,
 }: PostActionsModalProps) => {
   const { onCopy } = useClipboard(`http://localhost:3000/p/${postId}`);
   const toast = useToast();
@@ -27,14 +31,28 @@ const PostActionsModal = ({
     });
     onClose();
   };
+  const {
+    isOpen: isUnfollowModalOpen,
+    onOpen: onUnfollowModalOpen,
+    onClose: onUnfollowModalClose,
+  } = useDisclosure();
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered={true}>
+      {author ? (
+        <UnfollowModal
+          isOpen={isUnfollowModalOpen}
+          onClose={onUnfollowModalClose}
+          user={author}
+        />
+      ) : (
+        <></>
+      )}
       <ModalOverlay />
       <ModalContent overflow="hidden" borderRadius="5px" maxW="25rem">
         <ModalBody p={0}>
           {headerOptions ? (
             <>
-              <ModalItem>
+              <ModalItem onClick={onUnfollowModalOpen}>
                 <Text
                   textAlign="center"
                   userSelect="none"

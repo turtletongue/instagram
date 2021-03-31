@@ -5,7 +5,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@chakra-ui/popover";
 import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
 import { POST_PAGE, USER_PAGE } from "../../constants";
-import { IPost, setCommentInput } from "../../redux/feed/feed.slice";
+import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch } from "../../redux/hooks";
 import { setPostPageCommentInput } from "../../redux/post-page/post-page.slice";
 import { setUserPageCommentInput } from "../../redux/user-page/user-page.slice";
@@ -19,9 +19,10 @@ interface IEmoji {
 interface EmojiPopoverProps {
   post: IPost;
   page?: string;
+  inputRef: any;
 }
 
-const EmojiPopover = ({ post, page }: EmojiPopoverProps) => {
+const EmojiPopover = ({ post, page, inputRef }: EmojiPopoverProps) => {
   const dispatch = useAppDispatch();
   const emojies: IEmoji[] = [
     { id: 1, content: "😀" },
@@ -30,25 +31,21 @@ const EmojiPopover = ({ post, page }: EmojiPopoverProps) => {
     { id: 4, content: "👺" },
     { id: 5, content: "❤" },
   ];
-  const commentInput: string = post.commentInput;
   const emojiPickHandler = (emoji: IEmoji) => {
     const commentContent = {
       postId: post.id,
-      commentInput: (commentInput ? commentInput : "") + emoji.content,
+      commentInput: "",
     };
     switch (page) {
       case USER_PAGE:
         dispatch(setUserPageCommentInput(commentContent));
         break;
       case POST_PAGE:
-        dispatch(
-          setPostPageCommentInput(
-            (commentInput ? commentInput : "") + emoji.content
-          )
-        );
+        dispatch(setPostPageCommentInput(""));
         break;
       default:
-        dispatch(setCommentInput(commentContent));
+        inputRef.current.value += emoji.content;
+        break;
     }
   };
   return (

@@ -85,7 +85,7 @@ interface RequestUserByIdResponse {
 }
 
 export const requestUserById = createAsyncThunk(
-  "user/equestUserByIdStatus",
+  "user/requestUserByIdStatus",
   async (requestOptions: RequestOptions, thunkAPI) => {
     if (requestOptions.testData) {
       return requestOptions.testData;
@@ -145,6 +145,8 @@ const userSlice = createSlice({
       state.userId = null;
       state.isLoggedIn = false;
       localStorage.removeItem("authToken");
+      localStorage.removeItem("username");
+      localStorage.removeItem("expiryDate");
     },
     checkIsLogged: (state: UserState) => {
       const token: string | null = localStorage.getItem("authToken");
@@ -168,9 +170,11 @@ const userSlice = createSlice({
       state.userId = action.payload.userId;
       state.isLoggedIn = true;
       state.signInLoading = "idle";
-      localStorage.setItem("authToken", action.payload.token);
-      localStorage.setItem("userId", action.payload.userId.toString());
-      localStorage.setItem("expiryDate", (Date.now() + HOUR).toString());
+      if (action.payload.token) {
+        localStorage.setItem("authToken", action.payload.token);
+        localStorage.setItem("userId", action.payload.userId.toString());
+        localStorage.setItem("expiryDate", (Date.now() + HOUR).toString());
+      }
     },
     [requestSignIn.rejected as any]: (
       state: UserState,

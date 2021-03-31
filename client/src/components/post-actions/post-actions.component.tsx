@@ -56,6 +56,7 @@ const PostActions = ({
   } = useDisclosure();
   const isLiked: boolean = post.isLiked;
   const isBookmarked: boolean = post.isBookmarked;
+  const token: string | null = localStorage.getItem("authToken");
   const likeHandler = () => {
     switch (page) {
       case USER_PAGE:
@@ -67,7 +68,10 @@ const PostActions = ({
         dispatch(isLiked ? unlikePostPagePost() : likePostPagePost());
         break;
       default:
-        dispatch(isLiked ? unlikePost(post.id) : likePost(post.id));
+        if (token) {
+          if (isLiked) dispatch(unlikePost({ postId: Number(post.id), token }));
+          else dispatch(likePost({ postId: Number(post.id), token }));
+        }
         break;
     }
   };
@@ -86,9 +90,11 @@ const PostActions = ({
         );
         break;
       default:
-        dispatch(
-          isBookmarked ? unbookmarkPost(post.id) : bookmarkPost(post.id)
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(unbookmarkPost({ postId: Number(post.id), token }));
+          else dispatch(bookmarkPost({ postId: Number(post.id), token }));
+        }
         break;
     }
   };

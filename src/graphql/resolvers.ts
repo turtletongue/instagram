@@ -226,11 +226,11 @@ export default {
     if (errors.length > 0) {
       throw new InvalidInputError("Invalid input.", errors);
     }
-    const createdComment: CommentInstance = post.createComment({
+    const createdComment: CommentInstance = await post.createComment({
       authorName: user.username,
       content,
     });
-    return createdComment;
+    return { ...createdComment.dataValues, isLiked: false };
   },
   login: async ({ username, password }: LoginArgs) => {
     const userData: UserInstance = await User.findOne({ where: { username } });
@@ -254,7 +254,26 @@ export default {
     if (!req.isAuth) {
       throw new Error("Not authenticated.");
     }
+    const following = await Followers.findOne({
+      where: { followerId: req.userId, followingId },
+    });
+    if (following) {
+      throw new Error("Following is already created.");
+    }
     await Followers.create({ followerId: req.userId, followingId });
+    return true;
+  },
+  unfollow: async ({ followingId }: FollowArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new Error("Not authenticated.");
+    }
+    const following = await Followers.findOne({
+      where: { followerId: req.userId, followingId },
+    });
+    if (!following) {
+      throw new Error("Following not found.");
+    }
+    await following.destroy();
     return true;
   },
   getFollowingPosts: async (
@@ -341,8 +360,6 @@ export default {
         );
       })
     );
-    const start: number =
-      slice * MAX_FOLLOWING_POSTS_COUNT - MAX_FOLLOWING_POSTS_COUNT;
     const end: number =
       slice * MAX_FOLLOWING_POSTS_COUNT -
       MAX_FOLLOWING_POSTS_COUNT +
@@ -351,7 +368,7 @@ export default {
       (a: IPost, b: IPost) =>
         Number(new Date(b.createdAt)) - Number(new Date(a.createdAt))
     );
-    return followingsPosts.slice(start, end);
+    return followingsPosts.slice(0, end);
   },
   likePost: async ({ postId }: LikePostArgs, req: AuthRequest) => {
     if (!req.isAuth) {

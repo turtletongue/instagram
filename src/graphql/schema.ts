@@ -89,6 +89,7 @@ export default buildSchema(`
     createPost(imageUrl: String!): Post!
     createComment(commentInput: CommentInputData): Comment!
     follow(followingId: Int!): Boolean!
+    unfollow(followingId: Int!): Boolean!
     likePost(postId: Int!): Like!
     likeComment(commentId: Int!, postId: Int!): Like!
     unlikePost(postId: Int!): Boolean!

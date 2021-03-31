@@ -37,6 +37,7 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
+  const token: string | null = localStorage.getItem("authToken");
   const commentLikeHandler = (comment: IComment) => {
     if (comment.id && user) {
       const commentLike = {
@@ -60,9 +61,14 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
           );
           break;
         default:
-          dispatch(
-            isLiked ? unlikeComment(commentLike) : likeComment(commentLike)
-          );
+          if (token) {
+            if (isLiked)
+              dispatch(
+                unlikeComment({ token, postId, commentId: +comment.id })
+              );
+            else
+              dispatch(likeComment({ token, postId, commentId: +comment.id }));
+          }
           break;
       }
     }

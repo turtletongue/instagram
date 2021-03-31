@@ -52,11 +52,20 @@ const FollowersModal = ({ isOpen, onClose, user }: FollowersModalProps) => {
                     .map((f: IUser) => f.id)
                     .includes(follower.id)
                 : false;
+              const isLoggedUser: boolean =
+                currentLoggedUser?.id === follower.id;
               return (
-                <Flex align="center" key={index}>
+                <Flex align="center" key={index} onClick={onClose}>
                   <ShrimpUser user={follower} />
                   <Spacer />
-                  <ControlFollowingButton isFollowed={isFollowed} user={user} />
+                  {!isLoggedUser ? (
+                    <ControlFollowingButton
+                      isFollowed={isFollowed}
+                      user={follower}
+                    />
+                  ) : (
+                    <></>
+                  )}
                 </Flex>
               );
             })

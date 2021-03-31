@@ -18,19 +18,33 @@ import {
   requestUserPagePosts,
   selectAllUserPagePosts,
 } from "../../redux/user-page/user-page.slice";
-import { IUser } from "../../redux/user/user.slice";
+import { IUser, requestUserById } from "../../redux/user/user.slice";
 
 const UserPage = () => {
   const params: any = useParams();
   const username: string = params.username;
   const dispatch = useAppDispatch();
   const token: string | null = localStorage.getItem("authToken");
+  const isUnfollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.unfollowLoading === "loading"
+  );
+  const isFollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.followLoading === "loading"
+  );
   useEffect(() => {
     if (token) {
       dispatch(requestUserData({ input: { username } }));
       dispatch(requestUserPagePosts({ input: { username, token } }));
     }
-  }, [dispatch, username, token]);
+  }, [dispatch, username, token, isUnfollowLoading, isFollowLoading]);
+  const loggedUser: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  useEffect(() => {
+    if ((!isUnfollowLoading || !isFollowLoading) && loggedUser?.id) {
+      dispatch(requestUserById({ input: { userId: Number(loggedUser.id) } }));
+    }
+  }, [dispatch, isUnfollowLoading, isFollowLoading, loggedUser?.id]);
   const state: RootState = useAppSelector((state: RootState) => state);
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.userPage.user
@@ -45,6 +59,9 @@ const UserPage = () => {
   );
   const savedPosts: IPost[] = userPagePosts.filter(
     (post: IPost) => post.isBookmarked
+  );
+  const isItLoggedUserPage: boolean = useAppSelector(
+    (state: RootState) => state.user.currentUser?.id === user?.id
   );
   const {
     isOpen: isChangePhotoModalOpen,
@@ -82,8 +99,10 @@ const UserPage = () => {
               {category === POSTS ? (
                 userPosts.length ? (
                   <UserPosts posts={userPosts} />
-                ) : (
+                ) : isItLoggedUserPage ? (
                   <NoPostsBanner />
+                ) : (
+                  <></>
                 )
               ) : (
                 <UserPosts posts={savedPosts} />

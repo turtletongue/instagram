@@ -24,7 +24,6 @@ const ProfileSettingsModal = ({
   const logOutHandler = () => {
     onLoggedOutModalOpen();
     setTimeout(() => {
-      onLoggedOutModalClose();
       dispatch(logOut());
     }, 2000);
   };

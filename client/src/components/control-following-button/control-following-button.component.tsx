@@ -26,7 +26,7 @@ const ControlFollowingButton = ({
         user={user}
       />
       {isFollowed ? (
-        <UnfollowButton onUnfollowModalOpen={onUnfollowModalOpen} />
+        <UnfollowButton user={user} onUnfollowModalOpen={onUnfollowModalOpen} />
       ) : (
         <FollowButton user={user} />
       )}

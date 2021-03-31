@@ -8,19 +8,13 @@ import EditProfilePage from "./pages/profile-edit-page/profile-edit-page.compone
 import SignIn from "./pages/signIn/signIn.component";
 import UserPage from "./pages/user-page/user-page.component";
 import { requestLastActivities } from "./redux/activities/activities.slice";
-import {
-  incrementPostSlice,
-  requestSliceOfPosts,
-} from "./redux/feed/feed.slice";
+import { incrementPostSlice } from "./redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
 import { checkIsLogged, requestUserById } from "./redux/user/user.slice";
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const slice: number = useAppSelector(
-    (state: RootState) => state.feed.lastPostsSlice
-  );
   useEffect(() => {
     dispatch(checkIsLogged());
     dispatch(
@@ -48,17 +42,20 @@ const App = () => {
     (state: RootState) => state.user.userId
   );
   const token: string | null = localStorage.getItem("authToken");
+  const isUnfollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.unfollowLoading === "loading"
+  );
+  const isFollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.followLoading === "loading"
+  );
   useEffect(() => {
     if (isAuth && !!userId && token) {
-      dispatch(requestUserById({ input: { userId } }));
+      dispatch(requestUserById({ input: { userId: Number(userId) } }));
     }
-  }, [dispatch, isAuth, userId, token]);
+  }, [dispatch, isAuth, userId, token, isUnfollowLoading, isFollowLoading]);
   useEffect(() => {
     dispatch(incrementPostSlice());
   }, [dispatch]);
-  useEffect(() => {
-    dispatch(requestSliceOfPosts({ input: { slice, token } }));
-  }, [dispatch, slice, token]);
   return (
     <>
       <Fonts />

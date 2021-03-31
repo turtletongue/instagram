@@ -35,7 +35,12 @@ interface UserPageState {
   ids: EntityId[];
   entities: any;
   userPagePostsLoading: string;
+  followErrorMessage: string | null;
+  followLoading: string;
+  unfollowErrorMessage: string | null;
+  unfollowLoading: string;
   errorMessage: string | null;
+  unfollowModalUser: IUser | null;
 }
 
 const userPagePostsAdapter = createEntityAdapter();
@@ -47,8 +52,94 @@ const initialState: UserPageState = userPagePostsAdapter.getInitialState({
   clickedPostId: -1,
   userLoading: "idle",
   userPagePostsLoading: "idle",
+  followErrorMessage: null,
+  followLoading: "idle",
+  unfollowErrorMessage: null,
+  unfollowLoading: "idle",
   errorMessage: null,
+  unfollowModalUser: null,
 });
+
+interface UnfollowJSON {
+  data: {
+    unfollow: any;
+  };
+}
+
+export const unfollow = createAsyncThunk(
+  "userPage/unfollowStatus",
+  async (requestOptions: RequestOptions, thunkAPI) => {
+    if (requestOptions.testData) {
+      return requestOptions.testData;
+    }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation Unfollow($followingId: Int!) {
+          unfollow(followingId: $followingId)
+        }
+      `,
+      variables: {
+        followingId: requestOptions.input.followingId,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${requestOptions.input.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: UnfollowJSON = await res.json();
+      console.log(json);
+      return json.data.unfollow;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface FollowJSON {
+  data: {
+    follow: any;
+  };
+}
+
+export const follow = createAsyncThunk(
+  "userPage/followStatus",
+  async (requestOptions: RequestOptions, thunkAPI) => {
+    if (requestOptions.testData) {
+      return requestOptions.testData;
+    }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation Follow($followingId: Int!) {
+          follow(followingId: $followingId)
+        }
+      `,
+      variables: {
+        followingId: requestOptions.input.followingId,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${requestOptions.input.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: FollowJSON = await res.json();
+      return json.data.follow;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
 
 interface RequestUserPostsJSON {
   data: {
@@ -311,6 +402,12 @@ const userPageSlice = createSlice({
         changes: { commentInput: "" },
       });
     },
+    setUnfollowModalUser: (
+      state: UserPageState,
+      action: PayloadAction<IUser>
+    ) => {
+      state.unfollowModalUser = action.payload;
+    },
   },
   extraReducers: {
     [requestUserPagePosts.pending as any]: (state: UserPageState) => {
@@ -349,6 +446,34 @@ const userPageSlice = createSlice({
       state.userLoading = "idle";
       state.errorMessage = action.payload;
     },
+    [follow.pending as any]: (state: UserPageState) => {
+      state.followLoading = "loading";
+      state.followErrorMessage = null;
+    },
+    [follow.fulfilled as any]: (state: UserPageState) => {
+      state.followLoading = "idle";
+    },
+    [follow.rejected as any]: (
+      state: UserPageState,
+      action: PayloadAction<string>
+    ) => {
+      state.followErrorMessage = action.payload;
+      state.followLoading = "idle";
+    },
+    [unfollow.pending as any]: (state: UserPageState) => {
+      state.unfollowLoading = "loading";
+      state.unfollowErrorMessage = null;
+    },
+    [unfollow.fulfilled as any]: (state: UserPageState) => {
+      state.unfollowLoading = "idle";
+    },
+    [unfollow.rejected as any]: (
+      state: UserPageState,
+      action: PayloadAction<string>
+    ) => {
+      state.unfollowErrorMessage = action.payload;
+      state.unfollowLoading = "idle";
+    },
   },
 });
 
@@ -372,6 +497,7 @@ export const {
   addUserPageComment,
   clearUserPageCommentInput,
   setClickedPostId,
+  setUnfollowModalUser,
 } = userPageSlice.actions;
 
 export default userPageSlice.reducer;
