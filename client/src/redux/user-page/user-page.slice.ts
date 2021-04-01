@@ -194,10 +194,7 @@ export const requestUserPagePosts = createAsyncThunk(
         body: JSON.stringify(graphqlQuery),
       });
       const json: RequestUserPostsJSON = await res.json();
-      return json.data.getUserPosts.map((post: any) => ({
-        ...post,
-        commentInput: "",
-      }));
+      return json.data.getUserPosts;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -257,6 +254,63 @@ export const requestUserData = createAsyncThunk(
       });
       const json: RequestUserDataJSON = await res.json();
       return json.data.getUserByUsername;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface RequestUserSavedPostsJSON {
+  data: {
+    getUserBookmarkedPosts: IPost[];
+  };
+}
+
+export const requestUserPageSavedPosts = createAsyncThunk(
+  "userPage/requestUserPageSavedPostsStatus",
+  async (requestOptions: RequestOptions, thunkAPI) => {
+    if (requestOptions.testData) {
+      return requestOptions.testData;
+    }
+
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        {
+          getUserBookmarkedPosts {
+            id
+            imageUrl
+            createdAt
+            likesCount
+            isLiked
+            isBookmarked
+            author {
+              id
+              avatarUrl
+              username
+            }
+            comments {
+              id
+              content
+              isLiked
+              authorName
+              createdAt
+              postId
+            }
+          }
+        }
+      `,
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${requestOptions.input.token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: RequestUserSavedPostsJSON = await res.json();
+      return json.data.getUserBookmarkedPosts;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -473,6 +527,12 @@ const userPageSlice = createSlice({
     ) => {
       state.unfollowErrorMessage = action.payload;
       state.unfollowLoading = "idle";
+    },
+    [requestUserPageSavedPosts.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<IPost[]>
+    ) => {
+      userPagePostsAdapter.upsertMany(state, action.payload);
     },
   },
 });

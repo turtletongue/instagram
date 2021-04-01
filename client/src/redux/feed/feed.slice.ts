@@ -28,12 +28,6 @@ export interface IPost {
   isLiked: boolean;
   isBookmarked: boolean;
   comments: IComment[];
-  commentInput: string;
-}
-
-export interface ICommentInput {
-  postId: number;
-  commentInput: string;
 }
 
 interface FollowingPostsJSON {
@@ -89,10 +83,7 @@ export const requestSliceOfPosts = createAsyncThunk(
         body: JSON.stringify(graphqlQuery),
       });
       const json: FollowingPostsJSON = await res.json();
-      return json.data.getFollowingPosts.map((post: any) => ({
-        ...post,
-        commentInput: "",
-      }));
+      return json.data.getFollowingPosts;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

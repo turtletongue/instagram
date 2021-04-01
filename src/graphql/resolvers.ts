@@ -538,7 +538,6 @@ export default {
         if (!postAuthor) {
           throw new Error("Author of post not found.");
         }
-        const comments: IComment[] = (await postData.getComments()) as IComment[];
         let isLiked: boolean = false;
         const like: LikeInstance = await Like.findOne({
           where: {
@@ -550,6 +549,32 @@ export default {
         if (like) {
           isLiked = true;
         }
+        const commentsData: CommentInstance[] = await postData.getComments();
+        const comments: IComment[] = [];
+        await Promise.all(
+          commentsData.map(async (commentData: CommentInstance) => {
+            let isLiked: boolean = false;
+            const like: LikeInstance = await Like.findOne({
+              where: {
+                postId: postData.id,
+                commentId: commentData.id,
+                userId: req.userId,
+              },
+            });
+            if (like) {
+              isLiked = true;
+            }
+            comments.push({
+              id: commentData.id,
+              content: commentData.content,
+              isLiked,
+              postId: postData.id,
+              authorName: commentData.authorName,
+              createdAt: commentData.createdAt.toISOString(),
+              updatedAt: commentData.updatedAt.toISOString(),
+            });
+          })
+        );
         if (postData) {
           bookmarkedPosts.push({
             id: postData.id,
@@ -650,8 +675,71 @@ export default {
     );
     return posts;
   },
-  getPostById: async ({ postId }: GetPostByIdArgs) => {
-    const post: PostInstance = await Post.findOne({ where: { id: postId } });
+  getPostById: async ({ postId }: GetPostByIdArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new Error("Not authenticated.");
+    }
+    const postData: PostInstance = await Post.findOne({
+      where: { id: postId },
+    });
+    const postAuthor: UserInstance = await User.findByPk(postData.userId);
+    if (!postAuthor) {
+      throw new Error("Author of post not found.");
+    }
+    const like: LikeInstance = await Like.findOne({
+      where: {
+        postId: postData.id,
+        commentId: null,
+        userId: req.userId,
+      },
+    });
+    let isPostLiked: boolean = false;
+    if (like) {
+      isPostLiked = true;
+    }
+    let isPostBookmarked: boolean = false;
+    const bookmark: BookmarkInstance = await Bookmark.findOne({
+      where: {
+        postId: postData.id,
+        userId: req.userId,
+      },
+    });
+    if (bookmark) {
+      isPostBookmarked = true;
+    }
+    const comments: IComment[] = [];
+    const commentsData: CommentInstance[] = await postData.getComments();
+    await Promise.all(
+      commentsData.map(async (commentData: CommentInstance) => {
+        let isLiked: boolean = false;
+        const like: LikeInstance = await Like.findOne({
+          where: {
+            postId: postData.id,
+            commentId: commentData.id,
+            userId: req.userId,
+          },
+        });
+        if (like) {
+          isLiked = true;
+        }
+        comments.push({
+          id: commentData.id,
+          content: commentData.content,
+          isLiked,
+          postId: postData.id,
+          authorName: commentData.authorName,
+          createdAt: commentData.createdAt.toISOString(),
+          updatedAt: commentData.updatedAt.toISOString(),
+        });
+      })
+    );
+    const post = {
+      ...postData.dataValues,
+      isLiked: isPostLiked,
+      isBookmarked: isPostBookmarked,
+      comments,
+      author: postAuthor.dataValues,
+    };
     return post;
   },
   getUserById: async ({ userId }: GetUserByIdArgs) => {

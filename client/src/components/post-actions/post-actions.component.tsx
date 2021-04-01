@@ -65,7 +65,11 @@ const PostActions = ({
         );
         break;
       case POST_PAGE:
-        dispatch(isLiked ? unlikePostPagePost() : likePostPagePost());
+        if (token) {
+          if (isLiked)
+            dispatch(unlikePostPagePost({ postId: Number(post.id), token }));
+          else dispatch(likePostPagePost({ postId: Number(post.id), token }));
+        }
         break;
       default:
         if (token) {
@@ -85,9 +89,14 @@ const PostActions = ({
         );
         break;
       case POST_PAGE:
-        dispatch(
-          isBookmarked ? unbookmarkPostPagePost() : bookmarkPostPagePost()
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(
+              unbookmarkPostPagePost({ postId: Number(post.id), token })
+            );
+          else
+            dispatch(bookmarkPostPagePost({ postId: Number(post.id), token }));
+        }
         break;
       default:
         if (token) {

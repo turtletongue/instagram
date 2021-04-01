@@ -8,10 +8,7 @@ import {
 import { POST_PAGE, USER_PAGE } from "../../constants";
 import { addComment, IComment, IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import {
-  addPostPageComment,
-  clearPostPageCommentInput,
-} from "../../redux/post-page/post-page.slice";
+import { addPostPageComment } from "../../redux/post-page/post-page.slice";
 import { RootState } from "../../redux/store";
 import {
   addUserPageComment,
@@ -33,7 +30,7 @@ const CommentInput = ({ post, inputRef, page }: CommentInputProps) => {
   );
   const token: string | null = localStorage.getItem("authToken");
   const addCommentHandler = () => {
-    if (token && user) {
+    if (token && user && inputRef.current.value) {
       const commentData: IComment = {
         id: post.comments.length + 1,
         authorName: user.username,
@@ -48,8 +45,14 @@ const CommentInput = ({ post, inputRef, page }: CommentInputProps) => {
           dispatch(clearUserPageCommentInput(post.id));
           break;
         case POST_PAGE:
-          dispatch(addPostPageComment(commentData));
-          dispatch(clearPostPageCommentInput());
+          dispatch(
+            addPostPageComment({
+              token,
+              postId: +post.id,
+              content: inputRef.current.value,
+            })
+          );
+          inputRef.current.value = "";
           break;
         default:
           dispatch(
@@ -78,24 +81,6 @@ const CommentInput = ({ post, inputRef, page }: CommentInputProps) => {
         </InputLeftElement>
         <Input
           ref={inputRef}
-          // value={commentInput ? commentInput : ""}
-          onChange={(event) => {
-            const commentInput = {
-              postId: post.id,
-              commentInput: event.target.value,
-            };
-            // switch (page) {
-            //   case USER_PAGE:
-            //     dispatch(setUserPageCommentInput(commentInput));
-            //     break;
-            //   case POST_PAGE:
-            //     dispatch(setPostPageCommentInput(event.target.value));
-            //     break;
-            //   default:
-            //     dispatch(setCommentInput(commentInput));
-            //     break;
-            // }
-          }}
           onKeyDown={(event) => {
             if (event.key === "Enter") addCommentHandler();
           }}

@@ -7,7 +7,6 @@ import { VscSmiley } from "react-icons/vsc";
 import { POST_PAGE, USER_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch } from "../../redux/hooks";
-import { setPostPageCommentInput } from "../../redux/post-page/post-page.slice";
 import { setUserPageCommentInput } from "../../redux/user-page/user-page.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 
@@ -41,7 +40,7 @@ const EmojiPopover = ({ post, page, inputRef }: EmojiPopoverProps) => {
         dispatch(setUserPageCommentInput(commentContent));
         break;
       case POST_PAGE:
-        dispatch(setPostPageCommentInput(""));
+        inputRef.current.value += emoji.content;
         break;
       default:
         inputRef.current.value += emoji.content;

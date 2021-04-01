@@ -16,6 +16,7 @@ import {
   POSTS,
   requestUserData,
   requestUserPagePosts,
+  requestUserPageSavedPosts,
   selectAllUserPagePosts,
 } from "../../redux/user-page/user-page.slice";
 import { IUser, requestUserById } from "../../redux/user/user.slice";
@@ -35,6 +36,7 @@ const UserPage = () => {
     if (token) {
       dispatch(requestUserData({ input: { username } }));
       dispatch(requestUserPagePosts({ input: { username, token } }));
+      dispatch(requestUserPageSavedPosts({ input: { token } }));
     }
   }, [dispatch, username, token, isUnfollowLoading, isFollowLoading]);
   const loggedUser: IUser | null = useAppSelector(

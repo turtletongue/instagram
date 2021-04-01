@@ -54,11 +54,16 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
           );
           break;
         case POST_PAGE:
-          dispatch(
-            isLiked
-              ? unlikePostPageComment(comment.id)
-              : likePostPageComment(comment.id)
-          );
+          if (token) {
+            if (isLiked)
+              dispatch(
+                unlikePostPageComment({ token, postId, commentId: +comment.id })
+              );
+            else
+              dispatch(
+                likePostPageComment({ token, postId, commentId: +comment.id })
+              );
+          }
           break;
         default:
           if (token) {
