@@ -6,8 +6,6 @@ import { Fragment } from "react";
 import { VscSmiley } from "react-icons/vsc";
 import { POST_PAGE, USER_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
-import { useAppDispatch } from "../../redux/hooks";
-import { setUserPageCommentInput } from "../../redux/user-page/user-page.slice";
 import EmojiText from "../emoji-text/emoji-text.component";
 
 interface IEmoji {
@@ -22,7 +20,6 @@ interface EmojiPopoverProps {
 }
 
 const EmojiPopover = ({ post, page, inputRef }: EmojiPopoverProps) => {
-  const dispatch = useAppDispatch();
   const emojies: IEmoji[] = [
     { id: 1, content: "😀" },
     { id: 2, content: "🤩" },
@@ -31,13 +28,9 @@ const EmojiPopover = ({ post, page, inputRef }: EmojiPopoverProps) => {
     { id: 5, content: "❤" },
   ];
   const emojiPickHandler = (emoji: IEmoji) => {
-    const commentContent = {
-      postId: post.id,
-      commentInput: "",
-    };
     switch (page) {
       case USER_PAGE:
-        dispatch(setUserPageCommentInput(commentContent));
+        inputRef.current.value += emoji.content;
         break;
       case POST_PAGE:
         inputRef.current.value += emoji.content;

@@ -1,17 +1,21 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import natural from "natural";
 import validator from "validator";
 import { AuthRequest } from "../middleware/auth";
 import { ActivityInstance } from "../models/Activity";
 import Bookmark, { BookmarkInstance } from "../models/Bookmark";
-import { CommentInstance } from "../models/Comment";
-import Followers from "../models/Followers";
+import Comment, { CommentInstance } from "../models/Comment";
+import Followers, { FollowersInstance } from "../models/Followers";
 import Like, { LikeInstance } from "../models/Like";
 import Post, { PostInstance } from "../models/Post";
 import SliderImage from "../models/SliderImage";
 import User, { UserInstance } from "../models/User";
 
+const metaphone = natural.Metaphone;
+
 const MAX_FOLLOWING_POSTS_COUNT: number = 5;
+const MAX_USERS_IF_INPUT_LT_THREE_LETTERS: number = 10;
 const MS_IN_MOUNTH: number = 1000 * 60 * 60 * 24 * 7 * 4;
 
 interface IPost {
@@ -35,6 +39,12 @@ interface IComment {
   updatedAt: string;
   authorName: string;
   postId: number;
+}
+
+interface IActivity {
+  id: number;
+  author: UserInstance;
+  content: string;
 }
 
 type CreateUserArgs = {
@@ -130,6 +140,10 @@ type CreateActivityArgs = {
 
 type GetUserByUsernameArgs = {
   username: string;
+};
+
+type SearchUsersArgs = {
+  input: string;
 };
 
 class ValidationError extends Error {
@@ -254,13 +268,25 @@ export default {
     if (!req.isAuth) {
       throw new Error("Not authenticated.");
     }
-    const following = await Followers.findOne({
+    const follower: UserInstance = await User.findByPk(req.userId);
+    if (!follower) {
+      throw new Error("Follower not found.");
+    }
+    const followingUser: UserInstance = await User.findByPk(followingId);
+    if (!followingUser) {
+      throw new Error("Following not found.");
+    }
+    const following: FollowersInstance = await Followers.findOne({
       where: { followerId: req.userId, followingId },
     });
     if (following) {
       throw new Error("Following is already created.");
     }
     await Followers.create({ followerId: req.userId, followingId });
+    await followingUser.createActivity({
+      content: `started following you.`,
+      authorId: req.userId,
+    });
     return true;
   },
   unfollow: async ({ followingId }: FollowArgs, req: AuthRequest) => {
@@ -405,6 +431,25 @@ export default {
     if (like) {
       throw new Error("Like is exist already.");
     }
+
+    const comment: CommentInstance = await Comment.findByPk(commentId);
+
+    if (!comment) {
+      throw new Error("Comment not found.");
+    }
+
+    const commentAuthor: UserInstance = await User.findOne({
+      where: { username: comment.authorName },
+    });
+
+    if (!commentAuthor) {
+      throw new Error("Author of comment not found.");
+    }
+
+    await commentAuthor.createActivity({
+      content: "liked your comment.",
+      authorId: req.userId,
+    });
 
     const createdLike: LikeInstance = await Like.create({
       commentId,
@@ -783,7 +828,20 @@ export default {
     if (!existingUser) {
       throw new Error("User not found.");
     }
-    await existingUser.update({ values: { name, username, bio, avatarUrl } });
+    if (!username) {
+      throw new Error("Incorrect username.");
+    }
+    const userWithSameUsername: UserInstance = await User.findOne({
+      where: { username },
+    });
+    if (userWithSameUsername && userWithSameUsername.id !== existingUser.id) {
+      throw new Error("Username already taken.");
+    }
+    existingUser.name = name ? name : "";
+    existingUser.username = username;
+    existingUser.bio = bio ? bio : "";
+    existingUser.avatarUrl = avatarUrl ? avatarUrl : "";
+    await existingUser.save();
     return true;
   },
   updatePassword: async (
@@ -841,11 +899,41 @@ export default {
         Number(activity.createdAt) > Number(Date.now()) - MS_IN_MOUNTH
     );
 
-    return filteredActivities;
+    const resultActivities: IActivity[] = [];
+    await Promise.all(
+      filteredActivities.map(async (activity: ActivityInstance) => {
+        const activityAuthor = await User.findByPk(activity.authorId);
+        if (!activityAuthor) {
+          throw new Error("Author of activity not found.");
+        }
+        resultActivities.push({
+          ...activity.dataValues,
+          author: activityAuthor,
+        });
+      })
+    );
+
+    return resultActivities;
   },
   sliderImages: async () => {
     const sliderImages = await SliderImage.findAll();
     if (!sliderImages) return [];
     return sliderImages;
+  },
+  searchUsers: async ({ input }: SearchUsersArgs) => {
+    const allUsers: UserInstance[] = await User.findAll();
+    const searchedUsers: UserInstance[] = allUsers
+      .filter((user: UserInstance) => {
+        return (
+          metaphone.compare(input, user.username) ||
+          user.username.includes(input)
+        );
+      })
+      .slice(
+        0,
+        input.length < 3 ? MAX_USERS_IF_INPUT_LT_THREE_LETTERS : undefined
+      );
+
+    return searchedUsers;
   },
 };

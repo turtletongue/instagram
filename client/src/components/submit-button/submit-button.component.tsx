@@ -1,4 +1,7 @@
 import { Button } from "@chakra-ui/button";
+import { Spinner } from "@chakra-ui/spinner";
+import { useAppSelector } from "../../redux/hooks";
+import { RootState } from "../../redux/store";
 
 interface SubmitButtonProps {
   isActive: boolean;
@@ -6,6 +9,10 @@ interface SubmitButtonProps {
 }
 
 const SubmitButton = ({ isActive, ...otherProps }: SubmitButtonProps) => {
+  const isLoading: boolean = useAppSelector(
+    (state: RootState) =>
+      state.profileEditPage.updateUserDataLoading === "loading"
+  );
   return (
     <Button
       h="2rem"
@@ -24,7 +31,7 @@ const SubmitButton = ({ isActive, ...otherProps }: SubmitButtonProps) => {
       }}
       {...otherProps}
     >
-      Submit
+      {isLoading ? <Spinner color="white" size="sm" /> : "Submit"}
     </Button>
   );
 };

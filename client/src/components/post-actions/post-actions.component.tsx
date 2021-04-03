@@ -60,9 +60,11 @@ const PostActions = ({
   const likeHandler = () => {
     switch (page) {
       case USER_PAGE:
-        dispatch(
-          isLiked ? unlikeUserPagePost(post.id) : likeUserPagePost(post.id)
-        );
+        if (token) {
+          if (isLiked)
+            dispatch(unlikeUserPagePost({ postId: Number(post.id), token }));
+          else dispatch(likeUserPagePost({ postId: Number(post.id), token }));
+        }
         break;
       case POST_PAGE:
         if (token) {
@@ -82,11 +84,14 @@ const PostActions = ({
   const toggleBookmarkHandler = () => {
     switch (page) {
       case USER_PAGE:
-        dispatch(
-          isBookmarked
-            ? unbookmarkUserPagePost(post.id)
-            : bookmarkUserPagePost(post.id)
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(
+              unbookmarkUserPagePost({ postId: Number(post.id), token })
+            );
+          else
+            dispatch(bookmarkUserPagePost({ postId: Number(post.id), token }));
+        }
         break;
       case POST_PAGE:
         if (token) {

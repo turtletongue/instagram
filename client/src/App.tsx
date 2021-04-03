@@ -17,23 +17,6 @@ const App = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(checkIsLogged());
-    dispatch(
-      requestLastActivities({
-        testData: [
-          {
-            author: {
-              userId: "alternative.disney",
-              avatarUrl:
-                "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
-              fullname: "Alternative Disney",
-            },
-            type: "LIKE",
-            activityReceiverContent: "nice",
-            postId: 32323,
-          },
-        ],
-      })
-    );
   }, [dispatch]);
   const isAuth: boolean = useAppSelector(
     (state: RootState) => state.user.isLoggedIn
@@ -56,6 +39,11 @@ const App = () => {
   useEffect(() => {
     dispatch(incrementPostSlice());
   }, [dispatch]);
+  useEffect(() => {
+    if (token) {
+      dispatch(requestLastActivities(token));
+    }
+  }, [dispatch, token]);
   return (
     <>
       <Fonts />

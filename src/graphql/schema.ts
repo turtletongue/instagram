@@ -50,7 +50,7 @@ export default buildSchema(`
   type Activity {
     id: ID!
     content: String!
-    authorId: String!
+    author: User!
     createdAt: String!
   }
 
@@ -114,6 +114,7 @@ export default buildSchema(`
     getUserByUsername(username: String!): User
     getUserActivities: [Activity!]!
     sliderImages: [SliderImage!]!
+    searchUsers(input: String!): [User!]!
   }
 
   schema {

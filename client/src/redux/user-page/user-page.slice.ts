@@ -15,17 +15,6 @@ export const POSTS: string = "POSTS";
 
 export const SAVED: string = "SAVED";
 
-interface ICommentLike {
-  postId: number;
-  commentId: number;
-  likerId: number;
-}
-
-interface ICommentInput {
-  postId: number;
-  commentInput: string;
-}
-
 interface UserPageState {
   category: string;
   user: IUser | null;
@@ -317,6 +306,279 @@ export const requestUserPageSavedPosts = createAsyncThunk(
   }
 );
 
+interface LikePostArgs {
+  postId: number;
+  token: string;
+}
+
+interface LikePostJSON {
+  data: { likePost: { postId: string } };
+}
+
+export const likeUserPagePost = createAsyncThunk(
+  "userPage/likeUserPagePostStatus",
+  async ({ postId, token }: LikePostArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation LikePost($postId: Int!) {
+          likePost(postId: $postId) {
+            postId
+          }
+        }
+      `,
+      variables: {
+        postId,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: LikePostJSON = await res.json();
+      return json.data.likePost.postId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const unlikeUserPagePost = createAsyncThunk(
+  "userPage/unlikeUserPagePostStatus",
+  async ({ postId, token }: LikePostArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation UnlikePost($postId: Int!) {
+          unlikePost(postId: $postId)
+        }
+      `,
+      variables: {
+        postId,
+      },
+    };
+    try {
+      await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      return postId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface BookmarkPostArgs {
+  postId: number;
+  token: string;
+}
+
+interface BookmarkPostJSON {
+  data: {
+    bookmarkPost: {
+      postId: number;
+    };
+  };
+}
+
+export const bookmarkUserPagePost = createAsyncThunk(
+  "userPage/bookmarkUserPagePostStatus",
+  async ({ postId, token }: BookmarkPostArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation BookmarkPost($postId: Int!) {
+          bookmarkPost(postId: $postId) {
+            postId
+          }
+        }
+      `,
+      variables: {
+        postId,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: BookmarkPostJSON = await res.json();
+      return json.data.bookmarkPost.postId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const unbookmarkUserPagePost = createAsyncThunk(
+  "userPage/unbookmarkUserPagePostStatus",
+  async ({ postId, token }: BookmarkPostArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation UnbookmarkPost($postId: Int!) {
+          unbookmarkPost(postId: $postId)
+        }
+      `,
+      variables: {
+        postId,
+      },
+    };
+    try {
+      await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      return postId;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface AddCommentArgs {
+  postId: number;
+  content: string;
+  token: string;
+}
+
+interface AddCommentJSON {
+  data: {
+    createComment: IComment;
+  };
+}
+
+export const addUserPageComment = createAsyncThunk(
+  "userPage/addUserPageCommentStatus",
+  async ({ postId, content, token }: AddCommentArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation CreateComment($postId: Int!, $content: String!) {
+          createComment(commentInput: { postId: $postId, content: $content }) {
+            id
+            content
+            createdAt
+            isLiked
+            postId
+            authorName
+          }
+        }
+      `,
+      variables: {
+        postId,
+        content,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: AddCommentJSON = await res.json();
+      return json.data.createComment;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface LikeCommentArgs {
+  postId: number;
+  token: string;
+  commentId: number;
+}
+
+interface LikeCommentJSON {
+  data: {
+    likeComment: {
+      postId: number;
+      commentId: number;
+    };
+  };
+}
+
+export const likeUserPageComment = createAsyncThunk(
+  "userPage/likeUserPageCommentStatus",
+  async ({ postId, commentId, token }: LikeCommentArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation LikeComment($postId: Int!, $commentId: Int!) {
+          likeComment(postId: $postId, commentId: $commentId) {
+            postId
+            commentId
+          }
+        }
+      `,
+      variables: {
+        postId,
+        commentId,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: LikeCommentJSON = await res.json();
+      return json.data.likeComment;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const unlikeUserPageComment = createAsyncThunk(
+  "userPage/unlikeUserPageCommentStatus",
+  async ({ postId, commentId, token }: LikeCommentArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation UnlikeComment($postId: Int!, $commentId: Int!) {
+          unlikeComment(postId: $postId, commentId: $commentId)
+        }
+      `,
+      variables: {
+        postId,
+        commentId,
+      },
+    };
+    try {
+      await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      return { postId, commentId };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const userPageSlice = createSlice({
   name: "userPage",
   initialState,
@@ -335,126 +597,6 @@ const userPageSlice = createSlice({
     },
     blurPosts: (state: UserPageState) => {
       state.hoveredPostId = null;
-    },
-    likeUserPagePost: (state: UserPageState, action: PayloadAction<number>) => {
-      if (state.entities[action.payload]) {
-        userPagePostsAdapter.updateOne(state, {
-          id: action.payload,
-          changes: {
-            isLiked: true,
-            likesCount: state.entities[action.payload].likesCount + 1,
-          },
-        });
-      }
-    },
-    unlikeUserPagePost: (
-      state: UserPageState,
-      action: PayloadAction<number>
-    ) => {
-      if (state.entities[action.payload]) {
-        userPagePostsAdapter.updateOne(state, {
-          id: action.payload,
-          changes: {
-            isLiked: false,
-            likesCount: state.entities[action.payload].likesCount - 1,
-          },
-        });
-      }
-    },
-    bookmarkUserPagePost: (
-      state: UserPageState,
-      action: PayloadAction<number>
-    ) => {
-      userPagePostsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: { isBookmarked: true },
-      });
-    },
-    unbookmarkUserPagePost: (
-      state: UserPageState,
-      action: PayloadAction<number>
-    ) => {
-      userPagePostsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: { isBookmarked: false },
-      });
-    },
-    likeUserPageComment: (
-      state: UserPageState,
-      action: PayloadAction<ICommentLike>
-    ) => {
-      const { postId, commentId } = action.payload;
-      const post: IPost = state.entities[postId];
-      userPagePostsAdapter.updateOne(state, {
-        id: postId,
-        changes: {
-          comments: post
-            ? post.comments.map((comment: IComment) =>
-                comment.id === commentId
-                  ? {
-                      ...comment,
-                      isLiked: true,
-                    }
-                  : comment
-              )
-            : [],
-        },
-      });
-    },
-    unlikeUserPageComment: (
-      state: UserPageState,
-      action: PayloadAction<ICommentLike>
-    ) => {
-      const { postId, commentId } = action.payload;
-      const post: IPost = state.entities[postId];
-      userPagePostsAdapter.updateOne(state, {
-        id: postId,
-        changes: {
-          comments: post
-            ? post.comments.map((comment: IComment) =>
-                comment.id === commentId
-                  ? {
-                      ...comment,
-                      isLiked: false,
-                    }
-                  : comment
-              )
-            : [],
-        },
-      });
-    },
-    setUserPageCommentInput: (
-      state: UserPageState,
-      action: PayloadAction<ICommentInput>
-    ) => {
-      const { postId, commentInput } = action.payload;
-      userPagePostsAdapter.updateOne(state, {
-        id: postId,
-        changes: { commentInput },
-      });
-    },
-    addUserPageComment: (
-      state: UserPageState,
-      action: PayloadAction<IComment>
-    ) => {
-      const { postId } = action.payload;
-      if (state.entities[postId]) {
-        userPagePostsAdapter.updateOne(state, {
-          id: postId,
-          changes: {
-            comments: [...state.entities[postId].comments, action.payload],
-          },
-        });
-      }
-    },
-    clearUserPageCommentInput: (
-      state: UserPageState,
-      action: PayloadAction<number>
-    ) => {
-      userPagePostsAdapter.updateOne(state, {
-        id: action.payload,
-        changes: { commentInput: "" },
-      });
     },
     setUnfollowModalUser: (
       state: UserPageState,
@@ -534,6 +676,114 @@ const userPageSlice = createSlice({
     ) => {
       userPagePostsAdapter.upsertMany(state, action.payload);
     },
+    [likeUserPagePost.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<string | number>
+    ) => {
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload,
+          changes: {
+            isLiked: true,
+            likesCount: state.entities[action.payload].likesCount + 1,
+          },
+        });
+      }
+    },
+    [unlikeUserPagePost.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<string | number>
+    ) => {
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload,
+          changes: {
+            isLiked: false,
+            likesCount: state.entities[action.payload].likesCount - 1,
+          },
+        });
+      }
+    },
+    [bookmarkUserPagePost.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<string | number>
+    ) => {
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload,
+          changes: {
+            isBookmarked: true,
+          },
+        });
+      }
+    },
+    [unbookmarkUserPagePost.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<string | number>
+    ) => {
+      if (state.entities[action.payload]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload,
+          changes: {
+            isBookmarked: false,
+          },
+        });
+      }
+    },
+    [addUserPageComment.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<IComment>
+    ) => {
+      if (state.entities[action.payload.postId]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload.postId,
+          changes: {
+            comments: [
+              ...state.entities[action.payload.postId].comments,
+              action.payload,
+            ],
+          },
+        });
+      }
+    },
+    [likeUserPageComment.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<{ postId: number; commentId: number }>
+    ) => {
+      if (state.entities[action.payload.postId]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload.postId,
+          changes: {
+            comments: state.entities[
+              action.payload.postId
+            ].comments.map((comment: IComment) =>
+              +comment.id === +action.payload.commentId
+                ? { ...comment, isLiked: true }
+                : comment
+            ),
+          },
+        });
+      }
+    },
+    [unlikeUserPageComment.fulfilled as any]: (
+      state: UserPageState,
+      action: PayloadAction<{ postId: number; commentId: number }>
+    ) => {
+      if (state.entities[action.payload.postId]) {
+        userPagePostsAdapter.updateOne(state, {
+          id: +action.payload.postId,
+          changes: {
+            comments: state.entities[
+              action.payload.postId
+            ].comments.map((comment: IComment) =>
+              +comment.id === +action.payload.commentId
+                ? { ...comment, isLiked: false }
+                : comment
+            ),
+          },
+        });
+      }
+    },
   },
 });
 
@@ -547,15 +797,6 @@ export const {
   showSaved,
   hoverPostById,
   blurPosts,
-  likeUserPagePost,
-  unlikeUserPagePost,
-  unbookmarkUserPagePost,
-  bookmarkUserPagePost,
-  likeUserPageComment,
-  unlikeUserPageComment,
-  setUserPageCommentInput,
-  addUserPageComment,
-  clearUserPageCommentInput,
   setClickedPostId,
   setUnfollowModalUser,
 } = userPageSlice.actions;

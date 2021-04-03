@@ -1,9 +1,12 @@
 import { Box, Flex, Text, VStack } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/toast";
+import { MIN_PASSWORD_LENGTH } from "../../constants";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
   setConfirmNewPasswordInput,
   setNewPasswordInput,
   setOldPasswordInput,
+  updateUserPassword,
 } from "../../redux/profile-edit-page/profile-edit-page.slice";
 import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
@@ -27,6 +30,37 @@ const ChangePasswordForm = ({ user }: ChangePasswordFormProps) => {
     (state: RootState) =>
       state.profileEditPage.changePassword.confirmNewPassword
   );
+  const token: string | null = localStorage.getItem("authToken");
+  const toast = useToast();
+  const changePasswordHandler = () => {
+    if (
+      !(!!oldPasswordInput && !!newPasswordInput && !!confirmNewPasswordInput)
+    ) {
+      return;
+    } else if (newPasswordInput.length < MIN_PASSWORD_LENGTH) {
+      toast({
+        title: "Password is too small.",
+        description: `Min password length is ${MIN_PASSWORD_LENGTH}`,
+        status: "error",
+      });
+      return;
+    } else if (newPasswordInput !== confirmNewPasswordInput) {
+      toast({
+        title: "Passwords do not match.",
+        description: "Check that the data is correct.",
+        status: "error",
+      });
+      return;
+    } else if (token) {
+      dispatch(
+        updateUserPassword({
+          oldPassword: oldPasswordInput,
+          newPassword: newPasswordInput,
+          token,
+        })
+      );
+    }
+  };
   return (
     <VStack w="100%" spacing="1rem">
       <Flex w="60%" align="center">
@@ -80,6 +114,7 @@ const ChangePasswordForm = ({ user }: ChangePasswordFormProps) => {
               !!newPasswordInput &&
               !!confirmNewPasswordInput
             }
+            onClick={changePasswordHandler}
           />
           <Text
             mt="1rem"

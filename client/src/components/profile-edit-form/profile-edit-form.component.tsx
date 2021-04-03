@@ -6,6 +6,7 @@ import {
   setBioInput,
   setNameInput,
   setUsernameInput,
+  updateUserData,
 } from "../../redux/profile-edit-page/profile-edit-page.slice";
 import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
@@ -29,6 +30,19 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
   const bioInput: string = useAppSelector(
     (state: RootState) => state.profileEditPage.editProfile.bio
   );
+  const token: string | null = localStorage.getItem("authToken");
+  const submitHandler = () => {
+    if (token && usernameInput) {
+      dispatch(
+        updateUserData({
+          username: usernameInput,
+          name: nameInput,
+          bio: bioInput,
+          token,
+        })
+      );
+    }
+  };
   const {
     isOpen: isChangePhotoModalOpen,
     onOpen: onChangePhotoModalOpen,
@@ -43,14 +57,14 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
       <VStack w="100%" spacing="1rem">
         <Flex w="60%" align="center">
           <Avatar
-            src={user.avatarUrl}
+            src={user?.avatarUrl}
             h="2.5rem"
             w="2.5rem"
             onClick={onChangePhotoModalOpen}
           />
           <Box ml="1.5rem">
             <Text fontSize="xl" fontWeight="400">
-              {user.username}
+              {user?.username}
             </Text>
             <Text
               cursor="pointer"
@@ -120,7 +134,7 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
         </Flex>
         <Flex w="80%" align="center" pt="1rem">
           <Box w="8.5rem" />
-          <SubmitButton isActive={!!usernameInput} />
+          <SubmitButton isActive={!!usernameInput} onClick={submitHandler} />
         </Flex>
       </VStack>
     </>

@@ -6,6 +6,7 @@ export interface ActivityInstance extends Model {
   content: string;
   authorId: number;
   createdAt: Date;
+  dataValues?: ActivityInstance;
 }
 
 const Activity = sequelize.define<ActivityInstance>("activity", {

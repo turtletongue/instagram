@@ -85,7 +85,7 @@ interface LikePostJSON {
 }
 
 export const likePostPagePost = createAsyncThunk(
-  "feed/likePostPagePostStatus",
+  "postPage/likePostPagePostStatus",
   async ({ postId, token }: LikePostArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -117,7 +117,7 @@ export const likePostPagePost = createAsyncThunk(
 );
 
 export const unlikePostPagePost = createAsyncThunk(
-  "feed/unlikePostPagePostStatus",
+  "postPage/unlikePostPagePostStatus",
   async ({ postId, token }: LikePostArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -159,7 +159,7 @@ interface BookmarkPostJSON {
 }
 
 export const bookmarkPostPagePost = createAsyncThunk(
-  "feed/bookmarkPostPagePostStatus",
+  "postPage/bookmarkPostPagePostStatus",
   async ({ postId, token }: BookmarkPostArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -191,7 +191,7 @@ export const bookmarkPostPagePost = createAsyncThunk(
 );
 
 export const unbookmarkPostPagePost = createAsyncThunk(
-  "feed/unbookmarkPostPagePostStatus",
+  "postPage/unbookmarkPostPagePostStatus",
   async ({ postId, token }: BookmarkPostArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -232,7 +232,7 @@ interface AddCommentJSON {
 }
 
 export const addPostPageComment = createAsyncThunk(
-  "feed/addPostPageCommentStatus",
+  "postPage/addPostPageCommentStatus",
   async ({ postId, content, token }: AddCommentArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -285,7 +285,7 @@ interface LikeCommentJSON {
 }
 
 export const likePostPageComment = createAsyncThunk(
-  "feed/likePostPageCommentStatus",
+  "postPage/likePostPageCommentStatus",
   async ({ postId, commentId, token }: LikeCommentArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
@@ -319,7 +319,7 @@ export const likePostPageComment = createAsyncThunk(
 );
 
 export const unlikePostPageComment = createAsyncThunk(
-  "feed/unlikePostPageCommentStatus",
+  "postPage/unlikePostPageCommentStatus",
   async ({ postId, commentId, token }: LikeCommentArgs, thunkAPI) => {
     const graphqlQuery: GraphqlQuery = {
       query: `
