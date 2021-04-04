@@ -1,5 +1,7 @@
 import { Box, Divider, Text } from "@chakra-ui/layout";
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/modal";
+import { useAppDispatch } from "../../redux/hooks";
+import { removeCurrentPhoto } from "../../redux/profile-edit-page/profile-edit-page.slice";
 import ModalItem from "../modal-item/modal-item.component";
 
 interface ChangePhotoModalProps {
@@ -8,6 +10,8 @@ interface ChangePhotoModalProps {
 }
 
 const ChangePhotoModal = ({ isOpen, onClose }: ChangePhotoModalProps) => {
+  const dispatch = useAppDispatch();
+  const token: string | null = localStorage.getItem("authToken");
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -36,7 +40,14 @@ const ChangePhotoModal = ({ isOpen, onClose }: ChangePhotoModalProps) => {
             </Text>
           </ModalItem>
           <Divider />
-          <ModalItem>
+          <ModalItem
+            onClick={() => {
+              if (token) {
+                dispatch(removeCurrentPhoto({ token }));
+              }
+              onClose();
+            }}
+          >
             <Text
               textAlign="center"
               userSelect="none"

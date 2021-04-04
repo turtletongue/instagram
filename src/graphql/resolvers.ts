@@ -179,9 +179,6 @@ export default {
         new ValidationError("Username length should be less than 20.")
       );
     }
-    if (userInput.avatarUrl && !validator.isURL(userInput.avatarUrl)) {
-      errors.push(new ValidationError("Avatar URL should be URL."));
-    }
     if (errors.length > 0) {
       throw new InvalidInputError("Invalid input.", errors);
     }
@@ -405,7 +402,7 @@ export default {
       throw new Error("Post not found.");
     }
     const like: LikeInstance = await Like.findOne({
-      where: { postId, userId: req.userId },
+      where: { postId, commentId: null, userId: req.userId },
     });
     if (like) {
       throw new Error("Like is exist already.");
@@ -467,7 +464,7 @@ export default {
       throw new Error("Post not found.");
     }
     const like: LikeInstance = await Like.findOne({
-      where: { postId, userId: req.userId },
+      where: { postId, commentId: null, userId: req.userId },
     });
     if (!like) {
       throw new Error("Like isn't exist.");
@@ -935,5 +932,17 @@ export default {
       );
 
     return searchedUsers;
+  },
+  removeCurrentPhoto: async (args: any, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new Error("Not authenticated.");
+    }
+    const user: UserInstance = await User.findByPk(req.userId);
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    user.avatarUrl = "";
+    await user.save();
+    return true;
   },
 };

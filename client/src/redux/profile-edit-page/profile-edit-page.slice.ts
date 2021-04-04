@@ -26,6 +26,7 @@ interface ProfileEditPageState {
   updateUserPasswordLoading: string;
   updateUserPasswordErrorMessage: string | null;
   updateUserPasswordSuccess: boolean | null;
+  removePhotoSuccess: boolean | null;
 }
 
 const initialState: ProfileEditPageState = {
@@ -50,6 +51,7 @@ const initialState: ProfileEditPageState = {
   updateUserPasswordLoading: "idle",
   updateUserPasswordErrorMessage: null,
   updateUserPasswordSuccess: null,
+  removePhotoSuccess: null,
 };
 
 interface InitUserInputs {
@@ -149,6 +151,43 @@ export const updateUserPassword = createAsyncThunk(
   }
 );
 
+interface RemoveCurrentPhotoArgs {
+  token: string;
+}
+
+interface RemoveCurrentPhotoJSON {
+  data: {
+    removeCurrentPhoto: boolean;
+  };
+}
+
+export const removeCurrentPhoto = createAsyncThunk(
+  "profileEditPage/removeCurrentPhotoStatus",
+  async ({ token }: RemoveCurrentPhotoArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation {
+          removeCurrentPhoto
+        }
+      `,
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: RemoveCurrentPhotoJSON = await res.json();
+      return json.data.removeCurrentPhoto;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const profileEditPageSlice = createSlice({
   name: "profileEditPage",
   initialState,
@@ -219,6 +258,9 @@ const profileEditPageSlice = createSlice({
       state.changePassword.newPassword = "";
       state.changePassword.confirmNewPassword = "";
     },
+    resetRemovePhotoStatus: (state: ProfileEditPageState) => {
+      state.removePhotoSuccess = null;
+    },
   },
   extraReducers: {
     [updateUserData.pending as any]: (state: ProfileEditPageState) => {
@@ -261,6 +303,15 @@ const profileEditPageSlice = createSlice({
       state.updateUserPasswordErrorMessage = action.payload;
       state.updateUserPasswordSuccess = false;
     },
+    [removeCurrentPhoto.fulfilled as any]: (
+      state: ProfileEditPageState,
+      action: PayloadAction<boolean>
+    ) => {
+      state.removePhotoSuccess = !!action.payload;
+    },
+    [removeCurrentPhoto.rejected as any]: (state: ProfileEditPageState) => {
+      state.removePhotoSuccess = false;
+    },
   },
 });
 
@@ -276,6 +327,7 @@ export const {
   resetUpdateUserDataStatus,
   resetUpdateUserPasswordStatus,
   resetPasswordInputs,
+  resetRemovePhotoStatus,
 } = profileEditPageSlice.actions;
 
 export default profileEditPageSlice.reducer;

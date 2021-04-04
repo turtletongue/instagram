@@ -6,6 +6,7 @@ import HomePage from "./pages/homepage/homepage.component";
 import PostPage from "./pages/post-page/post-page.component";
 import EditProfilePage from "./pages/profile-edit-page/profile-edit-page.component";
 import SignIn from "./pages/signIn/signIn.component";
+import SignUpPage from "./pages/signup-page/signup-page.component";
 import UserPage from "./pages/user-page/user-page.component";
 import { requestLastActivities } from "./redux/activities/activities.slice";
 import { incrementPostSlice } from "./redux/feed/feed.slice";
@@ -48,7 +49,14 @@ const App = () => {
     <>
       <Fonts />
       {!isAuth ? (
-        <SignIn />
+        <Switch>
+          <Route path="/accounts/emailsignup">
+            <SignUpPage />
+          </Route>
+          <Route path="/">
+            <SignIn />
+          </Route>
+        </Switch>
       ) : (
         <Switch>
           <Route exact path="/">

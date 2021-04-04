@@ -9,6 +9,7 @@ import { useAppSelector } from "../../redux/hooks";
 import {
   initInputs,
   resetPasswordInputs,
+  resetRemovePhotoStatus,
   resetUpdateUserDataStatus,
   resetUpdateUserPasswordStatus,
 } from "../../redux/profile-edit-page/profile-edit-page.slice";
@@ -30,12 +31,16 @@ const EditProfilePage = () => {
   const isUpdateUserPasswordSuccess: boolean | null = useAppSelector(
     (state: RootState) => state.profileEditPage.updateUserPasswordSuccess
   );
+  const removePhotoSuccess: boolean | null = useAppSelector(
+    (state: RootState) => state.profileEditPage.removePhotoSuccess
+  );
   useEffect(() => {
     if (isUpdateUserDataSuccess) {
       toast({
         title: "Data was updated.",
         description: "Changes have been made.",
         status: "success",
+        isClosable: true,
       });
       dispatch(resetUpdateUserDataStatus());
     } else if (isUpdateUserDataSuccess === false) {
@@ -43,6 +48,7 @@ const EditProfilePage = () => {
         title: "Some error occured.",
         description: "Check that the data is correct.",
         status: "error",
+        isClosable: true,
       });
       dispatch(resetUpdateUserDataStatus());
     }
@@ -51,6 +57,7 @@ const EditProfilePage = () => {
         title: "Password was updated.",
         description: "Changes have been made.",
         status: "success",
+        isClosable: true,
       });
       dispatch(resetUpdateUserPasswordStatus());
       dispatch(resetPasswordInputs());
@@ -59,10 +66,28 @@ const EditProfilePage = () => {
         title: "Some error occured.",
         description: "Check that the password is correct.",
         status: "error",
+        isClosable: true,
       });
       dispatch(resetUpdateUserPasswordStatus());
     }
   }, [dispatch, toast, isUpdateUserDataSuccess, isUpdateUserPasswordSuccess]);
+  useEffect(() => {
+    if (removePhotoSuccess) {
+      toast({
+        title: "Profile photo was deleted.",
+        status: "success",
+        isClosable: true,
+      });
+      dispatch(resetRemovePhotoStatus());
+    } else if (removePhotoSuccess === false) {
+      toast({
+        title: "An error occurred while deleting a photo.",
+        status: "error",
+        isClosable: true,
+      });
+      dispatch(resetRemovePhotoStatus());
+    }
+  }, [dispatch, toast, removePhotoSuccess]);
   useEffect(() => {
     dispatch(
       initInputs({

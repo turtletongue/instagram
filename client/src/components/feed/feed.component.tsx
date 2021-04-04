@@ -23,7 +23,13 @@ const Feed = () => {
           return <PostContainer key={index} post={post} />;
         })}
       {isSliceLoading ? (
-        <Flex w="100%" justify="center" align="center" m="1rem 0">
+        <Flex
+          w="100%"
+          justify="center"
+          align="center"
+          m="1rem 0"
+          p={isLessThan820 ? "3rem 0 0 0" : "6rem 0 1rem 12rem"}
+        >
           <Spinner color="black" size="lg" />
         </Flex>
       ) : (

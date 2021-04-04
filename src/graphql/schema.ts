@@ -99,6 +99,7 @@ export default buildSchema(`
     updateUserData(updateUserDataInput: UpdateUserData): Boolean!
     updatePassword(oldPassword: String!, newPassword: String!): Boolean!
     createActivity(receiverId: Int!, content: String!): Activity!
+    removeCurrentPhoto: Boolean!
   }
 
   type RootQuery {
