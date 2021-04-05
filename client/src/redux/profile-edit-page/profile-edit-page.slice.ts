@@ -27,6 +27,8 @@ interface ProfileEditPageState {
   updateUserPasswordErrorMessage: string | null;
   updateUserPasswordSuccess: boolean | null;
   removePhotoSuccess: boolean | null;
+  uploadedImageUrl: string | null;
+  updateAvatarUrlSuccess: boolean | null;
 }
 
 const initialState: ProfileEditPageState = {
@@ -52,6 +54,8 @@ const initialState: ProfileEditPageState = {
   updateUserPasswordErrorMessage: null,
   updateUserPasswordSuccess: null,
   removePhotoSuccess: null,
+  uploadedImageUrl: null,
+  updateAvatarUrlSuccess: null,
 };
 
 interface InitUserInputs {
@@ -188,6 +192,76 @@ export const removeCurrentPhoto = createAsyncThunk(
   }
 );
 
+interface UploadPhotoArgs {
+  fileData: any;
+}
+
+interface UploadPhotoJSON {
+  data: {
+    url: string;
+  };
+}
+
+export const uploadPhoto = createAsyncThunk(
+  "profileEditPage/uploadPhotoStatus",
+  async ({ fileData }: UploadPhotoArgs, thunkAPI) => {
+    try {
+      const formData = new FormData();
+      formData.append("key", "798a24e7fe5a8ad72df54eaa8b47a87d");
+      formData.append("image", fileData);
+      const res = await fetch("https://api.imgbb.com/1/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const json: UploadPhotoJSON = await res.json();
+      return json.data.url;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+interface UpdateAvatarUrlArgs {
+  token: string;
+  avatarUrl: string;
+}
+
+interface UpdateAvatarUrlJSON {
+  data: {
+    changeAvatar: boolean;
+  };
+}
+
+export const updateAvatarUrl = createAsyncThunk(
+  "profileEditPage/updateAvatarlUrlStatus",
+  async ({ token, avatarUrl }: UpdateAvatarUrlArgs, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        mutation UpdateAvatarUrl($avatarUrl: String!) {
+          changeAvatar(avatarUrl: $avatarUrl)
+        }
+      `,
+      variables: {
+        avatarUrl,
+      },
+    };
+    try {
+      const res = await fetch(SERVER_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
+      });
+      const json: UpdateAvatarUrlJSON = await res.json();
+      return json.data.changeAvatar;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
 const profileEditPageSlice = createSlice({
   name: "profileEditPage",
   initialState,
@@ -261,6 +335,12 @@ const profileEditPageSlice = createSlice({
     resetRemovePhotoStatus: (state: ProfileEditPageState) => {
       state.removePhotoSuccess = null;
     },
+    resetUploadedImageUrl: (state: ProfileEditPageState) => {
+      state.uploadedImageUrl = null;
+    },
+    resetUpdateAvatarUrlSuccess: (state: ProfileEditPageState) => {
+      state.updateAvatarUrlSuccess = null;
+    },
   },
   extraReducers: {
     [updateUserData.pending as any]: (state: ProfileEditPageState) => {
@@ -312,6 +392,18 @@ const profileEditPageSlice = createSlice({
     [removeCurrentPhoto.rejected as any]: (state: ProfileEditPageState) => {
       state.removePhotoSuccess = false;
     },
+    [uploadPhoto.fulfilled as any]: (
+      state: ProfileEditPageState,
+      action: PayloadAction<string>
+    ) => {
+      state.uploadedImageUrl = action.payload;
+    },
+    [updateAvatarUrl.fulfilled as any]: (
+      state: ProfileEditPageState,
+      action: PayloadAction<boolean>
+    ) => {
+      state.updateAvatarUrlSuccess = !!action.payload;
+    },
   },
 });
 
@@ -328,6 +420,8 @@ export const {
   resetUpdateUserPasswordStatus,
   resetPasswordInputs,
   resetRemovePhotoStatus,
+  resetUploadedImageUrl,
+  resetUpdateAvatarUrlSuccess,
 } = profileEditPageSlice.actions;
 
 export default profileEditPageSlice.reducer;

@@ -28,7 +28,13 @@ const Feed = () => {
           justify="center"
           align="center"
           m="1rem 0"
-          p={isLessThan820 ? "3rem 0 0 0" : "6rem 0 1rem 12rem"}
+          p={
+            !!!posts.length
+              ? isLessThan820
+                ? "3rem 0 0 0"
+                : "6rem 0 1rem 12rem"
+              : 0
+          }
         >
           <Spinner color="black" size="lg" />
         </Flex>

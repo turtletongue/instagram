@@ -1,3 +1,4 @@
+import compression from "compression";
 import cors from "cors";
 import express from "express";
 import { graphqlHTTP } from "express-graphql";
@@ -13,6 +14,8 @@ import User from "./models/User";
 import sequelize from "./utils/database";
 
 const app = express();
+
+app.use(compression());
 
 app.use(cors({ origin: "http://localhost:3000" }));
 

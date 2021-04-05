@@ -10,11 +10,14 @@ import {
   initInputs,
   resetPasswordInputs,
   resetRemovePhotoStatus,
+  resetUpdateAvatarUrlSuccess,
   resetUpdateUserDataStatus,
   resetUpdateUserPasswordStatus,
+  resetUploadedImageUrl,
+  updateAvatarUrl,
 } from "../../redux/profile-edit-page/profile-edit-page.slice";
 import { RootState } from "../../redux/store";
-import { IUser } from "../../redux/user/user.slice";
+import { IUser, requestUserById } from "../../redux/user/user.slice";
 
 const EditProfilePage = () => {
   const dispatch = useDispatch();
@@ -22,6 +25,7 @@ const EditProfilePage = () => {
   const loggedUser: IUser = useAppSelector(
     (state: RootState) => state.user.currentUser
   ) as IUser;
+  const token: string | null = localStorage.getItem("authToken");
   const isLoading: boolean = useAppSelector(
     (state: RootState) => state.user.userLoading === "loading"
   );
@@ -79,15 +83,16 @@ const EditProfilePage = () => {
         isClosable: true,
       });
       dispatch(resetRemovePhotoStatus());
+      dispatch(requestUserById({ input: { userId: +loggedUser.id } }));
     } else if (removePhotoSuccess === false) {
       toast({
-        title: "An error occurred while deleting a photo.",
+        title: "An error occurred while deleting the photo.",
         status: "error",
         isClosable: true,
       });
       dispatch(resetRemovePhotoStatus());
     }
-  }, [dispatch, toast, removePhotoSuccess]);
+  }, [dispatch, toast, removePhotoSuccess, loggedUser]);
   useEffect(() => {
     dispatch(
       initInputs({
@@ -97,6 +102,36 @@ const EditProfilePage = () => {
       })
     );
   }, [dispatch, loggedUser]);
+  const uploadedImageUrl: string | null = useAppSelector(
+    (state: RootState) => state.profileEditPage.uploadedImageUrl
+  );
+  const updateAvatarUrlSuccess: boolean | null = useAppSelector(
+    (state: RootState) => state.profileEditPage.updateAvatarUrlSuccess
+  );
+  useEffect(() => {
+    if (uploadedImageUrl && token) {
+      dispatch(updateAvatarUrl({ avatarUrl: uploadedImageUrl, token }));
+      dispatch(resetUploadedImageUrl());
+    }
+  }, [dispatch, uploadedImageUrl, token]);
+  useEffect(() => {
+    if (updateAvatarUrlSuccess) {
+      toast({
+        title: "Profile photo was updated.",
+        status: "success",
+        isClosable: true,
+      });
+      dispatch(resetUpdateAvatarUrlSuccess());
+      dispatch(requestUserById({ input: { userId: +loggedUser.id } }));
+    } else if (updateAvatarUrlSuccess === false) {
+      toast({
+        title: "An error occurred while updating the photo.",
+        status: "error",
+        isClosable: true,
+      });
+      dispatch(resetUpdateAvatarUrlSuccess());
+    }
+  }, [dispatch, loggedUser, toast, updateAvatarUrlSuccess]);
   return (
     <>
       <Header />

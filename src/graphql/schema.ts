@@ -100,6 +100,7 @@ export default buildSchema(`
     updatePassword(oldPassword: String!, newPassword: String!): Boolean!
     createActivity(receiverId: Int!, content: String!): Activity!
     removeCurrentPhoto: Boolean!
+    changeAvatar(avatarUrl: String!): Boolean!
   }
 
   type RootQuery {

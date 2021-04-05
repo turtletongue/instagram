@@ -146,6 +146,10 @@ type SearchUsersArgs = {
   input: string;
 };
 
+type ChangeAvatarArgs = {
+  avatarUrl: string;
+};
+
 class ValidationError extends Error {
   constructor(message: string) {
     super(message);
@@ -935,13 +939,28 @@ export default {
   },
   removeCurrentPhoto: async (args: any, req: AuthRequest) => {
     if (!req.isAuth) {
-      throw new Error("Not authenticated.");
+      throw new AuthError("Not authenticated.");
     }
     const user: UserInstance = await User.findByPk(req.userId);
     if (!user) {
       throw new Error("User not found.");
     }
     user.avatarUrl = "";
+    await user.save();
+    return true;
+  },
+  changeAvatar: async ({ avatarUrl }: ChangeAvatarArgs, req: AuthRequest) => {
+    if (!req.isAuth) {
+      throw new AuthError("Not authenticated.");
+    }
+    if (!validator.isURL(avatarUrl)) {
+      throw new Error("avatarUrl must be URL.");
+    }
+    const user: UserInstance = await User.findByPk(req.userId);
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    user.avatarUrl = avatarUrl;
     await user.save();
     return true;
   },
