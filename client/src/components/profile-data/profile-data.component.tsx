@@ -40,7 +40,7 @@ const ProfileData = ({
           <ControlFollowingButton
             isFollowed={isFollowed}
             user={user}
-            ml={0}
+            ml={isLessThan820 ? 0 : "1rem"}
             maxW="7rem"
           />
         )}
