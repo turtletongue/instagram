@@ -56,39 +56,59 @@ const PostActions = ({
   } = useDisclosure();
   const isLiked: boolean = post.isLiked;
   const isBookmarked: boolean = post.isBookmarked;
+  const token: string | null = localStorage.getItem("authToken");
   const likeHandler = () => {
     switch (page) {
       case USER_PAGE:
-        dispatch(
-          isLiked ? unlikeUserPagePost(post.id) : likeUserPagePost(post.id)
-        );
+        if (token) {
+          if (isLiked)
+            dispatch(unlikeUserPagePost({ postId: Number(post.id), token }));
+          else dispatch(likeUserPagePost({ postId: Number(post.id), token }));
+        }
         break;
       case POST_PAGE:
-        dispatch(isLiked ? unlikePostPagePost() : likePostPagePost());
+        if (token) {
+          if (isLiked)
+            dispatch(unlikePostPagePost({ postId: Number(post.id), token }));
+          else dispatch(likePostPagePost({ postId: Number(post.id), token }));
+        }
         break;
       default:
-        dispatch(isLiked ? unlikePost(post.id) : likePost(post.id));
+        if (token) {
+          if (isLiked) dispatch(unlikePost({ postId: Number(post.id), token }));
+          else dispatch(likePost({ postId: Number(post.id), token }));
+        }
         break;
     }
   };
   const toggleBookmarkHandler = () => {
     switch (page) {
       case USER_PAGE:
-        dispatch(
-          isBookmarked
-            ? unbookmarkUserPagePost(post.id)
-            : bookmarkUserPagePost(post.id)
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(
+              unbookmarkUserPagePost({ postId: Number(post.id), token })
+            );
+          else
+            dispatch(bookmarkUserPagePost({ postId: Number(post.id), token }));
+        }
         break;
       case POST_PAGE:
-        dispatch(
-          isBookmarked ? unbookmarkPostPagePost() : bookmarkPostPagePost()
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(
+              unbookmarkPostPagePost({ postId: Number(post.id), token })
+            );
+          else
+            dispatch(bookmarkPostPagePost({ postId: Number(post.id), token }));
+        }
         break;
       default:
-        dispatch(
-          isBookmarked ? unbookmarkPost(post.id) : bookmarkPost(post.id)
-        );
+        if (token) {
+          if (isBookmarked)
+            dispatch(unbookmarkPost({ postId: Number(post.id), token }));
+          else dispatch(bookmarkPost({ postId: Number(post.id), token }));
+        }
         break;
     }
   };

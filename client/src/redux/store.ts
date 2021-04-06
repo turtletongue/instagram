@@ -7,12 +7,14 @@ import postPageReducer from "./post-page/post-page.slice";
 import profileEditPageReducer from "./profile-edit-page/profile-edit-page.slice";
 import searchInputReducer from "./search-input/search-input.slice";
 import signInReducer from "./signin/signin.slice";
+import signUpReducer from "./signup/signup.slice";
 import userPageReducer from "./user-page/user-page.slice";
 import userReducer from "./user/user.slice";
 
 const store = configureStore({
   reducer: {
     signIn: signInReducer,
+    signUp: signUpReducer,
     user: userReducer,
     searchInput: searchInputReducer,
     feed: feedReducer,

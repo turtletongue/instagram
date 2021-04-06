@@ -7,11 +7,13 @@ import UnfollowModal from "../unfollow-modal/unfollow-modal.component";
 interface ControlFollowingButtonProps {
   isFollowed: boolean;
   user: IUser;
+  [propName: string]: any;
 }
 
 const ControlFollowingButton = ({
   isFollowed,
   user,
+  ...otherProps
 }: ControlFollowingButtonProps) => {
   const {
     isOpen: isUnfollowModalOpen,
@@ -26,9 +28,13 @@ const ControlFollowingButton = ({
         user={user}
       />
       {isFollowed ? (
-        <UnfollowButton onUnfollowModalOpen={onUnfollowModalOpen} />
+        <UnfollowButton
+          user={user}
+          onUnfollowModalOpen={onUnfollowModalOpen}
+          {...otherProps}
+        />
       ) : (
-        <FollowButton user={user} />
+        <FollowButton user={user} {...otherProps} />
       )}
     </>
   );

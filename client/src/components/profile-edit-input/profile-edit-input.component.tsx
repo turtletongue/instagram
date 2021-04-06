@@ -1,13 +1,15 @@
 import { Input } from "@chakra-ui/input";
+import { useMediaQuery } from "@chakra-ui/media-query";
 
 interface ProfileEditInputProps {
   [propName: string]: any;
 }
 
 const ProfileEditInput = ({ ...otherProps }: ProfileEditInputProps) => {
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <Input
-      w="65%"
+      w={isLessThan820 ? "100%" : "65%"}
       h="2rem"
       borderRadius={3}
       borderColor="#adadad"

@@ -37,13 +37,20 @@ const FollowingModal = ({
   const currentLoggedUser: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
+  const unfollowModalUser: IUser | null = useAppSelector(
+    (state: RootState) => state.userPage.unfollowModalUser
+  );
   return (
     <>
-      <UnfollowModal
-        isOpen={isUnfollowModalOpen}
-        onClose={onUnfollowModalClose}
-        user={user}
-      />
+      {unfollowModalUser ? (
+        <UnfollowModal
+          isOpen={isUnfollowModalOpen}
+          onClose={onUnfollowModalClose}
+          user={unfollowModalUser}
+        />
+      ) : (
+        <></>
+      )}
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent p="0" minH="10rem" maxH="25rem" overflow="hidden">
@@ -72,19 +79,26 @@ const FollowingModal = ({
                       .map((f: IUser) => f.id)
                       .includes(following.id)
                   : false;
+                const isLoggedUser: boolean =
+                  currentLoggedUser?.id === following.id;
                 return (
-                  <Flex align="center" key={index}>
+                  <Flex align="center" key={index} onClick={onClose}>
                     <ShrimpUser user={following} />
                     <Spacer />
-                    {isOtherUserFollowing ? (
-                      <ControlFollowingButton
-                        isFollowed={isFollowed}
-                        user={following}
-                      />
+                    {!isLoggedUser ? (
+                      isOtherUserFollowing ? (
+                        <ControlFollowingButton
+                          isFollowed={isFollowed}
+                          user={following}
+                        />
+                      ) : (
+                        <UnfollowButton
+                          user={following}
+                          onUnfollowModalOpen={onUnfollowModalOpen}
+                        />
+                      )
                     ) : (
-                      <UnfollowButton
-                        onUnfollowModalOpen={onUnfollowModalOpen}
-                      />
+                      <></>
                     )}
                   </Flex>
                 );

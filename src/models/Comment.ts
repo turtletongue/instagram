@@ -7,6 +7,7 @@ export interface CommentInstance extends Model {
   authorName: string;
   createdAt: Date;
   updatedAt: Date;
+  dataValues?: CommentInstance;
 }
 
 const Comment = sequelize.define<CommentInstance>("comment", {

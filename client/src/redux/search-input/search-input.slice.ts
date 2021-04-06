@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestOptions } from "../interfaces";
+import { SERVER_URL } from "../../constants";
+import { GraphqlQuery } from "../interfaces";
 import { IUser } from "../user/user.slice";
 
 interface SearchInputState {
@@ -11,19 +12,41 @@ interface SearchInputState {
   errorMessage: string | null;
 }
 
+interface requestUsersSearchJSON {
+  data: {
+    searchUsers: IUser[];
+  };
+}
+
 export const requestUsersSearch = createAsyncThunk(
-  "searchInput/requestUsersSearchStatus",
-  async (requestOptions: RequestOptions, thunkAPI) => {
-    if (requestOptions.testData) {
-      return requestOptions.testData;
-    }
+  "searchInput/requestUserSearchStatus",
+  async (input: string, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        query SearchUsers($input: String!) {
+          searchUsers(input: $input) {
+            id
+            username
+            name
+            avatarUrl
+            bio
+          }
+        }
+      `,
+      variables: {
+        input,
+      },
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: JSON.stringify(requestOptions.query),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      return data;
+      const json: requestUsersSearchJSON = await res.json();
+      return json.data.searchUsers;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

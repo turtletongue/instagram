@@ -29,7 +29,9 @@ export default buildSchema(`
     imageUrl: String!
     createdAt: String!
     likesCount: Int!
-    userId: Int!
+    author: User!
+    isLiked: Boolean!
+    isBookmarked: Boolean!
     comments: [Comment!]!
   }
 
@@ -48,7 +50,7 @@ export default buildSchema(`
   type Activity {
     id: ID!
     content: String!
-    authorId: String!
+    author: User!
     createdAt: String!
   }
 
@@ -87,6 +89,7 @@ export default buildSchema(`
     createPost(imageUrl: String!): Post!
     createComment(commentInput: CommentInputData): Comment!
     follow(followingId: Int!): Boolean!
+    unfollow(followingId: Int!): Boolean!
     likePost(postId: Int!): Like!
     likeComment(commentId: Int!, postId: Int!): Like!
     unlikePost(postId: Int!): Boolean!
@@ -96,6 +99,8 @@ export default buildSchema(`
     updateUserData(updateUserDataInput: UpdateUserData): Boolean!
     updatePassword(oldPassword: String!, newPassword: String!): Boolean!
     createActivity(receiverId: Int!, content: String!): Activity!
+    removeCurrentPhoto: Boolean!
+    changeAvatar(avatarUrl: String!): Boolean!
   }
 
   type RootQuery {
@@ -105,11 +110,13 @@ export default buildSchema(`
     isUserBookmarkPost(userId: Int!, postId: Int!): Boolean!
     isUserLikeComment(userId: Int!, postId: Int!, commentId: Int!): Boolean!
     getUserBookmarkedPosts: [Post!]!
-    getUserPosts(userId: Int!): [Post!]!
+    getUserPosts(username: String!): [Post!]!
     getPostById(postId: Int!): Post
     getUserById(userId: Int!): User
+    getUserByUsername(username: String!): User
     getUserActivities: [Activity!]!
     sliderImages: [SliderImage!]!
+    searchUsers(input: String!): [User!]!
   }
 
   schema {

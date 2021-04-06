@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RequestOptions } from "../interfaces";
+import { SERVER_URL } from "../../constants";
+import { GraphqlQuery } from "../interfaces";
 import { IUser } from "../user/user.slice";
 
 export interface IActivity {
+  id: number;
   author: IUser;
-  type: string;
-  activityReceiverContent?: string;
-  postId?: number;
+  content: string;
 }
 
 interface ActivitiesState {
@@ -15,19 +15,43 @@ interface ActivitiesState {
   errorMessage: string | null;
 }
 
+interface RequestLastActivitiesJSON {
+  data: {
+    getUserActivities: IActivity[];
+  };
+}
+
 export const requestLastActivities = createAsyncThunk(
   "activities/requestLastActivitiesStatus",
-  async (requestOptions: RequestOptions, thunkAPI) => {
-    if (requestOptions.testData) {
-      return requestOptions.testData;
-    }
+  async (token: string, thunkAPI) => {
+    const graphqlQuery: GraphqlQuery = {
+      query: `
+        {
+          getUserActivities {
+            id
+            author {
+              id
+              username
+              name
+              avatarUrl
+              bio
+            }
+            content
+          }
+        }
+      `,
+    };
     try {
-      const res = await fetch("URL", {
+      const res = await fetch(SERVER_URL, {
         method: "POST",
-        body: JSON.stringify(requestOptions.query),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(graphqlQuery),
       });
-      const data = await res.json();
-      return data;
+      const json: RequestLastActivitiesJSON = await res.json();
+      return json.data.getUserActivities;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

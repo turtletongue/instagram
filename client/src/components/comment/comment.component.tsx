@@ -37,32 +37,43 @@ const Comment = ({ comment, full, page, ...otherProps }: CommentProps) => {
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.user.currentUser
   );
+  const token: string | null = localStorage.getItem("authToken");
   const commentLikeHandler = (comment: IComment) => {
     if (comment.id && user) {
-      const commentLike = {
-        postId,
-        commentId: comment.id,
-        likerId: user.id,
-      };
       switch (page) {
         case USER_PAGE:
-          dispatch(
-            isLiked
-              ? unlikeUserPageComment(commentLike)
-              : likeUserPageComment(commentLike)
-          );
+          if (token) {
+            if (isLiked)
+              dispatch(
+                unlikeUserPageComment({ token, postId, commentId: +comment.id })
+              );
+            else
+              dispatch(
+                likeUserPageComment({ token, postId, commentId: +comment.id })
+              );
+          }
           break;
         case POST_PAGE:
-          dispatch(
-            isLiked
-              ? unlikePostPageComment(comment.id)
-              : likePostPageComment(comment.id)
-          );
+          if (token) {
+            if (isLiked)
+              dispatch(
+                unlikePostPageComment({ token, postId, commentId: +comment.id })
+              );
+            else
+              dispatch(
+                likePostPageComment({ token, postId, commentId: +comment.id })
+              );
+          }
           break;
         default:
-          dispatch(
-            isLiked ? unlikeComment(commentLike) : likeComment(commentLike)
-          );
+          if (token) {
+            if (isLiked)
+              dispatch(
+                unlikeComment({ token, postId, commentId: +comment.id })
+              );
+            else
+              dispatch(likeComment({ token, postId, commentId: +comment.id }));
+          }
           break;
       }
     }

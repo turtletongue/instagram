@@ -9,16 +9,8 @@ interface ActivityProps {
 }
 
 const Activity = ({ data, ...otherProps }: ActivityProps) => {
-  let activityComment: string;
-  switch (data.type) {
-    case "LIKE":
-      activityComment = "liked your comment: ";
-      break;
-    default:
-      activityComment = "did something: ";
-  }
   return (
-    <Flex cursor="pointer" align="center" {...otherProps}>
+    <Flex cursor="pointer" align="center" {...otherProps} m="0.5rem 0">
       <Link to={`/${data.author.username}`}>
         <Avatar src={data.author?.avatarUrl} h="2rem" w="2rem" />
       </Link>
@@ -37,25 +29,9 @@ const Activity = ({ data, ...otherProps }: ActivityProps) => {
           {data.author.username}
         </Text>
       </Link>
-      {data.postId ? (
-        <Flex as={Link} to={`/p/${data.postId}`}>
-          <Text fontSize="xs" ml="0.3rem">
-            {activityComment}
-          </Text>
-          <Text fontSize="xs" ml="0.3rem">
-            {data.activityReceiverContent ? data.activityReceiverContent : ""}
-          </Text>
-        </Flex>
-      ) : (
-        <>
-          <Text fontSize="xs" minW="8rem" ml="0.3rem">
-            {activityComment}
-          </Text>
-          <Text fontSize="xs" ml="0.3rem">
-            {data.activityReceiverContent ? data.activityReceiverContent : ""}
-          </Text>
-        </>
-      )}
+      <Text fontSize="xs" minW="8rem" ml="0.3rem">
+        {data.content}
+      </Text>
     </Flex>
   );
 };

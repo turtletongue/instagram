@@ -1,5 +1,12 @@
+import { Input } from "@chakra-ui/input";
 import { Box, Divider, Text } from "@chakra-ui/layout";
 import { Modal, ModalBody, ModalContent, ModalOverlay } from "@chakra-ui/modal";
+import { Ref, useRef } from "react";
+import { useAppDispatch } from "../../redux/hooks";
+import {
+  removeCurrentPhoto,
+  uploadPhoto,
+} from "../../redux/profile-edit-page/profile-edit-page.slice";
 import ModalItem from "../modal-item/modal-item.component";
 
 interface ChangePhotoModalProps {
@@ -8,6 +15,13 @@ interface ChangePhotoModalProps {
 }
 
 const ChangePhotoModal = ({ isOpen, onClose }: ChangePhotoModalProps) => {
+  const dispatch = useAppDispatch();
+  const inputRef: Ref<HTMLInputElement> = useRef(null);
+  const changeAvatarHandler = (file: any) => {
+    dispatch(uploadPhoto({ fileData: file }));
+    onClose();
+  };
+  const token: string | null = localStorage.getItem("authToken");
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
@@ -24,7 +38,19 @@ const ChangePhotoModal = ({ isOpen, onClose }: ChangePhotoModalProps) => {
             </Text>
           </Box>
           <Divider />
-          <ModalItem>
+          <ModalItem
+            position="relative"
+            onClick={() => inputRef.current?.click()}
+          >
+            <Input
+              d="none"
+              type="file"
+              ref={inputRef}
+              onChange={(event: { target: HTMLInputElement }) => {
+                if (event.target.files)
+                  changeAvatarHandler(event.target.files[0]);
+              }}
+            />
             <Text
               textAlign="center"
               userSelect="none"
@@ -36,7 +62,14 @@ const ChangePhotoModal = ({ isOpen, onClose }: ChangePhotoModalProps) => {
             </Text>
           </ModalItem>
           <Divider />
-          <ModalItem>
+          <ModalItem
+            onClick={() => {
+              if (token) {
+                dispatch(removeCurrentPhoto({ token }));
+              }
+              onClose();
+            }}
+          >
             <Text
               textAlign="center"
               userSelect="none"

@@ -1,4 +1,4 @@
-import { Box, Flex, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, useDisclosure, useMediaQuery } from "@chakra-ui/react";
 import { useRef } from "react";
 import { IPost } from "../../redux/feed/feed.slice";
 import findTimeDifference from "../../utils/findTimeDifference.util";
@@ -26,6 +26,7 @@ const PostContainer = ({ post, full, page }: PostContainerProps) => {
     onOpen: onPostPageOpen,
     onClose: onPostPageClose,
   } = useDisclosure();
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <Box
       maxW={full ? "60rem" : "38rem"}
@@ -36,14 +37,26 @@ const PostContainer = ({ post, full, page }: PostContainerProps) => {
     >
       {full ? (
         <>
-          <Flex>
-            <PostContent
-              w="40rem"
-              imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
-            />
+          <Flex direction={isLessThan820 ? "column" : "row"}>
+            {isLessThan820 ? (
+              <PostHeader h="3.5rem" author={post.author} postId={post.id} />
+            ) : (
+              <></>
+            )}
+            <PostContent w="40rem" imageUrl={post.imageUrl} />
             <Box w="20rem" borderLeftWidth="1px">
-              <PostHeader h="4.5rem" author={post.author} postId={post.id} />
-              <FullComments comments={post.comments} page={page} />
+              {!isLessThan820 ? (
+                <>
+                  <PostHeader
+                    h="4.5rem"
+                    author={post.author}
+                    postId={post.id}
+                  />
+                  <FullComments comments={post.comments} page={page} />
+                </>
+              ) : (
+                <></>
+              )}
               <Box h="35%">
                 <Box p="0.8rem" bgColor="white" borderTopWidth="1px">
                   <PostActions
@@ -65,9 +78,7 @@ const PostContainer = ({ post, full, page }: PostContainerProps) => {
       ) : (
         <>
           <PostHeader author={post.author} postId={post.id} />
-          <PostContent
-            imageUrl={post.imagesUrls[0] ? post.imagesUrls[0] : ""}
-          />
+          <PostContent imageUrl={post.imageUrl} />
           <PostFooter
             inputRef={inputRef}
             post={post}

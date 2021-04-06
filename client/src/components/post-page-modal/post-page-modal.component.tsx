@@ -3,7 +3,7 @@ import { IPost } from "../../redux/feed/feed.slice";
 import PostContainer from "../post-container/post-container.component";
 
 interface PostPageModalProps {
-  post: IPost;
+  post: IPost | null;
   isOpen: boolean;
   onClose: () => void;
   page?: string;
@@ -22,7 +22,7 @@ const PostPageModal = ({ post, isOpen, onClose, page }: PostPageModalProps) => {
         bgColor="transparent"
       >
         <ModalBody p={0} m="auto">
-          <PostContainer post={post} full page={page} />
+          {post ? <PostContainer post={post} full page={page} /> : <></>}
         </ModalBody>
       </ModalContent>
     </Modal>

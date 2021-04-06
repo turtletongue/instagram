@@ -1,74 +1,62 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Flex,
-  FormControl,
-  Icon,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Spinner,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
-import { MouseEvent, useEffect } from "react";
-import { AiFillFacebook } from "react-icons/ai";
+import { Button } from "@chakra-ui/button";
+import { FormControl } from "@chakra-ui/form-control";
+import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
+import { Box, Flex, Text } from "@chakra-ui/layout";
+import { Spinner } from "@chakra-ui/spinner";
+import { useToast } from "@chakra-ui/toast";
+import { useEffect } from "react";
+import { useHistory } from "react-router";
 import { MIN_PASSWORD_LENGTH } from "../../constants";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
-  changeLoginInput,
-  changePasswordInput,
   hidePassword,
+  requestSignUp,
+  resetInputs,
+  resetSignUpSuccess,
+  setNameInput,
+  setPasswordInput,
+  setUsernameInput,
   showPassword,
-} from "../../redux/signin/signin.slice";
+} from "../../redux/signup/signup.slice";
 import { RootState } from "../../redux/store";
 import { requestSignIn } from "../../redux/user/user.slice";
 import CardContainer from "../card-container/card-container.component";
 import Logo from "../logo/logo.component";
 
-const SignInCard = () => {
+const SignUpCard = () => {
   const dispatch = useAppDispatch();
   const toast = useToast();
-  const login: string = useAppSelector(
-    (state: RootState) => state.signIn.login
+  const history = useHistory();
+  const name: string = useAppSelector((state: RootState) => state.signUp.name);
+  const username: string = useAppSelector(
+    (state: RootState) => state.signUp.username
   );
   const password: string = useAppSelector(
-    (state: RootState) => state.signIn.password
+    (state: RootState) => state.signUp.password
   );
   const isPasswordVisible: boolean = useAppSelector(
-    (state: RootState) => state.signIn.isPasswordVisible
-  );
-  const errorMessage: string | null = useAppSelector(
-    (state: RootState) => state.user.errorMessage
-  );
-  const isSignInPending: boolean = useAppSelector(
-    (state: RootState) => state.user.signInLoading === "loading"
+    (state: RootState) => state.signUp.isPasswordVisible
   );
   const isFormDataValid: boolean =
-    (login && password.length) >= MIN_PASSWORD_LENGTH;
-
-  const submitHandler = (event: React.MouseEvent) => {
-    event.preventDefault();
+    !!name && !!username && password.length >= MIN_PASSWORD_LENGTH;
+  const isSignUpPending: boolean = useAppSelector(
+    (state: RootState) => state.signUp.loading === "loading"
+  );
+  const errorMessage: string | null = useAppSelector(
+    (state: RootState) => state.signUp.errorMessage
+  );
+  const signUpSuccess: boolean | null = useAppSelector(
+    (state: RootState) => state.signUp.signUpSuccess
+  );
+  const submitHandler = () => {
     if (!isFormDataValid) return;
-    dispatch(requestSignIn({ input: { username: login, password } }));
+    dispatch(requestSignUp({ input: { name, username, password } }));
   };
-
-  useEffect(() => {
-    if (errorMessage) {
-      toast({
-        title: "Sign In error",
-        status: "error",
-        description: "Check that your username and password are correct.",
-      });
-    }
-  }, [dispatch, toast, errorMessage]);
-
   useEffect(() => {
     const listener: EventListener = (event: any) => {
       if (event.code === "Enter" || event.code === "NumpadEnter") {
         if (!isFormDataValid) return;
-        dispatch(requestSignIn({ input: { username: login, password } }));
+        dispatch(requestSignUp({ input: { name, username, password } }));
       }
     };
 
@@ -76,16 +64,50 @@ const SignInCard = () => {
     return () => {
       document.removeEventListener("keydown", listener);
     };
-  }, [dispatch, isFormDataValid, login, password]);
+  }, [dispatch, isFormDataValid, name, username, password]);
 
+  useEffect(() => {
+    if (signUpSuccess === true) {
+      dispatch(requestSignIn({ input: { username, password } }));
+      dispatch(resetInputs());
+      dispatch(resetSignUpSuccess());
+      history.push("/");
+    } else if (signUpSuccess === false) {
+      toast({
+        title: "Sign Up error",
+        status: "error",
+        description: errorMessage ? errorMessage : "",
+      });
+      dispatch(resetSignUpSuccess());
+    }
+  }, [
+    dispatch,
+    history,
+    toast,
+    signUpSuccess,
+    errorMessage,
+    username,
+    password,
+  ]);
   return (
-    <CardContainer>
+    <CardContainer left={0}>
       <Logo fontSize="5xl" />
+      <Flex w="100%" justify="center">
+        <Text
+          textAlign="center"
+          color="#7b7b7b"
+          fontWeight="500"
+          fontSize="lg"
+          maxW="15rem"
+        >
+          Sign Up to see photos from your friends.
+        </Text>
+      </Flex>
       <Box w="85%" mt="1.5rem">
-        <FormControl id="login">
+        <FormControl id="fullname" mt="0.5rem">
           <Input
-            value={login}
-            onChange={(event) => dispatch(changeLoginInput(event.target.value))}
+            value={name}
+            onChange={(event) => dispatch(setNameInput(event.target.value))}
             textOverflow="ellipsis"
             p="0.5rem"
             bgColor="#fafafa"
@@ -93,7 +115,28 @@ const SignInCard = () => {
             borderRadius={2}
             borderColor="gray.300"
             type="text"
-            placeholder="Phone, number, username, or email"
+            placeholder="Fullname"
+            sx={{
+              "&:focus": {
+                boxShadow: "none",
+                borderColor: "gray.500",
+                bgColor: "#fafafa",
+              },
+            }}
+          />
+        </FormControl>
+        <FormControl id="username" mt="0.5rem">
+          <Input
+            value={username}
+            onChange={(event) => dispatch(setUsernameInput(event.target.value))}
+            textOverflow="ellipsis"
+            p="0.5rem"
+            bgColor="#fafafa"
+            fontSize="xs"
+            borderRadius={2}
+            borderColor="gray.300"
+            type="text"
+            placeholder="Username"
             sx={{
               "&:focus": {
                 boxShadow: "none",
@@ -108,7 +151,7 @@ const SignInCard = () => {
             <Input
               value={password}
               onChange={(event) =>
-                dispatch(changePasswordInput(event.target.value))
+                dispatch(setPasswordInput(event.target.value))
               }
               p="0.5rem"
               bgColor="#fafafa"
@@ -156,9 +199,7 @@ const SignInCard = () => {
         <Button
           type="submit"
           cursor={isFormDataValid ? "pointer" : "default"}
-          onClick={(event: MouseEvent) => {
-            submitHandler(event);
-          }}
+          onClick={submitHandler}
           borderRadius="3px"
           mt="1rem"
           h="2rem"
@@ -178,55 +219,23 @@ const SignInCard = () => {
             },
           }}
         >
-          {!isSignInPending ? "Log In" : <Spinner size="xs" />}
+          {!isSignUpPending ? "Sign Up" : <Spinner size="xs" />}
         </Button>
-        <Flex mt="1rem" w="100%" align="center">
-          <Divider borderColor="gray.400" />
+        <Flex w="100%" justify="center">
           <Text
+            textAlign="center"
+            color="#7b7b7b"
             fontSize="xs"
-            fontWeight="semibold"
-            color="gray.500"
-            ml="1rem"
-            mr="1rem"
+            maxW="15rem"
+            m="1rem 0"
           >
-            OR
-          </Text>
-          <Divider borderColor="gray.400" />
-        </Flex>
-        <Flex
-          mt="1rem"
-          w="100%"
-          align="center"
-          justify="center"
-          cursor="pointer"
-          sx={{
-            "&:active": {
-              opacity: 0.6,
-            },
-          }}
-        >
-          <Icon as={AiFillFacebook} color="#385185" h={5} w={5} />
-          <Text ml="0.5rem" color="#385185" fontWeight="semibold" fontSize="sm">
-            Log in with Facebook
+            By signing up, you agree to our Terms , Data Policy and Cookies
+            Policy.
           </Text>
         </Flex>
-        <Text
-          mt="1rem"
-          textAlign="center"
-          fontSize="xs"
-          color="#385185"
-          cursor="pointer"
-          sx={{
-            "&:active": {
-              opacity: 0.6,
-            },
-          }}
-        >
-          Forgot password?
-        </Text>
       </Box>
     </CardContainer>
   );
 };
 
-export default SignInCard;
+export default SignUpCard;

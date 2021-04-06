@@ -10,6 +10,7 @@ export interface PostInstance extends Model {
   getComments: Function;
   createdAt: Date;
   updatedAt: Date;
+  dataValues?: PostInstance;
 }
 
 const Post = sequelize.define<PostInstance>("post", {

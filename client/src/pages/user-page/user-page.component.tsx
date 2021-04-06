@@ -1,14 +1,18 @@
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Center, Divider, Flex, Spacer, Text } from "@chakra-ui/layout";
+import { useMediaQuery } from "@chakra-ui/media-query";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import Avatar from "../../components/avatar/avatar.component";
 import Categories from "../../components/categories/categories.component";
 import ChangePhotoModal from "../../components/change-photo-modal/change-photo-modal.component";
+import FollowersModal from "../../components/followers-modal/followers-modal.component";
+import FollowingModal from "../../components/following-modal/following-modal.component";
 import Header from "../../components/header/header.component";
 import NoPostsBanner from "../../components/no-posts-banner/no-posts-banner.component";
 import ProfileData from "../../components/profile-data/profile-data.component";
 import UserPosts from "../../components/user-posts/user-posts.component";
+import UserStatistics from "../../components/user-statistics/user-statistics.component";
 import { IPost } from "../../redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
@@ -16,99 +20,37 @@ import {
   POSTS,
   requestUserData,
   requestUserPagePosts,
+  requestUserPageSavedPosts,
   selectAllUserPagePosts,
 } from "../../redux/user-page/user-page.slice";
-import { IUser } from "../../redux/user/user.slice";
+import { IUser, requestUserById } from "../../redux/user/user.slice";
 
 const UserPage = () => {
   const params: any = useParams();
-  const userId: string = params.userId;
+  const username: string = params.username;
   const dispatch = useAppDispatch();
+  const token: string | null = localStorage.getItem("authToken");
+  const isUnfollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.unfollowLoading === "loading"
+  );
+  const isFollowLoading: boolean = useAppSelector(
+    (state: RootState) => state.userPage.followLoading === "loading"
+  );
   useEffect(() => {
-    dispatch(
-      requestUserData({
-        testData: {
-          userId: "lustervolt",
-          avatarUrl:
-            "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-          fullname: "Volt Luster",
-          followers: [
-            {
-              userId: "lustervolt1",
-              fullname: "Shrimp Shrimp",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-            {
-              userId: "lustervolt2",
-              fullname: "Shrimp Shrimp",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-          ],
-          following: [
-            {
-              userId: "lustervolt1",
-              fullname: "Shrimp Shrimp",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-            {
-              userId: "lustervolt2",
-              fullname: "Shrimp Shrimp",
-              avatarUrl:
-                "https://scontent-frt3-2.cdninstagram.com/v/t51.2885-19/s150x150/72549396_389185031989753_382381312025034752_n.jpg?tp=1&_nc_ht=scontent-frt3-2.cdninstagram.com&_nc_ohc=x7AMNhpuNJUAX_eghOn&oh=b3fc4b38bd8450a60f749677d408e8ba&oe=60782C28",
-            },
-          ],
-        },
-      })
-    );
-    dispatch(
-      requestUserPagePosts({
-        testData: [
-          {
-            id: 32324,
-            author: {
-              userId: "lustervolt",
-              fullname: "Volt Luster",
-              avatarUrl:
-                "https://scontent-frx5-1.cdninstagram.com/v/t51.2885-19/s320x320/37180174_2128883647392391_2180509584274227200_n.jpg?tp=1&_nc_ht=scontent-frx5-1.cdninstagram.com&_nc_ohc=p-XguE5bCK8AX9v4QS1&oh=80bd6ca7e744d819747cd5253d77a6fb&oe=606DB111",
-            },
-            imagesUrls: [
-              "https://scontent-arn2-1.cdninstagram.com/v/t51.2885-15/fr/e15/s1080x1080/155789273_770007063608934_120234005437861096_n.jpg?tp=1&_nc_ht=scontent-arn2-1.cdninstagram.com&_nc_cat=1&_nc_ohc=hSW3tHEk1GYAX8xMnU2&oh=10f1ad2d881737396eacbbc8362bc0d4&oe=606D1DB9",
-            ],
-            likesCount: 2454,
-            isLiked: false,
-            isBookmarked: false,
-            isDataVisible: false,
-            createdAt: new Date().toISOString(),
-            comments: [
-              {
-                id: 1,
-                postId: 32324,
-                authorId: "lindsayjmariiiie",
-                content: "@lindsayjmarie",
-                writedAt: new Date(2021, 2, 5).toISOString(),
-                likersIds: [],
-                isLiked: false,
-                replies: [],
-              },
-              {
-                id: 2,
-                postId: 32324,
-                authorId: "lindsayjmarie",
-                content: "Hello there!",
-                writedAt: new Date(2021, 2, 5).toISOString(),
-                likersIds: [],
-                isLiked: false,
-                replies: [],
-              },
-            ],
-          },
-        ],
-      })
-    );
-  }, [dispatch, userId]);
+    if (token) {
+      dispatch(requestUserData({ input: { username } }));
+      dispatch(requestUserPagePosts({ input: { username, token } }));
+      dispatch(requestUserPageSavedPosts({ input: { token } }));
+    }
+  }, [dispatch, username, token, isUnfollowLoading, isFollowLoading]);
+  const loggedUser: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  useEffect(() => {
+    if ((!isUnfollowLoading || !isFollowLoading) && loggedUser?.id) {
+      dispatch(requestUserById({ input: { userId: Number(loggedUser.id) } }));
+    }
+  }, [dispatch, isUnfollowLoading, isFollowLoading, loggedUser?.id]);
   const state: RootState = useAppSelector((state: RootState) => state);
   const user: IUser | null = useAppSelector(
     (state: RootState) => state.userPage.user
@@ -124,16 +66,64 @@ const UserPage = () => {
   const savedPosts: IPost[] = userPagePosts.filter(
     (post: IPost) => post.isBookmarked
   );
+  const isItLoggedUserPage: boolean = useAppSelector(
+    (state: RootState) => state.user.currentUser?.id === user?.id
+  );
+  const currentUser: IUser | null = useAppSelector(
+    (state: RootState) => state.user.currentUser
+  );
+  let isFollowed: boolean = false;
+  if (currentUser) {
+    isFollowed = currentUser?.following
+      ? currentUser.following.findIndex(
+          (followingUser: IUser) => followingUser.id === user?.id
+        ) !== -1
+      : false;
+  }
   const {
     isOpen: isChangePhotoModalOpen,
     onOpen: onChangePhotoModalOpen,
     onClose: onChangePhotoModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isFollowersModalOpen,
+    onOpen: onFollowersModalOpen,
+    onClose: onFollowersModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isFollowingModalOpen,
+    onOpen: onFollowingModalOpen,
+    onClose: onFollowingModalClose,
+  } = useDisclosure();
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <>
+      {user ? (
+        <>
+          <FollowersModal
+            isOpen={isFollowersModalOpen}
+            onClose={onFollowersModalClose}
+            user={user}
+          />
+          <FollowingModal
+            isOpen={isFollowingModalOpen}
+            onClose={onFollowingModalClose}
+            user={user}
+            isOtherUserFollowing={!isItLoggedUserPage}
+          />
+        </>
+      ) : (
+        <></>
+      )}
       <Header />
       <Box
-        p={user ? "5rem 0 1rem 12rem" : "5rem 0 1rem 0"}
+        p={
+          !isLessThan820
+            ? user
+              ? "5rem 0 1rem 12rem"
+              : "5rem 0 1rem 0"
+            : "4rem 0 1rem 0"
+        }
         w="100%"
         minH="100vh"
         bgColor="#fafafa"
@@ -144,24 +134,55 @@ const UserPage = () => {
               isOpen={isChangePhotoModalOpen}
               onClose={onChangePhotoModalClose}
             />
-            <Flex align="center" ml="4rem" maxW="33rem">
+            <Flex
+              align="center"
+              ml={isLessThan820 ? "1rem" : "4rem"}
+              maxW="33rem"
+            >
               <Avatar
-                w="9rem"
-                h="9rem"
+                w={isLessThan820 ? "4.5rem" : "9rem"}
+                h={isLessThan820 ? "4.5rem" : "9rem"}
                 src={user.avatarUrl}
                 onClick={onChangePhotoModalOpen}
               />
-              <Spacer />
-              <ProfileData user={user} postsCount={userPosts.length} />
+              {!isLessThan820 ? <Spacer /> : <></>}
+              <ProfileData
+                user={user}
+                postsCount={userPosts.length}
+                ml="1rem"
+                isItPageOfLoggedUser={isItLoggedUserPage}
+                isFollowed={isFollowed}
+                onFollowersModalOpen={onFollowersModalOpen}
+                onFollowingModalOpen={onFollowingModalOpen}
+              />
             </Flex>
-            <Divider mt="4rem" maxW="58rem" borderColor="#c7c7c7" />
+            {isLessThan820 ? (
+              <>
+                <Divider mt="4rem" maxW="58rem" borderColor="#c7c7c7" />
+                <UserStatistics
+                  postsCount={userPosts.length}
+                  user={user}
+                  onFollowersModalOpen={onFollowersModalOpen}
+                  onFollowingModalOpen={onFollowingModalOpen}
+                />
+              </>
+            ) : (
+              <></>
+            )}
+            <Divider
+              mt={isLessThan820 ? "1rem" : "4rem"}
+              maxW="58rem"
+              borderColor="#c7c7c7"
+            />
             <Categories />
             <Center maxW="60rem">
               {category === POSTS ? (
                 userPosts.length ? (
                   <UserPosts posts={userPosts} />
-                ) : (
+                ) : isItLoggedUserPage ? (
                   <NoPostsBanner />
+                ) : (
+                  <></>
                 )
               ) : (
                 <UserPosts posts={savedPosts} />

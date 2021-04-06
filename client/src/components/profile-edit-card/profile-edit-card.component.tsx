@@ -1,4 +1,5 @@
 import { Flex } from "@chakra-ui/layout";
+import { useMediaQuery } from "@chakra-ui/media-query";
 import { useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
 import { IUser } from "../../redux/user/user.slice";
@@ -14,6 +15,7 @@ const ProfileEditCard = ({ user }: ProfileEditCardProps) => {
   const activeTabId: number = useAppSelector(
     (state: RootState) => state.profileEditPage.activeTabId
   );
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <Flex
       align="center"
@@ -21,12 +23,12 @@ const ProfileEditCard = ({ user }: ProfileEditCardProps) => {
       borderWidth="1px"
       borderRadius="5px"
       overflow="hidden"
-      w="65%"
+      w={isLessThan820 ? "100%" : "65%"}
       h="85vh"
       position="relative"
       top="2rem"
     >
-      <ProfileEditTabs />
+      {!isLessThan820 ? <ProfileEditTabs /> : <></>}
       {activeTabId === 0 ? (
         <ProfileEditForm user={user} /> // Edit Profile
       ) : (

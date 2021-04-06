@@ -6,7 +6,11 @@ import { useHistory } from "react-router";
 import BorderButton from "../border-button/border-button.component";
 import ProfileSettingsModal from "../profile-settings-modal/profile-settings-modal.component";
 
-const ProfileParams = () => {
+interface ProfileParamsProps {
+  [propName: string]: any;
+}
+
+const ProfileParams = ({ ...otherProps }: ProfileParamsProps) => {
   const {
     isOpen: isProfileSettingsModalOpen,
     onOpen: onProfileSettingsModalOpen,
@@ -19,7 +23,10 @@ const ProfileParams = () => {
         isOpen={isProfileSettingsModalOpen}
         onClose={onProfileSettingsModalClose}
       />
-      <BorderButton onClick={() => history.push("/accounts/edit/")}>
+      <BorderButton
+        onClick={() => history.push("/accounts/edit/")}
+        {...otherProps}
+      >
         Edit Profile
       </BorderButton>
       <Icon
