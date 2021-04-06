@@ -17,11 +17,11 @@ const app = express();
 
 app.use(compression());
 
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: "http://localhost:5000" }));
 
 app.use(auth);
 
-app.options("/graphql", cors({ origin: "http://localhost:3000" }));
+app.options("/graphql", cors({ origin: "http://localhost:5000" }));
 app.use(
   "/graphql",
   graphqlHTTP({

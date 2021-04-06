@@ -19,7 +19,7 @@ const PostPage = () => {
     if (token) {
       dispatch(requestPostById({ input: { postId: +postId, token } }));
     }
-  }, [dispatch, postId]);
+  }, [dispatch, postId, token]);
   const isLoading: boolean = useAppSelector(
     (state: RootState) => state.postPage.postLoading === "loading"
   );
