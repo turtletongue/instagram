@@ -41,8 +41,6 @@ const NoPostsBanner = () => {
         <Image
           src="https://www.instagram.com/static/images/mediaUpsell.jpg/6efc710a1d5a.jpg"
           alt="Share your moments."
-          maxW="22rem"
-          maxH="22rem"
         />
       ) : (
         <></>
