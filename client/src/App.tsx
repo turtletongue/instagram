@@ -1,18 +1,24 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Route } from "react-router";
 import { Switch } from "react-router-dom";
+import ErrorBoundary from "./components/error-boundary/error-boundary.component";
 import Fonts from "./components/fonts/fonts.component";
-import HomePage from "./pages/homepage/homepage.component";
-import PostPage from "./pages/post-page/post-page.component";
-import EditProfilePage from "./pages/profile-edit-page/profile-edit-page.component";
-import SignIn from "./pages/signIn/signIn.component";
-import SignUpPage from "./pages/signup-page/signup-page.component";
-import UserPage from "./pages/user-page/user-page.component";
+import LoadingScreen from "./components/loading-screen/loading-screen.component";
 import { requestLastActivities } from "./redux/activities/activities.slice";
 import { incrementPostSlice } from "./redux/feed/feed.slice";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { RootState } from "./redux/store";
 import { checkIsLogged, requestUserById } from "./redux/user/user.slice";
+const HomePage = lazy(() => import("./pages/homepage/homepage.component"));
+const PostPage = lazy(() => import("./pages/post-page/post-page.component"));
+const EditProfilePage = lazy(
+  () => import("./pages/profile-edit-page/profile-edit-page.component")
+);
+const SignIn = lazy(() => import("./pages/signIn/signIn.component"));
+const SignUpPage = lazy(
+  () => import("./pages/signup-page/signup-page.component")
+);
+const UserPage = lazy(() => import("./pages/user-page/user-page.component"));
 
 const App = () => {
   const dispatch = useAppDispatch();
@@ -48,31 +54,35 @@ const App = () => {
   return (
     <>
       <Fonts />
-      {!isAuth ? (
-        <Switch>
-          <Route path="/accounts/emailsignup">
-            <SignUpPage />
-          </Route>
-          <Route path="/">
-            <SignIn />
-          </Route>
-        </Switch>
-      ) : (
-        <Switch>
-          <Route exact path="/">
-            <HomePage />
-          </Route>
-          <Route path="/accounts/edit">
-            <EditProfilePage />
-          </Route>
-          <Route path="/p/:postId">
-            <PostPage />
-          </Route>
-          <Route path="/:username">
-            <UserPage />
-          </Route>
-        </Switch>
-      )}
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingScreen />}>
+          {!isAuth ? (
+            <Switch>
+              <Route path="/accounts/emailsignup">
+                <SignUpPage />
+              </Route>
+              <Route path="/">
+                <SignIn />
+              </Route>
+            </Switch>
+          ) : (
+            <Switch>
+              <Route exact path="/">
+                <HomePage />
+              </Route>
+              <Route path="/accounts/edit">
+                <EditProfilePage />
+              </Route>
+              <Route path="/p/:postId">
+                <PostPage />
+              </Route>
+              <Route path="/:username">
+                <UserPage />
+              </Route>
+            </Switch>
+          )}
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 };

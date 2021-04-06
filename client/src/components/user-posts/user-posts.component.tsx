@@ -1,4 +1,9 @@
-import { Box, SimpleGrid, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  SimpleGrid,
+  useDisclosure,
+  useMediaQuery,
+} from "@chakra-ui/react";
 import { Fragment } from "react";
 import { USER_PAGE } from "../../constants";
 import { IPost } from "../../redux/feed/feed.slice";
@@ -36,12 +41,12 @@ const UserPosts = ({ posts }: UserPostsProps) => {
     onOpen: onPostPageOpen,
     onClose: onPostPageClose,
   } = useDisclosure();
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <SimpleGrid
-      minChildWidth="16rem"
       maxW="65rem"
       columns={3}
-      spacing="1.5rem"
+      spacing={isLessThan820 ? "0.2rem" : "1.5rem"}
       mt="1rem"
     >
       <PostPageModal

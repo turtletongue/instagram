@@ -1,5 +1,6 @@
 import { useDisclosure } from "@chakra-ui/hooks";
 import { Box, Flex, Text, VStack } from "@chakra-ui/layout";
+import { useMediaQuery } from "@chakra-ui/media-query";
 import { Textarea } from "@chakra-ui/textarea";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import {
@@ -48,14 +49,15 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
     onOpen: onChangePhotoModalOpen,
     onClose: onChangePhotoModalClose,
   } = useDisclosure();
+  const [isLessThan820] = useMediaQuery("(max-width: 820px)");
   return (
     <>
       <ChangePhotoModal
         isOpen={isChangePhotoModalOpen}
         onClose={onChangePhotoModalClose}
       />
-      <VStack w="100%" spacing="1rem">
-        <Flex w="60%" align="center">
+      <VStack w="100%" spacing="1rem" p={isLessThan820 ? "0 1rem" : 0}>
+        <Flex w={isLessThan820 ? "90%" : "60%"} align="center">
           <Avatar
             src={user?.avatarUrl}
             h="2.5rem"
@@ -79,44 +81,80 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
             </Text>
           </Box>
         </Flex>
-        <Flex w="80%" align="center">
-          <Text fontSize="md" fontWeight="500" w="7rem" textAlign="end">
+        <Flex
+          w={isLessThan820 ? "100%" : "80%"}
+          align={isLessThan820 ? "" : "center"}
+          direction={isLessThan820 ? "column" : "row"}
+        >
+          <Text
+            fontSize="md"
+            fontWeight="500"
+            w="7rem"
+            textAlign={isLessThan820 ? "unset" : "end"}
+          >
             Name
           </Text>
           <ProfileEditInput
-            ml="1.5rem"
+            ml={isLessThan820 ? 0 : "1.5rem"}
             value={nameInput}
             onChange={(event: { target: HTMLInputElement }) =>
               dispatch(setNameInput(event.target.value))
             }
           />
         </Flex>
-        <Flex w="80%" align="center">
+        <Flex
+          w={isLessThan820 ? "100%" : "80%"}
+          align={isLessThan820 ? "" : "center"}
+          direction={isLessThan820 ? "column" : "row"}
+        >
           <Box w="8.5rem" />
-          <Text fontSize="0.7rem" color="#929292" textAlign="justify" w="65%">
+          <Text
+            fontSize="0.7rem"
+            color="#929292"
+            textAlign="justify"
+            w={isLessThan820 ? "100%" : "65%"}
+          >
             Help people discover your account by using the name you're known by:
             either your full name, nickname, or business name.
           </Text>
         </Flex>
-        <Flex w="80%" align="center">
-          <Text fontSize="md" fontWeight="500" w="7rem" textAlign="end">
+        <Flex
+          w={isLessThan820 ? "100%" : "80%"}
+          align={isLessThan820 ? "" : "center"}
+          direction={isLessThan820 ? "column" : "row"}
+        >
+          <Text
+            fontSize="md"
+            fontWeight="500"
+            w="7rem"
+            textAlign={isLessThan820 ? "unset" : "end"}
+          >
             Username
           </Text>
           <ProfileEditInput
-            ml="1.5rem"
+            ml={isLessThan820 ? 0 : "1.5rem"}
             value={usernameInput}
             onChange={(event: { target: HTMLInputElement }) =>
               dispatch(setUsernameInput(event.target.value))
             }
           />
         </Flex>
-        <Flex w="80%" align="center">
-          <Text fontSize="md" fontWeight="500" w="7rem" textAlign="end">
+        <Flex
+          w={isLessThan820 ? "100%" : "80%"}
+          align={isLessThan820 ? "" : "center"}
+          direction={isLessThan820 ? "column" : "row"}
+        >
+          <Text
+            fontSize="md"
+            fontWeight="500"
+            w="7rem"
+            textAlign={isLessThan820 ? "unset" : "end"}
+          >
             Bio
           </Text>
           <Textarea
-            ml="1.5rem"
-            w="65%"
+            ml={isLessThan820 ? 0 : "1.5rem"}
+            w={isLessThan820 ? "100%" : "65%"}
             borderRadius={3}
             borderColor="#adadad"
             value={bioInput}
@@ -132,8 +170,8 @@ const ProfileEditForm = ({ user }: ProfileEditFormProps) => {
             }}
           />
         </Flex>
-        <Flex w="80%" align="center" pt="1rem">
-          <Box w="8.5rem" />
+        <Flex w={isLessThan820 ? "100%" : "80%"} align="center" pt="1rem">
+          {!isLessThan820 ? <Box w="8.5rem" /> : <></>}
           <SubmitButton isActive={!!usernameInput} onClick={submitHandler} />
         </Flex>
       </VStack>

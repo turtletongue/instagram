@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, useMediaQuery } from "@chakra-ui/react";
+import { Box, Spinner, useMediaQuery } from "@chakra-ui/react";
 import { IPost, selectAllPosts } from "../../redux/feed/feed.slice";
 import { useAppSelector } from "../../redux/hooks";
 import { RootState } from "../../redux/store";
@@ -23,21 +23,12 @@ const Feed = () => {
           return <PostContainer key={index} post={post} />;
         })}
       {isSliceLoading ? (
-        <Flex
-          w="100%"
-          justify="center"
-          align="center"
+        <Box
+          p={isLessThan820 ? "3rem 1rem 0 43vw " : "6rem 0 1rem 12rem"}
           m="1rem 0"
-          p={
-            !!!posts.length
-              ? isLessThan820
-                ? "3rem 0 0 0"
-                : "6rem 0 1rem 12rem"
-              : 0
-          }
         >
           <Spinner color="black" size="lg" />
-        </Flex>
+        </Box>
       ) : (
         <></>
       )}

@@ -6,7 +6,7 @@ import SignUpCard from "../../components/signup-card/signup-card.component";
 
 const SignUpPage = () => {
   return (
-    <Center w="100%" h="100vh" bgColor="#fafafa">
+    <Center w="100%" minH="100vh" bgColor="#fafafa">
       <Flex>
         <Box h="100%" mt="2rem" mb="2rem">
           <SignUpCard />
