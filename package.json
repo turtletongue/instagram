@@ -9,7 +9,7 @@
     "tsc": "tsc",
     "server": "nodemon -r dotenv/config dist/server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "build": "tsc && cd client && npm run build",
+    "build": "tsc && cd client && npm install && npm run build",
     "start": "node dist/server.js",
     "postinstall": "tsc"
   },
