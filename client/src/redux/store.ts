@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import activitiesReducer from "./activities/activities.slice";
 import feedReducer from "./feed/feed.slice";
-import fullCommentsReducer from "./full-comments/full-comments.slice";
 import headerReducer from "./header/header.slice";
 import postPageReducer from "./post-page/post-page.slice";
 import profileEditPageReducer from "./profile-edit-page/profile-edit-page.slice";
@@ -18,7 +17,6 @@ const store = configureStore({
     user: userReducer,
     searchInput: searchInputReducer,
     feed: feedReducer,
-    fullComments: fullCommentsReducer,
     userPage: userPageReducer,
     postPage: postPageReducer,
     header: headerReducer,

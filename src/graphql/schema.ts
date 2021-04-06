@@ -21,6 +21,7 @@ export default buildSchema(`
     userId: Int!
     isLiked: Boolean!
     authorName: String!
+    authorAvatar: String!
     postId: Int!
   }
 

@@ -13,6 +13,7 @@ import { IUser } from "../user/user.slice";
 export interface IComment {
   id: number;
   authorName: string;
+  authorAvatar: string;
   createdAt: string;
   isLiked: boolean;
   content: string;
@@ -63,6 +64,7 @@ export const requestSliceOfPosts = createAsyncThunk(
               content
               isLiked
               authorName
+              authorAvatar
               createdAt
               postId
             }
@@ -259,6 +261,7 @@ export const addComment = createAsyncThunk(
             isLiked
             postId
             authorName
+            authorAvatar
           }
         }
       `,

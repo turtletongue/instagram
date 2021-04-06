@@ -48,6 +48,7 @@ export const requestPostById = createAsyncThunk(
               content
               isLiked
               authorName
+              authorAvatar
               createdAt
               postId
             }
@@ -244,6 +245,7 @@ export const addPostPageComment = createAsyncThunk(
             isLiked
             postId
             authorName
+            authorAvatar
           }
         }
       `,

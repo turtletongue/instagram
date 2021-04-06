@@ -282,6 +282,7 @@ export const requestUserPageSavedPosts = createAsyncThunk(
               content
               isLiked
               authorName
+              authorAvatar
               createdAt
               postId
             }
@@ -475,6 +476,7 @@ export const addUserPageComment = createAsyncThunk(
             isLiked
             postId
             authorName
+            authorAvatar
           }
         }
       `,

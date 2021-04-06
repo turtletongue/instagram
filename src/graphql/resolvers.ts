@@ -38,6 +38,7 @@ interface IComment {
   createdAt: string;
   updatedAt: string;
   authorName: string;
+  authorAvatar: string;
   postId: number;
 }
 
@@ -245,7 +246,11 @@ export default {
       authorName: user.username,
       content,
     });
-    return { ...createdComment.dataValues, isLiked: false };
+    return {
+      ...createdComment.dataValues,
+      isLiked: false,
+      authorAvatar: user.avatarUrl,
+    };
   },
   login: async ({ username, password }: LoginArgs) => {
     const userData: UserInstance = await User.findOne({ where: { username } });
@@ -360,12 +365,18 @@ export default {
                 if (like) {
                   isLiked = true;
                 }
+                const commentAuthor: UserInstance = await User.findOne({
+                  where: { username: commentData.authorName },
+                });
                 comments.push({
                   id: commentData.id,
                   content: commentData.content,
                   isLiked,
                   postId: post.id,
                   authorName: commentData.authorName,
+                  authorAvatar: commentAuthor?.avatarUrl
+                    ? commentAuthor.avatarUrl
+                    : "",
                   createdAt: commentData.createdAt.toISOString(),
                   updatedAt: commentData.updatedAt.toISOString(),
                 });
@@ -610,12 +621,18 @@ export default {
             if (like) {
               isLiked = true;
             }
+            const commentAuthor: UserInstance = await User.findOne({
+              where: { username: commentData.authorName },
+            });
             comments.push({
               id: commentData.id,
               content: commentData.content,
               isLiked,
               postId: postData.id,
               authorName: commentData.authorName,
+              authorAvatar: commentAuthor?.avatarUrl
+                ? commentAuthor.avatarUrl
+                : "",
               createdAt: commentData.createdAt.toISOString(),
               updatedAt: commentData.updatedAt.toISOString(),
             });
@@ -695,12 +712,18 @@ export default {
             if (like) {
               isLiked = true;
             }
+            const commentAuthor: UserInstance = await User.findOne({
+              where: { username: commentData.authorName },
+            });
             comments.push({
               id: commentData.id,
               content: commentData.content,
               isLiked,
               postId: postData.id,
               authorName: commentData.authorName,
+              authorAvatar: commentAuthor?.avatarUrl
+                ? commentAuthor.avatarUrl
+                : "",
               createdAt: commentData.createdAt.toISOString(),
               updatedAt: commentData.updatedAt.toISOString(),
             });
@@ -768,12 +791,16 @@ export default {
         if (like) {
           isLiked = true;
         }
+        const commentAuthor: UserInstance = await User.findOne({
+          where: { username: commentData.authorName },
+        });
         comments.push({
           id: commentData.id,
           content: commentData.content,
           isLiked,
           postId: postData.id,
           authorName: commentData.authorName,
+          authorAvatar: commentAuthor?.avatarUrl ? commentAuthor.avatarUrl : "",
           createdAt: commentData.createdAt.toISOString(),
           updatedAt: commentData.updatedAt.toISOString(),
         });
