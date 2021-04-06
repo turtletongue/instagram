@@ -10,7 +10,8 @@
     "server": "nodemon -r dotenv/config dist/server.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "build": "tsc && cd client && npm run build",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "postinstall": "tsc"
   },
   "repository": {
     "type": "git",
