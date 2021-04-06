@@ -21,7 +21,7 @@ const PostActionsModal = ({
   postId,
   author,
 }: PostActionsModalProps) => {
-  const { onCopy } = useClipboard(`http://localhost:3000/p/${postId}`);
+  const { onCopy } = useClipboard(`http://localhost:5000/p/${postId}`);
   const toast = useToast();
   const copyLinkHandler = () => {
     onCopy();
