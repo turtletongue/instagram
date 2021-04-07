@@ -288,6 +288,9 @@ export default {
     if (following) {
       throw new Error("Following is already created.");
     }
+    if (followingUser.id === req.userId) {
+      throw new Error("Following and follower should not be equal.");
+    }
     await Followers.create({ followerId: req.userId, followingId });
     await followingUser.createActivity({
       content: `started following you.`,
@@ -458,10 +461,12 @@ export default {
       throw new Error("Author of comment not found.");
     }
 
-    await commentAuthor.createActivity({
-      content: "liked your comment.",
-      authorId: req.userId,
-    });
+    if (commentAuthor.id !== req.userId) {
+      await commentAuthor.createActivity({
+        content: "liked your comment.",
+        authorId: req.userId,
+      });
+    }
 
     const createdLike: LikeInstance = await Like.create({
       commentId,
@@ -844,9 +849,7 @@ export default {
     return user.dataValues;
   },
   updateUserData: async (
-    {
-      updateUserDataInput: { name, username, bio, avatarUrl },
-    }: UpdateUserDataArgs,
+    { updateUserDataInput: { name, username, bio } }: UpdateUserDataArgs,
     req: AuthRequest
   ) => {
     if (!req.isAuth) {
@@ -868,7 +871,6 @@ export default {
     existingUser.name = name ? name : "";
     existingUser.username = username;
     existingUser.bio = bio ? bio : "";
-    existingUser.avatarUrl = avatarUrl ? avatarUrl : "";
     await existingUser.save();
     return true;
   },
@@ -903,6 +905,9 @@ export default {
     const receiver: UserInstance = await User.findByPk(receiverId);
     if (!receiver) {
       throw new Error("User not found.");
+    }
+    if (receiver.id === req.userId) {
+      throw new Error("Receiver and sender should not be equal.");
     }
     const createdActivity: ActivityInstance = await receiver.createActivity({
       content,
